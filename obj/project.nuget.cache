@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "/sjIcgHcsKM=",
+  "dgSpecHash": "GCRHwM4A8vk=",
   "success": true,
   "projectFilePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
   "expectedPackageFiles": [
@@ -59,8 +59,9 @@
     "/Users/larajohnson/.nuget/packages/humanizer.core.zh-hant/2.14.1/humanizer.core.zh-hant.2.14.1.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/mailkit/4.0.0/mailkit.4.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.0/microsoft.aspnetcore.authentication.jwtbearer.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.aspnetcore.cryptography.internal/8.0.0/microsoft.aspnetcore.cryptography.internal.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.aspnetcore.cryptography.keyderivation/8.0.0/microsoft.aspnetcore.cryptography.keyderivation.8.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.aspnetcore.identity.entityframeworkcore/8.0.0/microsoft.aspnetcore.identity.entityframeworkcore.8.0.0.nupkg.sha512",
-    "/Users/larajohnson/.nuget/packages/microsoft.aspnetcore.openapi/10.0.2/microsoft.aspnetcore.openapi.10.0.2.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.aspnetcore.razor.language/6.0.24/microsoft.aspnetcore.razor.language.6.0.24.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.bcl.asyncinterfaces/7.0.0/microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.build/17.7.2/microsoft.build.17.7.2.nupkg.sha512",
@@ -90,7 +91,18 @@
     "/Users/larajohnson/.nuget/packages/microsoft.entityframeworkcore.sqlite.core/8.0.0/microsoft.entityframeworkcore.sqlite.core.8.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.entityframeworkcore.sqlserver/8.0.0/microsoft.entityframeworkcore.sqlserver.8.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.entityframeworkcore.tools/8.0.0/microsoft.entityframeworkcore.tools.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.caching.abstractions/8.0.0/microsoft.extensions.caching.abstractions.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.caching.memory/8.0.0/microsoft.extensions.caching.memory.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.configuration.abstractions/8.0.0/microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.dependencyinjection/8.0.0/microsoft.extensions.dependencyinjection.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.extensions.dependencymodel/8.0.0/microsoft.extensions.dependencymodel.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.identity.core/8.0.0/microsoft.extensions.identity.core.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.identity.stores/8.0.0/microsoft.extensions.identity.stores.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.logging/8.0.0/microsoft.extensions.logging.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.options/8.0.0/microsoft.extensions.options.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/microsoft.extensions.primitives/8.0.0/microsoft.extensions.primitives.8.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.identity.client/4.47.2/microsoft.identity.client.4.47.2.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.identity.client.extensions.msal/2.19.3/microsoft.identity.client.extensions.msal.2.19.3.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.identitymodel.abstractions/7.0.3/microsoft.identitymodel.abstractions.7.0.3.nupkg.sha512",
@@ -100,7 +112,6 @@
     "/Users/larajohnson/.nuget/packages/microsoft.identitymodel.protocols.openidconnect/7.0.3/microsoft.identitymodel.protocols.openidconnect.7.0.3.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.identitymodel.tokens/7.0.3/microsoft.identitymodel.tokens.7.0.3.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.net.stringtools/17.7.2/microsoft.net.stringtools.17.7.2.nupkg.sha512",
-    "/Users/larajohnson/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.sqlserver.server/1.0.0/microsoft.sqlserver.server.1.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.visualstudio.web.codegeneration/8.0.0/microsoft.visualstudio.web.codegeneration.8.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/microsoft.visualstudio.web.codegeneration.core/8.0.0/microsoft.visualstudio.web.codegeneration.core.8.0.0.nupkg.sha512",
@@ -127,6 +138,7 @@
     "/Users/larajohnson/.nuget/packages/sqlitepclraw.lib.e_sqlite3/2.1.6/sqlitepclraw.lib.e_sqlite3.2.1.6.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/sqlitepclraw.provider.e_sqlite3/2.1.6/sqlitepclraw.provider.e_sqlite3.2.1.6.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.codedom/5.0.0/system.codedom.5.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.collections.immutable/7.0.0/system.collections.immutable.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.composition/7.0.0/system.composition.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.composition.attributedmodel/7.0.0/system.composition.attributedmodel.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.composition.convention/7.0.0/system.composition.convention.7.0.0.nupkg.sha512",
@@ -135,184 +147,31 @@
     "/Users/larajohnson/.nuget/packages/system.composition.typedparts/7.0.0/system.composition.typedparts.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.configuration.configurationmanager/7.0.0/system.configuration.configurationmanager.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.data.datasetextensions/4.5.0/system.data.datasetextensions.4.5.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.diagnostics.diagnosticsource/6.0.0/system.diagnostics.diagnosticsource.6.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.diagnostics.eventlog/7.0.0/system.diagnostics.eventlog.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.drawing.common/7.0.0/system.drawing.common.7.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.formats.asn1/6.0.0/system.formats.asn1.6.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.identitymodel.tokens.jwt/7.0.3/system.identitymodel.tokens.jwt.7.0.3.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.io.pipelines/7.0.0/system.io.pipelines.7.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.memory/4.5.4/system.memory.4.5.4.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.memory.data/1.0.2/system.memory.data.1.0.2.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.numerics.vectors/4.5.0/system.numerics.vectors.4.5.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.reflection.metadata/7.0.0/system.reflection.metadata.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.reflection.metadataloadcontext/7.0.0/system.reflection.metadataloadcontext.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.runtime.caching/6.0.0/system.runtime.caching.6.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.runtime.compilerservices.unsafe/6.0.0/system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.security.cryptography.cng/5.0.0/system.security.cryptography.cng.5.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.security.cryptography.pkcs/6.0.2/system.security.cryptography.pkcs.6.0.2.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.security.cryptography.protecteddata/7.0.0/system.security.cryptography.protecteddata.7.0.0.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.security.permissions/7.0.0/system.security.permissions.7.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.security.principal.windows/5.0.0/system.security.principal.windows.5.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.text.encoding.codepages/6.0.0/system.text.encoding.codepages.6.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.text.encodings.web/8.0.0/system.text.encodings.web.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.text.json/8.0.0/system.text.json.8.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.threading.channels/7.0.0/system.threading.channels.7.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.threading.tasks.dataflow/7.0.0/system.threading.tasks.dataflow.7.0.0.nupkg.sha512",
+    "/Users/larajohnson/.nuget/packages/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "/Users/larajohnson/.nuget/packages/system.windows.extensions/7.0.0/system.windows.extensions.7.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1903",
-      "level": "Warning",
-      "message": "Package 'Azure.Identity' 1.7.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-5mfx-4wcx-rv27",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "Azure.Identity",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1902",
-      "level": "Warning",
-      "message": "Package 'Azure.Identity' 1.7.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-m5vv-6r4h-3vj9",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "Azure.Identity",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1902",
-      "level": "Warning",
-      "message": "Package 'Azure.Identity' 1.7.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-wvxc-855f-jvrv",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "Azure.Identity",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1902",
-      "level": "Warning",
-      "message": "Package 'BouncyCastle.Cryptography' 2.1.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8xfc-gm6g-vgpv",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "BouncyCastle.Cryptography",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1902",
-      "level": "Warning",
-      "message": "Package 'BouncyCastle.Cryptography' 2.1.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-m44j-cfrm-g8qc",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "BouncyCastle.Cryptography",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1902",
-      "level": "Warning",
-      "message": "Package 'BouncyCastle.Cryptography' 2.1.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-v435-xc8x-wvr9",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "BouncyCastle.Cryptography",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1903",
-      "level": "Warning",
-      "message": "Package 'Microsoft.Data.SqlClient' 5.1.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "Microsoft.Data.SqlClient",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1902",
-      "level": "Warning",
-      "message": "Package 'Microsoft.IdentityModel.JsonWebTokens' 7.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-59j7-ghrg-fj52",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "Microsoft.IdentityModel.JsonWebTokens",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1903",
-      "level": "Warning",
-      "message": "Package 'MimeKit' 4.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-gmc6-fwg3-75m5",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "MimeKit",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1903",
-      "level": "Warning",
-      "message": "Package 'NuGet.Common' 6.3.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-6qmf-mmc7-6c2p",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "NuGet.Common",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1904",
-      "level": "Warning",
-      "message": "Package 'NuGet.Packaging' 6.3.1 has a known critical severity vulnerability, https://github.com/advisories/GHSA-68w7-72jg-6qpp",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "NuGet.Packaging",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1903",
-      "level": "Warning",
-      "message": "Package 'NuGet.Protocol' 6.3.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-6qmf-mmc7-6c2p",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "NuGet.Protocol",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1902",
-      "level": "Warning",
-      "message": "Package 'System.IdentityModel.Tokens.Jwt' 7.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-59j7-ghrg-fj52",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "System.IdentityModel.Tokens.Jwt",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1903",
-      "level": "Warning",
-      "message": "Package 'System.Security.Cryptography.Pkcs' 6.0.2 has a known high severity vulnerability, https://github.com/advisories/GHSA-555c-2p6r-68mm",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "libraryId": "System.Security.Cryptography.Pkcs",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  "logs": []
 }
