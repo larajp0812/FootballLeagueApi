@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using FootballLeagueApi.Models;
+using FootballLeagueApi.DTOs.Auth;
 
 namespace FootballLeagueApi.Controllers
 {
@@ -16,7 +16,7 @@ namespace FootballLeagueApi.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDTO model)
+        public async Task<IActionResult> Register(RegisterDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

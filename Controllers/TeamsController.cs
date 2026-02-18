@@ -1,3 +1,4 @@
+using FootballLeagueApi.DTOs;
 using FootballLeagueApi.Models;
 using FootballLeagueApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,8 @@ namespace FootballLeagueApi.Controllers
         public async Task<IActionResult> GetAll()
         {
             var teams = await _teamService.GetAllAsync();
-            return Ok(teams);
+            var dto = teams.Select(t => TeamMapper.ToDto(t));
+            return Ok(dto);
         }
 
         [HttpGet("{id}")]
@@ -29,34 +31,16 @@ namespace FootballLeagueApi.Controllers
             if (team == null)
                 return NotFound();
 
-            return Ok(team);
+            return Ok(TeamMapper.ToDto(team));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Team team)
+        public async Task<IActionResult> Create(TeamCreateDto dto)
         {
+            var team = TeamMapper.ToModel(dto);
             var created = await _teamService.CreateAsync(team);
-            return CreatedAtAction(nameof(GetById), new { id = created.TeamId }, created);
-        }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Team team)
-        {
-            var success = await _teamService.UpdateAsync(id, team);
-            if (!success)
-                return BadRequest();
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var success = await _teamService.DeleteAsync(id);
-            if (!success)
-                return NotFound();
-
-            return NoContent();
+            return CreatedAtAction(nameof(GetById), new { id = created.TeamId }, TeamMapper.ToDto(created));
         }
     }
 }
