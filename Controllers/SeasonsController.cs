@@ -45,43 +45,51 @@ namespace FootballLeagueApi.Controllers
             return CreatedAtAction(nameof(GetSeason), new { id = season.SeasonId }, season);
         }
 
-        // PUT: api/seasons/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSeason(int id, Season updatedSeason)
+      // PUT: api/seasons/5
+[HttpPut("{id}")]
+public async Task<IActionResult> UpdateSeason(int id, Season updatedSeason)
+{
+    if (id != updatedSeason.SeasonId)
+    {
+        return BadRequest("Season ID mismatch");
+    }
+
+    _context.Entry(updatedSeason).State = EntityState.Modified;
+
+    try
+    {
+        await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        if (!_context.Seasons.Any(s => s.SeasonId == id))
         {
-            if (id != updatedSeason.SeasonId)
-                return BadRequest("Season ID mismatch");
-
-            _context.Entry(updatedSeason).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Seasons.Any(s => s.SeasonId == id))
-                    return NotFound();
-
-                throw;
-            }
-
-            return NoContent();
+            return NotFound();
         }
-
-        // DELETE: api/seasons/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSeason(int id)
+        else
         {
-            var season = await _context.Seasons.FindAsync(id);
-
-            if (season == null)
-                return NotFound();
-
-            _context.Seasons.Remove(season);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            throw;
         }
+    }
+
+    return NoContent();
+}
+
+// DELETE: api/seasons/5
+[HttpDelete("{id}")]
+public async Task<IActionResult> DeleteSeason(int id)
+{
+    var season = await _context.Seasons.FindAsync(id);
+
+    if (season == null)
+    {
+        return NotFound();
+    }
+
+    _context.Seasons.Remove(season);
+    await _context.SaveChangesAsync();
+
+    return NoContent();
+}
     }
 }

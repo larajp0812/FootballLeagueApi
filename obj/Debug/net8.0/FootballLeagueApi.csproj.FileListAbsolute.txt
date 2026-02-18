@@ -280,3 +280,8 @@
 /Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/obj/Debug/net8.0/FootballLeagueApi.pdb
 /Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/obj/Debug/net8.0/FootballLeagueApi.genruntimeconfig.cache
 /Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/obj/Debug/net8.0/ref/FootballLeagueApi.dll
+/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/bin/Debug/net8.0/Microsoft.OpenApi.dll
+/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/bin/Debug/net8.0/Swashbuckle.AspNetCore.Swagger.dll
+/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerUI.dll
+/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/obj/Debug/net8.0/FootballLeagueApi.MvcApplicationPartsAssemblyInfo.cs
