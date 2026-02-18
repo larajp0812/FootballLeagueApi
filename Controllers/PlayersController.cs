@@ -1,90 +1,60 @@
 using FootballLeagueApi.Models;
+using FootballLeagueApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FootballLeagueApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class PlayersController : ControllerBase
     {
-        private readonly LeagueContext _context;
+        private readonly IPlayerService _playerService;
 
-        public PlayersController(LeagueContext context)
+        public PlayersController(IPlayerService playerService)
         {
-            _context = context;
+            _playerService = playerService;
         }
 
-        // GET: api/players
         [HttpGet]
-        public async Task<IActionResult> GetPlayers()
+        public async Task<IActionResult> GetAll()
         {
-            var players = await _context.Players
-                .Include(p => p.Team)
-                .ToListAsync();
-
+            var players = await _playerService.GetAllAsync();
             return Ok(players);
         }
 
-        // GET: api/players/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPlayer(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var player = await _context.Players
-                .Include(p => p.Team)
-                .FirstOrDefaultAsync(p => p.PlayerId == id);
-
+            var player = await _playerService.GetByIdAsync(id);
             if (player == null)
                 return NotFound();
 
             return Ok(player);
         }
 
-        // POST: api/players
         [HttpPost]
-        public async Task<IActionResult> CreatePlayer(Player player)
+        public async Task<IActionResult> Create(Player player)
         {
-            _context.Players.Add(player);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetPlayer), new { id = player.PlayerId }, player);
+            var created = await _playerService.CreateAsync(player);
+            return CreatedAtAction(nameof(GetById), new { id = created.PlayerId }, created);
         }
 
-        // PUT: api/players/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePlayer(int id, Player updatedPlayer)
+        public async Task<IActionResult> Update(int id, Player player)
         {
-            if (id != updatedPlayer.PlayerId)
-                return BadRequest("Player ID mismatch");
-
-            _context.Entry(updatedPlayer).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Players.Any(p => p.PlayerId == id))
-                    return NotFound();
-
-                throw;
-            }
+            var success = await _playerService.UpdateAsync(id, player);
+            if (!success)
+                return BadRequest();
 
             return NoContent();
         }
 
-        // DELETE: api/players/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePlayer(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var player = await _context.Players.FindAsync(id);
-
-            if (player == null)
+            var success = await _playerService.DeleteAsync(id);
+            if (!success)
                 return NotFound();
-
-            _context.Players.Remove(player);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }

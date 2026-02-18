@@ -1,96 +1,67 @@
 using FootballLeagueApi.Models;
+using FootballLeagueApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FootballLeagueApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class MatchesController : ControllerBase
     {
-        private readonly LeagueContext _context;
+        private readonly IMatchService _matchService;
 
-        public MatchesController(LeagueContext context)
+        public MatchesController(IMatchService matchService)
         {
-            _context = context;
+            _matchService = matchService;
         }
 
-        // GET: api/matches
         [HttpGet]
-        public async Task<IActionResult> GetMatches()
+        public async Task<IActionResult> GetAll()
         {
-            var matches = await _context.Matches
-                .Include(m => m.HomeTeam)
-                .Include(m => m.AwayTeam)
-                .Include(m => m.Venue)
-                .Include(m => m.Season)
-                .ToListAsync();
-
+            var matches = await _matchService.GetAllAsync();
             return Ok(matches);
         }
 
-        // GET: api/matches/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetMatch(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var match = await _context.Matches
-                .Include(m => m.HomeTeam)
-                .Include(m => m.AwayTeam)
-                .Include(m => m.Venue)
-                .Include(m => m.Season)
-                .FirstOrDefaultAsync(m => m.MatchId == id);
-
+            var match = await _matchService.GetByIdAsync(id);
             if (match == null)
                 return NotFound();
 
             return Ok(match);
         }
 
-        // POST: api/matches
         [HttpPost]
-        public async Task<IActionResult> CreateMatch(Match match)
+        public async Task<IActionResult> Create(Match match)
         {
-            _context.Matches.Add(match);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetMatch), new { id = match.MatchId }, match);
-        }
-
-        // PUT: api/matches/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMatch(int id, Match updatedMatch)
-        {
-            if (id != updatedMatch.MatchId)
-                return BadRequest("Match ID mismatch");
-
-            _context.Entry(updatedMatch).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var created = await _matchService.CreateAsync(match);
+                return CreatedAtAction(nameof(GetById), new { id = created.MatchId }, created);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!_context.Matches.Any(m => m.MatchId == id))
-                    return NotFound();
-
-                throw;
+                return BadRequest(new { error = ex.Message });
             }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, Match match)
+        {
+            var success = await _matchService.UpdateAsync(id, match);
+            if (!success)
+                return BadRequest();
 
             return NoContent();
         }
 
-        // DELETE: api/matches/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMatch(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var match = await _context.Matches.FindAsync(id);
-
-            if (match == null)
+            var success = await _matchService.DeleteAsync(id);
+            if (!success)
                 return NotFound();
-
-            _context.Matches.Remove(match);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }

@@ -1,85 +1,60 @@
 using FootballLeagueApi.Models;
+using FootballLeagueApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FootballLeagueApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class VenuesController : ControllerBase
     {
-        private readonly LeagueContext _context;
+        private readonly IVenueService _venueService;
 
-        public VenuesController(LeagueContext context)
+        public VenuesController(IVenueService venueService)
         {
-            _context = context;
+            _venueService = venueService;
         }
 
-        // GET: api/venues
         [HttpGet]
-        public async Task<IActionResult> GetVenues()
+        public async Task<IActionResult> GetAll()
         {
-            var venues = await _context.Venues.ToListAsync();
+            var venues = await _venueService.GetAllAsync();
             return Ok(venues);
         }
 
-        // GET: api/venues/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetVenue(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var venue = await _context.Venues.FindAsync(id);
-
+            var venue = await _venueService.GetByIdAsync(id);
             if (venue == null)
                 return NotFound();
 
             return Ok(venue);
         }
 
-        // POST: api/venues
         [HttpPost]
-        public async Task<IActionResult> CreateVenue(Venue venue)
+        public async Task<IActionResult> Create(Venue venue)
         {
-            _context.Venues.Add(venue);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetVenue), new { id = venue.VenueId }, venue);
+            var created = await _venueService.CreateAsync(venue);
+            return CreatedAtAction(nameof(GetById), new { id = created.VenueId }, created);
         }
 
-        // PUT: api/venues/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateVenue(int id, Venue updatedVenue)
+        public async Task<IActionResult> Update(int id, Venue venue)
         {
-            if (id != updatedVenue.VenueId)
-                return BadRequest("Venue ID mismatch");
-
-            _context.Entry(updatedVenue).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Venues.Any(v => v.VenueId == id))
-                    return NotFound();
-
-                throw;
-            }
+            var success = await _venueService.UpdateAsync(id, venue);
+            if (!success)
+                return BadRequest();
 
             return NoContent();
         }
 
-        // DELETE: api/venues/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVenue(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var venue = await _context.Venues.FindAsync(id);
-
-            if (venue == null)
+            var success = await _venueService.DeleteAsync(id);
+            if (!success)
                 return NotFound();
-
-            _context.Venues.Remove(venue);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }

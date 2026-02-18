@@ -1,3 +1,4 @@
+using FootballLeagueApi.Data;
 using FootballLeagueApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

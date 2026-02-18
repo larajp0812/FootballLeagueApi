@@ -1,95 +1,62 @@
 using FootballLeagueApi.Models;
+using FootballLeagueApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FootballLeagueApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class SeasonsController : ControllerBase
     {
-        private readonly LeagueContext _context;
+        private readonly ISeasonService _seasonService;
 
-        public SeasonsController(LeagueContext context)
+        public SeasonsController(ISeasonService seasonService)
         {
-            _context = context;
+            _seasonService = seasonService;
         }
 
-        // GET: api/seasons
         [HttpGet]
-        public async Task<IActionResult> GetSeasons()
+        public async Task<IActionResult> GetAll()
         {
-            var seasons = await _context.Seasons.ToListAsync();
+            var seasons = await _seasonService.GetAllAsync();
             return Ok(seasons);
         }
 
-        // GET: api/seasons/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetSeason(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var season = await _context.Seasons.FindAsync(id);
-
+            var season = await _seasonService.GetByIdAsync(id);
             if (season == null)
                 return NotFound();
 
             return Ok(season);
         }
 
-        // POST: api/seasons
         [HttpPost]
-        public async Task<IActionResult> CreateSeason(Season season)
+        public async Task<IActionResult> Create(Season season)
         {
-            _context.Seasons.Add(season);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetSeason), new { id = season.SeasonId }, season);
+            var created = await _seasonService.CreateAsync(season);
+            return CreatedAtAction(nameof(GetById), new { id = created.SeasonId }, created);
         }
 
-      // PUT: api/seasons/5
-[HttpPut("{id}")]
-public async Task<IActionResult> UpdateSeason(int id, Season updatedSeason)
-{
-    if (id != updatedSeason.SeasonId)
-    {
-        return BadRequest("Season ID mismatch");
-    }
-
-    _context.Entry(updatedSeason).State = EntityState.Modified;
-
-    try
-    {
-        await _context.SaveChangesAsync();
-    }
-    catch (DbUpdateConcurrencyException)
-    {
-        if (!_context.Seasons.Any(s => s.SeasonId == id))
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, Season season)
         {
-            return NotFound();
+            var success = await _seasonService.UpdateAsync(id, season);
+            if (!success)
+                return BadRequest();
+
+            return NoContent();
         }
-        else
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            throw;
+            var success = await _seasonService.DeleteAsync(id);
+            if (!success)
+                return NotFound();
+
+            return NoContent();
         }
-    }
-
-    return NoContent();
-}
-
-// DELETE: api/seasons/5
-[HttpDelete("{id}")]
-public async Task<IActionResult> DeleteSeason(int id)
-{
-    var season = await _context.Seasons.FindAsync(id);
-
-    if (season == null)
-    {
-        return NotFound();
-    }
-
-    _context.Seasons.Remove(season);
-    await _context.SaveChangesAsync();
-
-    return NoContent();
-}
     }
 }

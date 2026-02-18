@@ -1,85 +1,60 @@
 using FootballLeagueApi.Models;
+using FootballLeagueApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FootballLeagueApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class TeamsController : ControllerBase
     {
-        private readonly LeagueContext _context;
+        private readonly ITeamService _teamService;
 
-        public TeamsController(LeagueContext context)
+        public TeamsController(ITeamService teamService)
         {
-            _context = context;
+            _teamService = teamService;
         }
 
-        // GET: api/teams
         [HttpGet]
-        public async Task<IActionResult> GetTeams()
+        public async Task<IActionResult> GetAll()
         {
-            var teams = await _context.Teams.ToListAsync();
+            var teams = await _teamService.GetAllAsync();
             return Ok(teams);
         }
 
-        // GET: api/teams/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTeam(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
-
+            var team = await _teamService.GetByIdAsync(id);
             if (team == null)
                 return NotFound();
 
             return Ok(team);
         }
 
-        // POST: api/teams
         [HttpPost]
-        public async Task<IActionResult> CreateTeam(Team team)
+        public async Task<IActionResult> Create(Team team)
         {
-            _context.Teams.Add(team);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetTeam), new { id = team.TeamId }, team);
+            var created = await _teamService.CreateAsync(team);
+            return CreatedAtAction(nameof(GetById), new { id = created.TeamId }, created);
         }
 
-        // PUT: api/teams/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTeam(int id, Team updatedTeam)
+        public async Task<IActionResult> Update(int id, Team team)
         {
-            if (id != updatedTeam.TeamId)
-                return BadRequest("Team ID mismatch");
-
-            _context.Entry(updatedTeam).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Teams.Any(t => t.TeamId == id))
-                    return NotFound();
-
-                throw;
-            }
+            var success = await _teamService.UpdateAsync(id, team);
+            if (!success)
+                return BadRequest();
 
             return NoContent();
         }
 
-        // DELETE: api/teams/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeam(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
-
-            if (team == null)
+            var success = await _teamService.DeleteAsync(id);
+            if (!success)
                 return NotFound();
-
-            _context.Teams.Remove(team);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }

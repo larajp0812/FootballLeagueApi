@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using FootballLeagueApi.Models;
 
-namespace FootballLeagueApi.Models
+
+namespace FootballLeagueApi.Data
 {
     public class LeagueContext : IdentityDbContext<IdentityUser>
     {
