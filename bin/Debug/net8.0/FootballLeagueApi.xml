@@ -26,16 +26,80 @@
         <member name="M:FootballLeagueApi.Controllers.AuthController.Register(FootballLeagueApi.DTOs.Auth.RegisterDto)">
             <summary>
             POST /api/auth/register - Register a new user account
-            Accepts a RegisterDto with UserName, Email, and Password
-            Validates input and creates a new user with hashed password
+            
+            User Registration Security Flow:
+            1. Client sends UserName, Email, and Password
+            2. Server validates input (email format, password complexity, etc.)
+            3. Server checks if email already exists (prevent duplicate accounts)
+            4. Server hashes password using PBKDF2 algorithm (10,000 iterations + salt)
+            5. Server stores user in AspNetUsers table with hashed password (plaintext never stored!)
+            6. Return success or validation errors
+            
+            Password Security Details:
+            - Algorithm: PBKDF2 (Password-Based Key Derivation Function 2)
+            - Iterations: 10,000 (slows down brute force attacks)
+            - Salt: Unique random value per user (prevents rainbow table attacks)
+            - Never stored: Original password is discarded after hashing
+            - Verification: Login compares provided password hash with stored hash
+            
+            DataAnnotations Validation (from RegisterDto):
+            - [Required] UserName, Email, Password must be provided
+            - [EmailAddress] Email must be valid email format
+            - [StringLength(100, MinimumLength = 6)] Password between 6-100 chars
+            - [RegularExpression] Password requires uppercase, lowercase, digit, symbol
+            
             Returns:
-              200 OK with success message if registration succeeds
+              200 OK with "User registered successfully." if registration succeeds
               400 Bad Request with validation errors if registration fails
+              
+            Example request:
+            POST /api/auth/register
+            {
+              "UserName": "john_doe",
+              "Email": "john@example.com",
+              "Password": "SecurePass123!"
+            }
+            
+            Example responses:
+            Success (200):
+            "User registered successfully."
+            
+            Validation failure (400):
+            {
+              "Email": ["The Email field is not a valid e-mail address."],
+              "Password": ["Password must contain at least one uppercase letter."]
+            }
             </summary>
         </member>
         <member name="M:FootballLeagueApi.Controllers.AuthController.Login(FootballLeagueApi.DTOs.Auth.LoginDto)">
             <summary>
-            POST /api/auth/login - Authenticate user and return JWT token
+            POST /api/auth/login - Authenticate user and return JWT bearer token
+            
+            JWT (JSON Web Token) Authentication Flow:
+            1. Client sends email and password
+            2. Server verifies password against hashed value in database
+            3. If valid, generate JWT token with user claims
+            4. Return token to client (token expires in 60 minutes)
+            5. Client stores token and includes in all subsequent requests
+            6. Server validates token signature without database lookup
+            
+            Token Structure (3 parts separated by dots):
+            Header.Payload.Signature
+            
+            Header (algorithm and token type):
+            { "alg": "HS256", "typ": "JWT" }
+            
+            Payload (claims - user info):
+            { "sub": "john", "email": "john@example.com", "jti": "unique-id", "exp": 1234567890 }
+            
+            Signature (HMAC-SHA256 of header+payload signed with secret key):
+            Ensures token hasn't been tampered with
+            Only server knows secret key, so client can't forge tokens
+            
+            Returns:
+              200 OK with { "token": "eyJ...", "expires": "2026-02-24..." } if authentication succeeds
+              401 Unauthorized if email not found or password is incorrect
+              400 Bad Request if email/password validation fails
             </summary>
         </member>
         <member name="T:FootballLeagueApi.Controllers.MatchesController">
@@ -495,7 +559,31 @@
         <member name="M:FootballLeagueApi.Data.LeagueContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <summary>
             Configure model relationships through Fluent API
-            This method is called after the model has been constructed to fine-tune configuration
+            
+            This method is called during DbContext initialization to configure:
+            1. Relationships between entities (one-to-many, many-to-one, etc.)
+            2. Foreign key constraints (referential integrity)
+            3. Delete behaviors when related records are deleted
+            4. Shadow properties, indexes, and other configuration
+            
+            Fluent API vs Data Annotations:
+            - Data Annotations: [ForeignKey], [Required] on properties (less flexible)
+            - Fluent API: modelBuilder configuration (more powerful, centralized)
+            
+            Why centralize here?
+            - Single place to see all relationships
+            - Easy to modify constraints without touching models
+            - Supports complex scenarios that annotations can't handle
+            
+            DeleteBehavior Options:
+            - Cascade: Delete dependent records automatically (e.g., delete team → delete all players)
+            - Restrict: Prevent deletion if dependent records exist (safe, requires explicit cleanup)
+            - SetNull: Set foreign key to null when parent deleted (if column is nullable)
+            - ClientCascade: Cascade on client side (slower, use sparingly)
+            
+            Our choice: DeleteBehavior.Restrict
+            Reason: Matches are historical records. If you delete a team with past matches,
+            you lose match history. Better to require manual match deletion first.
             </summary>
         </member>
         <member name="T:FootballLeagueApi.DTOs.Auth.LoginDto">
@@ -1384,8 +1472,46 @@
         <member name="P:FootballLeagueApi.Models.Player.Team">
             <summary>
             Navigation property: Reference to the Team this player belongs to
-            [JsonIgnore] prevents the full team object from being serialized in API responses
-            This avoids circular reference issues (Player -> Team -> Players -> Player...)
+            
+            Why [JsonIgnore]?
+            Without it, when serializing a Player to JSON, the Team object would be included.
+            But Team has a Players collection, which includes this Player, creating a circular reference:
+            
+            Without [JsonIgnore] (INFINITE LOOP):
+            GET /api/players/1 → 
+            {
+              "PlayerId": 1,
+              "FullName": "John",
+              "Team": {
+                "TeamId": 5,
+                "Name": "Arsenal",
+                "Players": [
+                  {
+                    "PlayerId": 1,
+                    "FullName": "John",
+                    "Team": {
+                      "TeamId": 5,
+                      "Players": [ ... INFINITE! ]
+                    }
+                  }
+                ]
+              }
+            }
+            
+            With [JsonIgnore] (CLEAN):
+            GET /api/players/1 → 
+            {
+              "PlayerId": 1,
+              "FullName": "John",
+              "TeamId": 5
+              // Team property not included in JSON
+            }
+            
+            Client knows TeamId = 5, and can fetch the team separately if needed:
+            GET /api/teams/5
+            
+            This pattern is called "foreign key exposure" - don't expose collections,
+            just expose the ID, and let client fetch related data if needed (REST principle).
             </summary>
         </member>
         <member name="T:FootballLeagueApi.Models.Season">
@@ -1787,6 +1913,140 @@
             Delete a team by its ID
             Returns true if successful, false if team not found
             Note: Deletion is prevented if the team has scheduled matches (referential integrity)
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Services.TeamService">
+            <summary>
+            TeamService - Business Logic Layer for Teams
+            
+            Service Layer Responsibilities:
+            1. Coordinate calls to repositories (data layer)
+            2. Implement business rules and validation
+            3. Handle transactions (SaveChangesAsync)
+            4. Log operations for debugging and auditing
+            5. Return results to controllers
+            
+            Why a separate service layer?
+            - Controllers should not directly access repositories (separation of concerns)
+            - Business logic stays in services, not scattered in controllers
+            - Easy to test: mock ITeamRepository and test service logic
+            - Easy to modify: business rules in one place
+            - Easy to reuse: service methods can be called from multiple controllers
+            
+            Example: Create a team
+            1. Controller receives HTTP request with team data
+            2. Controller calls service.CreateAsync(team)
+            3. Service logs operation
+            4. Service calls repository.AddAsync(team) - stages in EF Core memory
+            5. Service calls repository.SaveChangesAsync() - executes SQL INSERT
+            6. Service logs success and returns team
+            7. Controller returns HTTP 201 Created response
+            
+            Dependency Injection:
+            - ITeamRepository: Injected in constructor, implements repository pattern
+            - ILogger&lt;TeamService&gt;: Injected in constructor, logs operations
+            - Any other service could be injected if needed (e.g., IEmailService, IPlayerService)
+            </summary>
+        </member>
+        <member name="F:FootballLeagueApi.Services.TeamService._repo">
+            <summary>
+            Repository for data access
+            Injected through constructor
+            Used for Add, Update, Delete, Get operations
+            </summary>
+        </member>
+        <member name="F:FootballLeagueApi.Services.TeamService._logger">
+            <summary>
+            Logger for debugging and auditing
+            Injected through constructor
+            Used to log operations: LogDebug, LogInformation, LogWarning, LogError
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.TeamService.#ctor(FootballLeagueApi.Repositories.ITeamRepository,Microsoft.Extensions.Logging.ILogger{FootballLeagueApi.Services.TeamService})">
+            <summary>
+            Constructor - Dependency Injection
+            DI Container (in Program.cs) provides ITeamRepository and ILogger instances
+            
+            Example of dependency injection in action:
+            var service = new TeamService(repository, logger);
+            // DI container creates these for you:
+            var repository = new TeamRepository(dbContext);
+            var logger = loggerFactory.CreateLogger&lt;TeamService&gt;();
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.TeamService.GetAllAsync">
+            <summary>
+            Get all teams from database
+            
+            Service responsibilities:
+            1. Call repository method (data access)
+            2. Log the operation (debugging)
+            3. Process/validate results if needed
+            4. Return to controller
+            
+            Async: Doesn't block thread while database query executes
+            Thread-safe: Unblock thread to handle other requests
+            Performance: ~50 threads can handle 1000+ concurrent requests (non-blocking)
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.TeamService.GetByIdAsync(System.Int32)">
+            <summary>
+            Get a single team by ID
+            
+            Demonstrates error handling and logging:
+            - Log at debug level if found (expected case)
+            - Log at warning level if not found (unexpected, but not critical)
+            - Return null and let controller return 404 Not Found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.TeamService.CreateAsync(FootballLeagueApi.Models.Team)">
+            <summary>
+            Create a new team
+            
+            Transaction flow:
+            1. Receive team object (from controller, already validated)
+            2. Add to repository (stages in EF Core change tracker)
+            3. SaveChangesAsync() executes SQL INSERT:
+               INSERT INTO Teams (Name, Coach, FoundedYear) VALUES (...)
+            4. Database auto-generates TeamId and returns it
+            5. Object now has TeamId populated
+            
+            Why async?
+            SaveChangesAsync() executes SQL to database (slow I/O operation)
+            Async allows thread to handle other requests while waiting
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.TeamService.UpdateAsync(System.Int32,FootballLeagueApi.Models.Team)">
+            <summary>
+            Update an existing team
+            
+            Business rule validation:
+            - URL ID must match object TeamId
+            - Example: PUT /api/teams/5 with body { TeamId: 5 }
+            - If URL ID = 10 but body TeamId = 5, that's a conflict!
+            - Prevents accidentally updating the wrong team
+            
+            Transaction flow:
+            1. Validate ID consistency
+            2. Update in EF (mark as modified)
+            3. SaveChangesAsync executes UPDATE statement
+            4. Return success/failure
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.TeamService.DeleteAsync(System.Int32)">
+            <summary>
+            Delete a team
+            
+            Transaction flow:
+            1. Fetch team by ID (to ensure it exists)
+            2. Delete from repository (mark for deletion in EF Core)
+            3. SaveChangesAsync executes DELETE statement
+            4. Return success (or false if team not found)
+            
+            Database constraint:
+            DeleteBehavior.Restrict on Match.HomeTeamId and Match.AwayTeamId prevents deletion
+            If team has matches: DELETE fails with FK constraint violation
+            Exception is caught by GlobalExceptionHandlingMiddleware → 500 or custom handler
             </summary>
         </member>
     </members>

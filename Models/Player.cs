@@ -41,8 +41,46 @@ namespace FootballLeagueApi.Models
 
         /// <summary>
         /// Navigation property: Reference to the Team this player belongs to
-        /// [JsonIgnore] prevents the full team object from being serialized in API responses
-        /// This avoids circular reference issues (Player -> Team -> Players -> Player...)
+        /// 
+        /// Why [JsonIgnore]?
+        /// Without it, when serializing a Player to JSON, the Team object would be included.
+        /// But Team has a Players collection, which includes this Player, creating a circular reference:
+        /// 
+        /// Without [JsonIgnore] (INFINITE LOOP):
+        /// GET /api/players/1 → 
+        /// {
+        ///   "PlayerId": 1,
+        ///   "FullName": "John",
+        ///   "Team": {
+        ///     "TeamId": 5,
+        ///     "Name": "Arsenal",
+        ///     "Players": [
+        ///       {
+        ///         "PlayerId": 1,
+        ///         "FullName": "John",
+        ///         "Team": {
+        ///           "TeamId": 5,
+        ///           "Players": [ ... INFINITE! ]
+        ///         }
+        ///       }
+        ///     ]
+        ///   }
+        /// }
+        /// 
+        /// With [JsonIgnore] (CLEAN):
+        /// GET /api/players/1 → 
+        /// {
+        ///   "PlayerId": 1,
+        ///   "FullName": "John",
+        ///   "TeamId": 5
+        ///   // Team property not included in JSON
+        /// }
+        /// 
+        /// Client knows TeamId = 5, and can fetch the team separately if needed:
+        /// GET /api/teams/5
+        /// 
+        /// This pattern is called "foreign key exposure" - don't expose collections,
+        /// just expose the ID, and let client fetch related data if needed (REST principle).
         /// </summary>
         [JsonIgnore]
         public Team? Team { get; set; }

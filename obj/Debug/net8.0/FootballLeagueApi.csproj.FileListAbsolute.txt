@@ -370,3 +370,4 @@ C:\develop-lara\UoW\FootballLeagueApi\obj\Debug\net8.0\refint\FootballLeagueApi.
 C:\develop-lara\UoW\FootballLeagueApi\obj\Debug\net8.0\FootballLeagueApi.pdb
 C:\develop-lara\UoW\FootballLeagueApi\obj\Debug\net8.0\FootballLeagueApi.genruntimeconfig.cache
 C:\develop-lara\UoW\FootballLeagueApi\obj\Debug\net8.0\ref\FootballLeagueApi.dll
+C:\develop-lara\UoW\FootballLeagueApi\bin\Debug\net8.0\azure-deploy-template.json

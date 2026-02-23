@@ -38,11 +38,49 @@ namespace FootballLeagueApi.Controllers
 
         /// <summary>
         /// POST /api/auth/register - Register a new user account
-        /// Accepts a RegisterDto with UserName, Email, and Password
-        /// Validates input and creates a new user with hashed password
+        /// 
+        /// User Registration Security Flow:
+        /// 1. Client sends UserName, Email, and Password
+        /// 2. Server validates input (email format, password complexity, etc.)
+        /// 3. Server checks if email already exists (prevent duplicate accounts)
+        /// 4. Server hashes password using PBKDF2 algorithm (10,000 iterations + salt)
+        /// 5. Server stores user in AspNetUsers table with hashed password (plaintext never stored!)
+        /// 6. Return success or validation errors
+        /// 
+        /// Password Security Details:
+        /// - Algorithm: PBKDF2 (Password-Based Key Derivation Function 2)
+        /// - Iterations: 10,000 (slows down brute force attacks)
+        /// - Salt: Unique random value per user (prevents rainbow table attacks)
+        /// - Never stored: Original password is discarded after hashing
+        /// - Verification: Login compares provided password hash with stored hash
+        /// 
+        /// DataAnnotations Validation (from RegisterDto):
+        /// - [Required] UserName, Email, Password must be provided
+        /// - [EmailAddress] Email must be valid email format
+        /// - [StringLength(100, MinimumLength = 6)] Password between 6-100 chars
+        /// - [RegularExpression] Password requires uppercase, lowercase, digit, symbol
+        /// 
         /// Returns:
-        ///   200 OK with success message if registration succeeds
+        ///   200 OK with "User registered successfully." if registration succeeds
         ///   400 Bad Request with validation errors if registration fails
+        ///   
+        /// Example request:
+        /// POST /api/auth/register
+        /// {
+        ///   "UserName": "john_doe",
+        ///   "Email": "john@example.com",
+        ///   "Password": "SecurePass123!"
+        /// }
+        /// 
+        /// Example responses:
+        /// Success (200):
+        /// "User registered successfully."
+        /// 
+        /// Validation failure (400):
+        /// {
+        ///   "Email": ["The Email field is not a valid e-mail address."],
+        ///   "Password": ["Password must contain at least one uppercase letter."]
+        /// }
         /// </summary>
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto model)
@@ -51,94 +89,182 @@ namespace FootballLeagueApi.Controllers
             {
                 _logger.LogInformation("User registration attempt for email: {Email}", model.Email);
                 
-                // Check if the model is valid (all required fields present)
+                // ===== STEP 1: VALIDATE INPUT =====
+                // Check if model passed DataAnnotation validation rules
+                // Validation rules defined in RegisterDto class:
+                // - [Required] on UserName, Email, Password
+                // - [EmailAddress] on Email
+                // - [StringLength] on Password
+                // - [RegularExpression] for password complexity
                 if (!ModelState.IsValid)
                 {
                     _logger.LogWarning("Registration failed: Invalid model state for email {Email}", model.Email);
+                    // Return 400 with all validation errors
+                    // Example: { "Email": ["email format invalid"], "Password": ["too weak"] }
                     return BadRequest(ModelState);
                 }
 
-                // Create a new Identity user with the provided username and email
+                // ===== STEP 2: CREATE IDENTITY USER OBJECT =====
+                // IdentityUser is from ASP.NET Core Identity framework
+                // Stores: UserName, Email, PasswordHash, SecurityStamp, ConcurrencyStamp, etc.
+                // Note: Password is NOT stored here - we pass it separately to UserManager
                 var user = new IdentityUser
                 {
-                    UserName = model.UserName,
-                    Email = model.Email
+                    UserName = model.UserName,  // Unique username (not yet saved)
+                    Email = model.Email          // Email address (not yet saved)
                 };
 
-                // Call UserManager to create the user with the hashed password
-                // UserManager automatically hashes passwords for security
+                // ===== STEP 3: CREATE USER WITH HASHED PASSWORD =====
+                // UserManager.CreateAsync handles:
+                // 1. Check if email/username already exists (prevent duplicates)
+                // 2. Hash the plaintext password using PBKDF2
+                // 3. Save to AspNetUsers table in database
+                // 4. Return result with success flag and error messages if any
                 var result = await _userManager.CreateAsync(user, model.Password);
 
-                // Check if user creation was successful
+                // ===== STEP 4: CHECK RESULT =====
+                // CreateAsync returns IdentityResult with Succeeded flag and Errors collection
+                // Errors might include:
+                // - "DuplicateUserName" (username already exists)
+                // - "DuplicateEmail" (email already registered)
+                // - "InvalidEmail" (email format invalid)
+                // - "PasswordTooShort" (less than minimum length)
                 if (!result.Succeeded)
                 {
                     _logger.LogWarning("Registration failed for email {Email}: {Errors}", model.Email, 
                         string.Join(", ", result.Errors.Select(e => e.Description)));
+                    // Return 400 with error details
                     return BadRequest(result.Errors);
                 }
 
+                // ===== STEP 5: REGISTRATION SUCCESSFUL =====
                 _logger.LogInformation("User registered successfully: {Email}", model.Email);
-                // Return success message
+                // User can now login with their email and password
                 return Ok("User registered successfully.");
             }
             catch (Exception ex)
             {
+                // Catch unexpected exceptions and log them
+                // Return 500 error (handled by GlobalExceptionHandlingMiddleware)
                 _logger.LogError(ex, "Error during user registration for email: {Email}", model.Email);
                 throw;
             }
         }
 
         /// <summary>
-        /// POST /api/auth/login - Authenticate user and return JWT token
+        /// POST /api/auth/login - Authenticate user and return JWT bearer token
+        /// 
+        /// JWT (JSON Web Token) Authentication Flow:
+        /// 1. Client sends email and password
+        /// 2. Server verifies password against hashed value in database
+        /// 3. If valid, generate JWT token with user claims
+        /// 4. Return token to client (token expires in 60 minutes)
+        /// 5. Client stores token and includes in all subsequent requests
+        /// 6. Server validates token signature without database lookup
+        /// 
+        /// Token Structure (3 parts separated by dots):
+        /// Header.Payload.Signature
+        /// 
+        /// Header (algorithm and token type):
+        /// { "alg": "HS256", "typ": "JWT" }
+        /// 
+        /// Payload (claims - user info):
+        /// { "sub": "john", "email": "john@example.com", "jti": "unique-id", "exp": 1234567890 }
+        /// 
+        /// Signature (HMAC-SHA256 of header+payload signed with secret key):
+        /// Ensures token hasn't been tampered with
+        /// Only server knows secret key, so client can't forge tokens
+        /// 
+        /// Returns:
+        ///   200 OK with { "token": "eyJ...", "expires": "2026-02-24..." } if authentication succeeds
+        ///   401 Unauthorized if email not found or password is incorrect
+        ///   400 Bad Request if email/password validation fails
         /// </summary>
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto model)
         {
+            // Validate email and password are provided and match data annotation rules
+            // (DataAnnotations: [Required], [EmailAddress] on LoginDto)
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            // ===== STEP 1: FIND USER BY EMAIL =====
+            // Query AspNetUsers table for user with this email
+            // Returns null if not found
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 _logger.LogWarning("Login failed: user with email {Email} not found", model.Email);
+                // Return 401 (don't reveal if email exists - security)
                 return Unauthorized();
             }
 
+            // ===== STEP 2: VERIFY PASSWORD =====
+            // UserManager compares provided password with stored hash
+            // Hashing algorithm: PBKDF2 with 10,000 iterations (slow - prevents brute force)
+            // Returns false if password doesn't match
             var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!passwordValid)
             {
                 _logger.LogWarning("Login failed: invalid password for {Email}", model.Email);
+                // Return 401 (don't reveal why - security)
                 return Unauthorized();
             }
 
-            // Build JWT
+            // ===== STEP 3: READ JWT CONFIGURATION =====
+            // Load JWT settings from appsettings.json [Jwt] section
             var jwtSection = _config.GetSection("Jwt");
-            var key = jwtSection.GetValue<string>("Key");
-            var issuer = jwtSection.GetValue<string>("Issuer");
-            var audience = jwtSection.GetValue<string>("Audience");
-            var expiresMinutes = jwtSection.GetValue<int>("ExpiresMinutes");
+            var key = jwtSection.GetValue<string>("Key");             // Secret key for signing
+            var issuer = jwtSection.GetValue<string>("Issuer");       // "FootballLeagueApi"
+            var audience = jwtSection.GetValue<string>("Audience");   // "FootballLeagueApiUsers"
+            var expiresMinutes = jwtSection.GetValue<int>("ExpiresMinutes");  // Usually 60
 
+            // ===== STEP 4: CREATE CLAIMS =====
+            // Claims are key-value pairs that describe the user
+            // These will be embedded in the JWT token payload
+            // Client can read these without decrypting (JWT is Base64 encoded, not encrypted!)
+            // Server validates signature to ensure token wasn't modified
             var claims = new List<Claim>
             {
+                // Subject (sub): Unique identifier for this user
+                // Usually: UserName if available, fallback to Email
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName ?? user.Email),
+                
+                // JWT ID (jti): Unique identifier for this specific token
+                // Useful for token revocation (blacklist)
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                
+                // Email claim: User's email address
+                // Useful for identifying user without another database lookup
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
             };
 
+            // ===== STEP 5: CREATE SIGNING CREDENTIALS =====
+            // HMAC-SHA256 signing ensures token integrity
+            // Only server knows the key, so only server can generate valid signatures
             var keyBytes = Encoding.UTF8.GetBytes(key);
             var securityKey = new SymmetricSecurityKey(keyBytes);
             var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            // ===== STEP 6: BUILD JWT TOKEN OBJECT =====
+            // Construct the JWT with all components
             var token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(expiresMinutes),
-                signingCredentials: creds
+                issuer: issuer,                    // Who issued it
+                audience: audience,                // Who can use it
+                claims: claims,                    // User information
+                expires: DateTime.UtcNow.AddMinutes(expiresMinutes),  // Expiry time
+                signingCredentials: creds          // Signature (HMAC-SHA256)
             );
 
+            // ===== STEP 7: SERIALIZE TOKEN TO STRING =====
+            // Convert JWT object to Base64-encoded string format
+            // Format: Header.Payload.Signature
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
+            // ===== STEP 8: RETURN TOKEN TO CLIENT =====
+            // Client must store this token and send it in Authorization header for future requests:
+            // Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+            _logger.LogInformation("User {Email} logged in successfully", user.Email);
             return Ok(new { token = tokenString, expires = token.ValidTo });
         }
     }
