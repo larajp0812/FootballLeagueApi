@@ -1,4 +1,5 @@
 using FootballLeagueApi.Models;
+using FootballLeagueApi.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace FootballLeagueApi.Repositories

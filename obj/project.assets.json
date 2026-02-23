@@ -8304,24 +8304,31 @@
     ]
   },
   "packageFolders": {
-    "/Users/larajohnson/.nuget/packages/": {}
+    "C:\\Users\\Lara J-P\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
+      "projectUniqueName": "C:\\develop-lara\\UoW\\FootballLeagueApi\\FootballLeagueApi.csproj",
       "projectName": "FootballLeagueApi",
-      "projectPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/FootballLeagueApi.csproj",
-      "packagesPath": "/Users/larajohnson/.nuget/packages/",
-      "outputPath": "/Users/larajohnson/AUOW/SEM2/Web App Dev/FootballLeagueApi/obj/",
+      "projectPath": "C:\\develop-lara\\UoW\\FootballLeagueApi\\FootballLeagueApi.csproj",
+      "packagesPath": "C:\\Users\\Lara J-P\\.nuget\\packages\\",
+      "outputPath": "C:\\develop-lara\\UoW\\FootballLeagueApi\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/Users/larajohnson/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Lara J-P\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -8404,7 +8411,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.102/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
