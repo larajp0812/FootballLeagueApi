@@ -28,14 +28,16 @@ namespace FootballLeagueApi.Repositories
             await _context.Players.AddAsync(player);
         }
 
-        public async Task UpdateAsync(Player player)
+        public Task UpdateAsync(Player player)
         {
             _context.Players.Update(player);
+            return Task.CompletedTask;
         }
 
-        public async Task DeleteAsync(Player player)
+        public Task DeleteAsync(Player player)
         {
             _context.Players.Remove(player);
+            return Task.CompletedTask;
         }
 
         public async Task<bool> SaveChangesAsync()

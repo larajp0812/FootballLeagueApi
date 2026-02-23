@@ -16,12 +16,14 @@ namespace FootballLeagueApi.Tests.Controllers
     public class MatchesControllerTests
     {
         private readonly Mock<IMatchService> _mockMatchService;
+        private readonly Mock<ILogger<MatchesController>> _mockLogger;
         private readonly MatchesController _controller;
 
         public MatchesControllerTests()
         {
             _mockMatchService = new Mock<IMatchService>();
-            _controller = new MatchesController(_mockMatchService.Object);
+            _mockLogger = new Mock<ILogger<MatchesController>>();
+            _controller = new MatchesController(_mockMatchService.Object, _mockLogger.Object);
         }
 
         [Fact]

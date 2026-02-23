@@ -1,0 +1,1793 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FootballLeagueApi</name>
+    </assembly>
+    <members>
+        <member name="T:FootballLeagueApi.Controllers.AuthController">
+            <summary>
+            Auth Controller - Handles user authentication operations
+            This controller provides REST API endpoints for user registration and login.
+            Uses ASP.NET Core Identity for secure user management and password hashing.
+            Maps to /api/auth endpoint.
+            </summary>
+        </member>
+        <member name="F:FootballLeagueApi.Controllers.AuthController._userManager">
+            <summary>
+            Dependency-injected UserManager from ASP.NET Core Identity
+            Provides methods for creating users, checking passwords, and managing user accounts
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.AuthController.#ctor(Microsoft.AspNetCore.Identity.UserManager{Microsoft.AspNetCore.Identity.IdentityUser},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{FootballLeagueApi.Controllers.AuthController})">
+            <summary>
+            Constructor accepting UserManager, IConfiguration and ILogger through dependency injection
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.AuthController.Register(FootballLeagueApi.DTOs.Auth.RegisterDto)">
+            <summary>
+            POST /api/auth/register - Register a new user account
+            Accepts a RegisterDto with UserName, Email, and Password
+            Validates input and creates a new user with hashed password
+            Returns:
+              200 OK with success message if registration succeeds
+              400 Bad Request with validation errors if registration fails
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.AuthController.Login(FootballLeagueApi.DTOs.Auth.LoginDto)">
+            <summary>
+            POST /api/auth/login - Authenticate user and return JWT token
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Controllers.MatchesController">
+            <summary>
+            Matches Controller - Manages REST API operations for league matches
+            
+            A match represents a game between two teams (home and away) played at a specific venue during a season.
+            Each match has a scheduled kickoff time and can optionally have results (goals, attendance).
+            Matches are associated with match events (goals, red cards, substitutions, etc.) that track specific occurrences during play.
+            
+            This controller manages match scheduling, result recording, and deletion.
+            Base route: /api/matches
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchesController.#ctor(FootballLeagueApi.Services.IMatchService,Microsoft.Extensions.Logging.ILogger{FootballLeagueApi.Controllers.MatchesController})">
+            <summary>
+            Constructor for dependency injection of MatchService and Logger
+            </summary>
+            <param name="matchService">Service for match business logic operations</param>
+            <param name="logger">Logger for tracking operations</param>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchesController.GetAll">
+            <summary>
+            Retrieve all matches
+            </summary>
+            <returns>Array of MatchReadDto objects</returns>
+            <response code="200">List retrieved successfully</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchesController.GetById(System.Int32)">
+            <summary>
+            Retrieve a specific match by ID
+            </summary>
+            <param name="id">Match ID</param>
+            <returns>MatchReadDto with match details including teams, venue, and kickoff time</returns>
+            <response code="200">Match found</response>
+            <response code="404">Match not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchesController.Create(FootballLeagueApi.DTOs.MatchCreateDto)">
+            <summary>
+            Create a new match
+            </summary>
+            <param name="dto">MatchCreateDto with match details (home team, away team, season, venue, kickoff time)</param>
+            <returns>Created MatchReadDto with assigned ID</returns>
+            <response code="201">Match created successfully</response>
+            <response code="400">Invalid match data or business rule violation</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchesController.Update(System.Int32,FootballLeagueApi.DTOs.MatchUpdateDto)">
+            <summary>
+            Update an existing match's information
+            Typically used to record the final score and match result after play completes
+            </summary>
+            <param name="id">Match ID to update</param>
+            <param name="dto">MatchUpdateDto with updated match information (scores, attendance)</param>
+            <returns>204 No Content</returns>
+            <response code="204">Match updated successfully</response>
+            <response code="404">Match not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchesController.Delete(System.Int32)">
+            <summary>
+            Delete a match
+            Warning: Deleting a match will remove all associated match events
+            </summary>
+            <param name="id">Match ID to delete</param>
+            <returns>204 No Content</returns>
+            <response code="204">Match deleted successfully</response>
+            <response code="404">Match not found</response>
+        </member>
+        <member name="T:FootballLeagueApi.Controllers.MatchEventsController">
+            <summary>
+            Match Events Controller - Manages REST API operations for match events
+            
+            Match Events capture specific occurrences during a match (goals, yellow cards, red cards, substitutions, etc.).
+            Events are associated with a specific match and typically involve a player (optional for non-player events).
+            Each event has a minute timestamp indicating when it occurred during play.
+            Events are primarily recorded through player actions but support tracking of major match incidents.
+            
+            This controller manages event recording, retrieval, updates, and deletion.
+            Base route: /api/matchevents
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchEventsController.#ctor(FootballLeagueApi.Services.IMatchEventService,Microsoft.Extensions.Logging.ILogger{FootballLeagueApi.Controllers.MatchEventsController})">
+            <summary>
+            Constructor for dependency injection of MatchEventService and Logger
+            </summary>
+            <param name="eventService">Service for match event business logic operations</param>
+            <param name="logger">Logger for tracking operations</param>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchEventsController.GetAll">
+            <summary>
+            Retrieve all match events
+            </summary>
+            <returns>Array of MatchEventReadDto objects</returns>
+            <response code="200">List retrieved successfully</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchEventsController.GetById(System.Int32)">
+            <summary>
+            Retrieve a specific match event by ID
+            </summary>
+            <param name="id">Match Event ID</param>
+            <returns>MatchEventReadDto with event details including match, player, minute, and type</returns>
+            <response code="200">Match event found</response>
+            <response code="404">Match event not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchEventsController.Create(FootballLeagueApi.DTOs.MatchEventCreateDto)">
+            <summary>
+            Create a new match event
+            Records an event occurrence during a match (goal, card, substitution, etc.)
+            </summary>
+            <param name="dto">MatchEventCreateDto with event details (match, player, minute, event type)</param>
+            <returns>Created MatchEventReadDto with assigned ID</returns>
+            <response code="201">Match event created successfully</response>
+            <response code="400">Invalid event data or business rule violation</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchEventsController.Update(System.Int32,FootballLeagueApi.DTOs.MatchEventUpdateDto)">
+            <summary>
+            Update an existing match event
+            Used to correct event details (player involved, minute, or event type)
+            </summary>
+            <param name="id">Match Event ID to update</param>
+            <param name="dto">MatchEventUpdateDto with updated event information</param>
+            <returns>204 No Content</returns>
+            <response code="204">Match event updated successfully</response>
+            <response code="404">Match event not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.MatchEventsController.Delete(System.Int32)">
+            <summary>
+            Delete a match event
+            Removes a recorded event from a match
+            </summary>
+            <param name="id">Match Event ID to delete</param>
+            <returns>204 No Content</returns>
+            <response code="204">Match event deleted successfully</response>
+            <response code="404">Match event not found</response>
+        </member>
+        <member name="T:FootballLeagueApi.Controllers.PlayersController">
+            <summary>
+            Players Controller - Manages REST API operations for football players
+            
+            This controller provides endpoints for managing individual player records including creation, 
+            retrieval, updates, and deletion. Players are associated with teams and can be tracked in matches.
+            Each player has a unique ID, full name, shirt number, position, and team assignment.
+            
+            Base route: /api/players
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.PlayersController.#ctor(FootballLeagueApi.Services.IPlayerService,Microsoft.Extensions.Logging.ILogger{FootballLeagueApi.Controllers.PlayersController})">
+            <summary>
+            Constructor for dependency injection of PlayerService and Logger
+            </summary>
+            <param name="playerService">Service for player business logic operations</param>
+            <param name="logger">Logger for tracking operations and errors</param>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.PlayersController.GetAll">
+            <summary>
+            Retrieve all players in the league
+            </summary>
+            <returns>Array of PlayerReadDto objects</returns>
+            <response code="200">List retrieved successfully</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.PlayersController.GetById(System.Int32)">
+            <summary>
+            Retrieve a specific player by ID
+            </summary>
+            <param name="id">Player ID</param>
+            <returns>PlayerReadDto with player details</returns>
+            <response code="200">Player found</response>
+            <response code="404">Player not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.PlayersController.Create(FootballLeagueApi.DTOs.PlayerCreateDto)">
+            <summary>
+            Create a new player
+            </summary>
+            <param name="dto">PlayerCreateDto with player information</param>
+            <returns>Created PlayerReadDto with assigned ID</returns>
+            <response code="201">Player created successfully</response>
+            <response code="400">Invalid player data</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.PlayersController.Update(System.Int32,FootballLeagueApi.DTOs.PlayerUpdateDto)">
+            <summary>
+            Update an existing player's information
+            </summary>
+            <param name="id">Player ID to update</param>
+            <param name="dto">PlayerUpdateDto with updated player information</param>
+            <returns>204 No Content</returns>
+            <response code="204">Player updated successfully</response>
+            <response code="404">Player not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.PlayersController.Delete(System.Int32)">
+            <summary>
+            Delete a player
+            </summary>
+            <param name="id">Player ID to delete</param>
+            <returns>204 No Content</returns>
+            <response code="204">Player deleted successfully</response>
+            <response code="404">Player not found</response>
+        </member>
+        <member name="T:FootballLeagueApi.Controllers.SeasonsController">
+            <summary>
+            Seasons Controller - Manages REST API operations for league seasons
+            
+            A season represents a complete period (e.g., 2025/26) during which all league matches are played.
+            This controller manages season creation, retrieval, updates, and deletion.
+            Multiple matches are associated with each season, and players participate in seasons through their teams.
+            
+            Base route: /api/seasons
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.SeasonsController.#ctor(FootballLeagueApi.Services.ISeasonService,Microsoft.Extensions.Logging.ILogger{FootballLeagueApi.Controllers.SeasonsController})">
+            <summary>
+            Constructor for dependency injection of SeasonService and Logger
+            </summary>
+            <param name="seasonService">Service for season business logic operations</param>
+            <param name="logger">Logger for tracking operations</param>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.SeasonsController.GetAll">
+            <summary>
+            Retrieve all seasons
+            </summary>
+            <returns>Array of SeasonReadDto objects</returns>
+            <response code="200">List retrieved successfully</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.SeasonsController.GetById(System.Int32)">
+            <summary>
+            Retrieve a specific season by ID
+            </summary>
+            <param name="id">Season ID</param>
+            <returns>SeasonReadDto with season details</returns>
+            <response code="200">Season found</response>
+            <response code="404">Season not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.SeasonsController.Create(FootballLeagueApi.DTOs.SeasonCreateDto)">
+            <summary>
+            Create a new season
+            </summary>
+            <param name="dto">SeasonCreateDto with season information</param>
+            <returns>Created SeasonReadDto with assigned ID</returns>
+            <response code="201">Season created successfully</response>
+            <response code="400">Invalid season data</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.SeasonsController.Update(System.Int32,FootballLeagueApi.DTOs.SeasonUpdateDto)">
+            <summary>
+            Update an existing season's information
+            </summary>
+            <param name="id">Season ID to update</param>
+            <param name="dto">SeasonUpdateDto with updated season information</param>
+            <returns>204 No Content</returns>
+            <response code="204">Season updated successfully</response>
+            <response code="404">Season not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.SeasonsController.Delete(System.Int32)">
+            <summary>
+            Delete a season
+            </summary>
+            <param name="id">Season ID to delete</param>
+            <returns>204 No Content</returns>
+            <response code="204">Season deleted successfully</response>
+            <response code="404">Season not found</response>
+        </member>
+        <member name="T:FootballLeagueApi.Controllers.TeamsController">
+            <summary>
+            Teams Controller - Manages REST API operations for football teams
+            
+            This controller provides endpoints for creating, reading, updating, and deleting team records.
+            Teams represent the individual clubs participating in the football league.
+            All operations are logged and include comprehensive error handling.
+            
+            Base route: /api/teams
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.TeamsController.#ctor(FootballLeagueApi.Services.ITeamService,Microsoft.Extensions.Logging.ILogger{FootballLeagueApi.Controllers.TeamsController})">
+            <summary>
+            Constructor for dependency injection of TeamService and Logger
+            </summary>
+            <param name="teamService">Service for team business logic operations</param>
+            <param name="logger">Logger for tracking operations and errors</param>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.TeamsController.GetAll">
+            <summary>
+            Retrieve all teams in the league
+            
+            Returns a complete list of all registered teams with their details.
+            This endpoint is useful for populating dropdowns, lists, or team selection interfaces.
+            </summary>
+            <returns>
+            200 OK - Returns an array of TeamReadDto objects containing all teams
+            Example: [{ "teamId": 1, "name": "Manchester United", "coach": "Erik ten Hag", "foundedYear": 1878 }]
+            </returns>
+            <response code="200">List of all teams successfully retrieved</response>
+            <response code="500">Internal server error occurred while fetching teams</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.TeamsController.GetById(System.Int32)">
+            <summary>
+            Retrieve a specific team by its ID
+            
+            Fetches detailed information about a single team including name, coach, and founding year.
+            This endpoint is used when you need information about a particular team.
+            </summary>
+            <param name="id">The unique identifier of the team (primary key)</param>
+            <returns>
+            200 OK - Returns TeamReadDto with team details
+            Example: { "teamId": 1, "name": "Manchester United", "coach": "Erik ten Hag", "foundedYear": 1878 }
+            </returns>
+            <response code="200">Team found and returned successfully</response>
+            <response code="404">Team with specified ID not found</response>
+            <response code="500">Internal server error occurred</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.TeamsController.Create(FootballLeagueApi.DTOs.TeamCreateDto)">
+            <summary>
+            Create a new team in the league
+            
+            Adds a new team to the system. The team ID is auto-generated by the database.
+            Requires team name, coach name, and founding year.
+            Returns the created team with its assigned ID.
+            </summary>
+            <param name="dto">TeamCreateDto containing team name, coach, and founded year</param>
+            <returns>
+            201 Created - Returns TeamReadDto with the newly created team and its assigned ID
+            Example: { "teamId": 1, "name": "Manchester United", "coach": "Erik ten Hag", "foundedYear": 1878 }
+            Location header points to GET /api/teams/1
+            </returns>
+            <response code="201">Team successfully created</response>
+            <response code="400">Invalid team data provided</response>
+            <response code="500">Internal server error occurred</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.TeamsController.Update(System.Int32,FootballLeagueApi.DTOs.TeamUpdateDto)">
+            <summary>
+            Update an existing team's information
+            
+            Modifies team details such as name, coaching staff, or founding year.
+            Requires the team ID in the URL path. The team ID cannot be changed.
+            Returns 204 No Content on success, 404 if team not found.
+            </summary>
+            <param name="id">The ID of the team to update</param>
+            <param name="dto">TeamUpdateDto containing updated team information</param>
+            <returns>
+            204 No Content - Team successfully updated (no response body)
+            </returns>
+            <response code="204">Team updated successfully</response>
+            <response code="404">Team with specified ID not found</response>
+            <response code="400">Invalid team data or update operation failed</response>
+            <response code="500">Internal server error occurred</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.TeamsController.Delete(System.Int32)">
+            <summary>
+            Delete a team from the league
+            
+            Permanently removes a team from the system. This operation is irreversible.
+            Returns 204 No Content on success, 404 if team not found.
+            Note: Deleting a team may affect related match records depending on database constraints.
+            </summary>
+            <param name="id">The ID of the team to delete</param>
+            <returns>
+            204 No Content - Team successfully deleted (no response body)
+            </returns>
+            <response code="204">Team deleted successfully</response>
+            <response code="404">Team with specified ID not found</response>
+            <response code="500">Internal server error occurred</response>
+        </member>
+        <member name="T:FootballLeagueApi.Controllers.VenuesController">
+            <summary>
+            Venues Controller - Manages REST API operations for football stadiums and venues
+            
+            This controller provides endpoints for managing physical locations where matches are played.
+            Venues contain information about stadium name, location, and capacity.
+            Each venue can host multiple matches throughout different seasons.
+            
+            Base route: /api/venues
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.VenuesController.#ctor(FootballLeagueApi.Services.IVenueService,Microsoft.Extensions.Logging.ILogger{FootballLeagueApi.Controllers.VenuesController})">
+            <summary>
+            Constructor for dependency injection of VenueService and Logger
+            </summary>
+            <param name="venueService">Service for venue business logic operations</param>
+            <param name="logger">Logger for tracking operations</param>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.VenuesController.GetAll">
+            <summary>
+            Retrieve all venues/stadiums
+            </summary>
+            <returns>Array of VenueReadDto objects</returns>
+            <response code="200">List retrieved successfully</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.VenuesController.GetById(System.Int32)">
+            <summary>
+            Retrieve a specific venue by ID
+            </summary>
+            <param name="id">Venue ID</param>
+            <returns>VenueReadDto with venue details</returns>
+            <response code="200">Venue found</response>
+            <response code="404">Venue not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.VenuesController.Create(FootballLeagueApi.DTOs.VenueCreateDto)">
+            <summary>
+            Create a new venue
+            </summary>
+            <param name="dto">VenueCreateDto with venue information</param>
+            <returns>Created VenueReadDto with assigned ID</returns>
+            <response code="201">Venue created successfully</response>
+            <response code="400">Invalid venue data</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.VenuesController.Update(System.Int32,FootballLeagueApi.DTOs.VenueUpdateDto)">
+            <summary>
+            Update an existing venue's information
+            </summary>
+            <param name="id">Venue ID to update</param>
+            <param name="dto">VenueUpdateDto with updated venue information</param>
+            <returns>204 No Content</returns>
+            <response code="204">Venue updated successfully</response>
+            <response code="404">Venue not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Controllers.VenuesController.Delete(System.Int32)">
+            <summary>
+            Delete a venue
+            </summary>
+            <param name="id">Venue ID to delete</param>
+            <returns>204 No Content</returns>
+            <response code="204">Venue deleted successfully</response>
+            <response code="404">Venue not found</response>
+        </member>
+        <member name="M:FootballLeagueApi.Data.LeagueContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{FootballLeagueApi.Data.LeagueContext})">
+            <summary>
+            Constructor that accepts DbContextOptions for configuration
+            The options are passed from Program.cs where we specify SQLite and connection string
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Data.LeagueContext.Teams">
+            <summary>
+            Teams table - stores football team information
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Data.LeagueContext.Players">
+            <summary>
+            Players table - stores player information and their team assignments
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Data.LeagueContext.Seasons">
+            <summary>
+            Seasons table - stores league seasons (e.g., 2025/26)
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Data.LeagueContext.Matches">
+            <summary>
+            Matches table - stores match results between teams
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Data.LeagueContext.Venues">
+            <summary>
+            Venues table - stores stadium/venue information
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Data.LeagueContext.MatchEvents">
+            <summary>
+            MatchEvents table - stores individual events within matches (goals, cards, etc.)
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Data.LeagueContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            Configure model relationships through Fluent API
+            This method is called after the model has been constructed to fine-tune configuration
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.Auth.LoginDto">
+            <summary>
+            LoginDto - Data Transfer Object for user login requests
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.Auth.LoginDto.Email">
+            <summary>
+            The user's email address (used as unique identifier)
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.Auth.LoginDto.Password">
+            <summary>
+            The user's password
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.Auth.RegisterDto">
+            <summary>
+            RegisterDto - Data Transfer Object for user registration requests
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.Auth.RegisterDto.UserName">
+            <summary>
+            The desired username for the account
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.Auth.RegisterDto.Email">
+            <summary>
+            The user's email address
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.Auth.RegisterDto.Password">
+            <summary>
+            The user's password
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.MatchCreateDto">
+            <summary>
+            MatchCreateDto - Data Transfer Object for creating a new match
+            
+            Used in POST /api/matches requests to schedule a new match.
+            Requires home team, away team, season, venue, and kickoff time.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchCreateDto.HomeTeamId">
+            <summary>
+            The ID of the team playing at home
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchCreateDto.AwayTeamId">
+            <summary>
+            The ID of the team playing away
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchCreateDto.SeasonId">
+            <summary>
+            The ID of the season this match belongs to
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchCreateDto.VenueId">
+            <summary>
+            The ID of the venue where this match will be played
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchCreateDto.KickoffTime">
+            <summary>
+            The date and time when the match kicks off
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.MatchEventCreateDto">
+            <summary>
+            MatchEventCreateDto - Data Transfer Object for creating a new match event
+            
+            Used in POST /api/matchevents requests to record an event during a match.
+            Events can be goals, cards, substitutions, etc.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventCreateDto.MatchId">
+            <summary>
+            The ID of the match this event occurred in
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventCreateDto.PlayerId">
+            <summary>
+            The ID of the player involved in this event (optional)
+            Nullable for events that don't involve a specific player
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventCreateDto.Minute">
+            <summary>
+            The minute (game time) when the event occurred
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventCreateDto.EventType">
+            <summary>
+            The type of event (e.g., "Goal", "YellowCard", "RedCard", "Substitution", "OwnGoal")
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.MatchEventMapper">
+            <summary>
+            MatchEventMapper - Utility class for converting between MatchEvent DTOs and domain models
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.MatchEventMapper.ToDto(FootballLeagueApi.Models.MatchEvent)">
+            <summary>
+            Convert a MatchEvent domain model to a MatchEventReadDto
+            Used when returning match event data in API responses
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.MatchEventMapper.ToModel(FootballLeagueApi.DTOs.MatchEventCreateDto)">
+            <summary>
+            Convert a MatchEventCreateDto to a MatchEvent domain model
+            Used when creating a new match event from API request data
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.MatchEventMapper.ToModel(FootballLeagueApi.DTOs.MatchEventUpdateDto,System.Int32,System.Int32)">
+            <summary>
+            Convert a MatchEventUpdateDto to a MatchEvent domain model
+            Used when updating an existing match event
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.MatchEventReadDto">
+            <summary>
+            MatchEventReadDto - Data Transfer Object for reading match event data
+            
+            Used in API responses (GET requests) to return match event information.
+            Includes all event details including the match and player references.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventReadDto.MatchEventId">
+            <summary>
+            The unique identifier for the match event
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventReadDto.MatchId">
+            <summary>
+            The ID of the match this event occurred in
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventReadDto.PlayerId">
+            <summary>
+            The ID of the player involved (if applicable)
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventReadDto.Minute">
+            <summary>
+            The minute when the event occurred
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventReadDto.EventType">
+            <summary>
+            The type of event
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.MatchEventUpdateDto">
+            <summary>
+            MatchEventUpdateDto - Data Transfer Object for updating a match event
+            
+            Used in PUT /api/matchevents/{id} requests to update event details.
+            The MatchEventId is not included as it comes from the URL path.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventUpdateDto.Minute">
+            <summary>
+            The minute when the event occurred
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventUpdateDto.EventType">
+            <summary>
+            The type of event
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchEventUpdateDto.PlayerId">
+            <summary>
+            The ID of the player involved (optional)
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.MatchMapper">
+            <summary>
+            MatchMapper - Utility class for converting between Match DTOs and domain models
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.MatchMapper.ToDto(FootballLeagueApi.Models.Match)">
+            <summary>
+            Convert a Match domain model to a MatchReadDto
+            Used when returning match data in API responses
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.MatchMapper.ToModel(FootballLeagueApi.DTOs.MatchCreateDto)">
+            <summary>
+            Convert a MatchCreateDto to a Match domain model
+            Used when creating a new match from API request data
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.MatchMapper.ToModel(FootballLeagueApi.DTOs.MatchUpdateDto,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Convert a MatchUpdateDto to a Match domain model
+            Used when updating an existing match
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.MatchReadDto">
+            <summary>
+            MatchReadDto - Data Transfer Object for reading match data
+            
+            Used in API responses (GET requests) to return match information.
+            Includes all match details including scores and team references.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchReadDto.MatchId">
+            <summary>
+            The unique identifier for the match
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchReadDto.HomeTeamId">
+            <summary>
+            The ID of the team playing at home
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchReadDto.AwayTeamId">
+            <summary>
+            The ID of the team playing away
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchReadDto.SeasonId">
+            <summary>
+            The ID of the season this match belongs to
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchReadDto.VenueId">
+            <summary>
+            The ID of the venue where this match is played
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchReadDto.KickoffTime">
+            <summary>
+            The date and time when the match kicks off
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchReadDto.HomeScore">
+            <summary>
+            The final score for the home team
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchReadDto.AwayScore">
+            <summary>
+            The final score for the away team
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.MatchUpdateDto">
+            <summary>
+            MatchUpdateDto - Data Transfer Object for updating match data
+            
+            Used in PUT /api/matches/{id} requests to update match information.
+            Typically used to update final scores after a match completes.
+            The MatchId is not included as it comes from the URL path.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchUpdateDto.HomeScore">
+            <summary>
+            The final score for the home team
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchUpdateDto.AwayScore">
+            <summary>
+            The final score for the away team
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.MatchUpdateDto.KickoffTime">
+            <summary>
+            The kickoff time (can be rescheduled)
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.PlayerCreateDto">
+            <summary>
+            PlayerCreateDto - Data Transfer Object for creating a new player
+            
+            Used in POST /api/players requests to create a new player.
+            The PlayerId is auto-generated; the TeamId is provided to assign the player to a team.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerCreateDto.FullName">
+            <summary>
+            The full name of the player
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerCreateDto.ShirtNumber">
+            <summary>
+            The shirt number worn by the player
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerCreateDto.Position">
+            <summary>
+            The player's position on the field (e.g., "Goalkeeper", "Defender", "Midfielder", "Forward")
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerCreateDto.TeamId">
+            <summary>
+            The ID of the team this player will play for
+            Must reference an existing team in the database
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.PlayerMapper">
+            <summary>
+            PlayerMapper - Utility class for converting between Player DTOs and domain models
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.PlayerMapper.ToDto(FootballLeagueApi.Models.Player)">
+            <summary>
+            Convert a Player domain model to a PlayerReadDto
+            Used when returning player data in API responses
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.PlayerMapper.ToModel(FootballLeagueApi.DTOs.PlayerCreateDto)">
+            <summary>
+            Convert a PlayerCreateDto to a Player domain model
+            Used when creating a new player from API request data
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.PlayerMapper.ToModel(FootballLeagueApi.DTOs.PlayerUpdateDto,System.Int32,System.Int32)">
+            <summary>
+            Convert a PlayerUpdateDto to a Player domain model
+            Used when updating an existing player
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.PlayerReadDto">
+            <summary>
+            PlayerReadDto - Data Transfer Object for reading player data
+            
+            Used in API responses (GET requests) to return player information.
+            Includes the PlayerId for client reference.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerReadDto.PlayerId">
+            <summary>
+            The unique identifier for the player
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerReadDto.FullName">
+            <summary>
+            The full name of the player
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerReadDto.ShirtNumber">
+            <summary>
+            The shirt number worn by the player
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerReadDto.Position">
+            <summary>
+            The player's position on the field
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerReadDto.TeamId">
+            <summary>
+            The ID of the team this player plays for
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.PlayerUpdateDto">
+            <summary>
+            PlayerUpdateDto - Data Transfer Object for updating a player
+            
+            Used in PUT /api/players/{id} requests to update player information.
+            The PlayerId is not included as it comes from the URL path.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerUpdateDto.FullName">
+            <summary>
+            The full name of the player
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerUpdateDto.ShirtNumber">
+            <summary>
+            The shirt number worn by the player
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.PlayerUpdateDto.Position">
+            <summary>
+            The player's position on the field
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.SeasonCreateDto">
+            <summary>
+            SeasonCreateDto - Data Transfer Object for creating a new season
+            
+            Used in POST /api/seasons requests to create a new league season.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonCreateDto.Name">
+            <summary>
+            The name/identifier for the season (e.g., "2025/26", "Premier League 2025-26")
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonCreateDto.StartDate">
+            <summary>
+            The date when this season starts
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonCreateDto.EndDate">
+            <summary>
+            The date when this season ends
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.SeasonMapper">
+            <summary>
+            SeasonMapper - Utility class for converting between Season DTOs and domain models
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.SeasonMapper.ToDto(FootballLeagueApi.Models.Season)">
+            <summary>
+            Convert a Season domain model to a SeasonReadDto
+            Used when returning season data in API responses
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.SeasonMapper.ToModel(FootballLeagueApi.DTOs.SeasonCreateDto)">
+            <summary>
+            Convert a SeasonCreateDto to a Season domain model
+            Used when creating a new season from API request data
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.SeasonMapper.ToModel(FootballLeagueApi.DTOs.SeasonUpdateDto,System.Int32)">
+            <summary>
+            Convert a SeasonUpdateDto to a Season domain model
+            Used when updating an existing season
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.SeasonReadDto">
+            <summary>
+            SeasonReadDto - Data Transfer Object for reading season data
+            
+            Used in API responses (GET requests) to return season information.
+            Includes the SeasonId and all season details.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonReadDto.SeasonId">
+            <summary>
+            The unique identifier for the season
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonReadDto.Name">
+            <summary>
+            The name/identifier for the season
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonReadDto.StartDate">
+            <summary>
+            The date when this season starts
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonReadDto.EndDate">
+            <summary>
+            The date when this season ends
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.SeasonUpdateDto">
+            <summary>
+            SeasonUpdateDto - Data Transfer Object for updating a season
+            
+            Used in PUT /api/seasons/{id} requests to update season information.
+            The SeasonId is not included as it comes from the URL path.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonUpdateDto.Name">
+            <summary>
+            The name/identifier for the season
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonUpdateDto.StartDate">
+            <summary>
+            The date when this season starts
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.SeasonUpdateDto.EndDate">
+            <summary>
+            The date when this season ends
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.TeamCreateDto">
+            <summary>
+            TeamCreateDto - Data Transfer Object for creating a new team
+            
+            DTOs (Data Transfer Objects) are used to define the shape of data
+            sent to and received from the API. This class represents the data
+            expected in a POST /api/teams request body.
+            
+            Notice: No TeamId property - the ID is auto-generated by the database
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamCreateDto.Name">
+            <summary>
+            The name of the team being created (e.g., "Manchester United")
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamCreateDto.Coach">
+            <summary>
+            The name of the team's head coach
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamCreateDto.FoundedYear">
+            <summary>
+            The year the team was founded
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.TeamMapper">
+            <summary>
+            TeamMapper - Utility class for converting between DTOs and domain models
+            
+            This static class provides methods to convert:
+            - Domain models (Team) to DTOs (TeamReadDto)
+            - DTOs (TeamCreateDto) to domain models (Team)
+            This keeps conversion logic centralized and reusable across the application.
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.TeamMapper.ToDto(FootballLeagueApi.Models.Team)">
+            <summary>
+            Convert a Team domain model to a TeamReadDto
+            Used when returning team data to clients in API responses
+            </summary>
+            <param name="team">The Team model to convert</param>
+            <returns>A TeamReadDto with the same data as the Team</returns>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.TeamMapper.ToModel(FootballLeagueApi.DTOs.TeamCreateDto)">
+            <summary>
+            Convert a TeamCreateDto to a Team domain model
+            Used when a client sends POST request data that needs to become a database entity
+            </summary>
+            <param name="dto">The TeamCreateDto from the request</param>
+            <returns>A new Team model ready to be saved to the database</returns>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.TeamReadDto">
+            <summary>
+            TeamReadDto - Data Transfer Object for reading team data
+            
+            This DTO represents the data structure returned in GET responses.
+            It includes the TeamId because the client needs to identify the team.
+            This is used when returning teams to the client in API responses.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamReadDto.TeamId">
+            <summary>
+            The unique identifier for the team
+            Populated by the database and included in read responses
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamReadDto.Name">
+            <summary>
+            The name of the team
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamReadDto.Coach">
+            <summary>
+            The name of the team's head coach
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamReadDto.FoundedYear">
+            <summary>
+            The year the team was founded
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.TeamUpdateDto">
+            <summary>
+            TeamUpdateDto - Data Transfer Object for updating a team
+            
+            This DTO represents the data expected in a PUT /api/teams/{id} request body.
+            The TeamId is NOT included because it comes from the URL path (/api/teams/{id}).
+            This prevents confusion and accidental ID mismatches.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamUpdateDto.Name">
+            <summary>
+            The updated name of the team
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamUpdateDto.Coach">
+            <summary>
+            The updated name of the team's head coach
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.TeamUpdateDto.FoundedYear">
+            <summary>
+            The updated year the team was founded
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.VenueCreateDto">
+            <summary>
+            VenueCreateDto - Data Transfer Object for creating a new venue
+            
+            Used in POST /api/venues requests to add a new stadium/venue to the system.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.VenueCreateDto.Name">
+            <summary>
+            The name of the venue/stadium (e.g., "Old Trafford", "Anfield")
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.VenueCreateDto.Address">
+            <summary>
+            The physical address of the venue
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.VenueMapper">
+            <summary>
+            VenueMapper - Utility class for converting between Venue DTOs and domain models
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.VenueMapper.ToDto(FootballLeagueApi.Models.Venue)">
+            <summary>
+            Convert a Venue domain model to a VenueReadDto
+            Used when returning venue data in API responses
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.VenueMapper.ToModel(FootballLeagueApi.DTOs.VenueCreateDto)">
+            <summary>
+            Convert a VenueCreateDto to a Venue domain model
+            Used when creating a new venue from API request data
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.DTOs.VenueMapper.ToModel(FootballLeagueApi.DTOs.VenueUpdateDto,System.Int32)">
+            <summary>
+            Convert a VenueUpdateDto to a Venue domain model
+            Used when updating an existing venue
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.VenueReadDto">
+            <summary>
+            VenueReadDto - Data Transfer Object for reading venue data
+            
+            Used in API responses (GET requests) to return venue information.
+            Includes the VenueId and all venue details.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.VenueReadDto.VenueId">
+            <summary>
+            The unique identifier for the venue
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.VenueReadDto.Name">
+            <summary>
+            The name of the venue/stadium
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.VenueReadDto.Address">
+            <summary>
+            The physical address of the venue
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.DTOs.VenueUpdateDto">
+            <summary>
+            VenueUpdateDto - Data Transfer Object for updating a venue
+            
+            Used in PUT /api/venues/{id} requests to update venue information.
+            The VenueId is not included as it comes from the URL path.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.VenueUpdateDto.Name">
+            <summary>
+            The name of the venue/stadium
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.DTOs.VenueUpdateDto.Address">
+            <summary>
+            The physical address of the venue
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Middleware.GlobalExceptionHandlingMiddleware">
+            <summary>
+            Global Exception Handling Middleware
+            
+            This middleware catches all unhandled exceptions in the application
+            and returns a standardized error response to the client.
+            It logs the exception details for debugging and monitoring.
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Middleware.ErrorResponse">
+            <summary>
+            Standard error response model returned by the API
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:FootballLeagueApi.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:FootballLeagueApi.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:FootballLeagueApi.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:FootballLeagueApi.Migrations.TeamUpdated">
+            <inheritdoc />
+        </member>
+        <member name="M:FootballLeagueApi.Migrations.TeamUpdated.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:FootballLeagueApi.Migrations.TeamUpdated.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:FootballLeagueApi.Migrations.TeamUpdated.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:FootballLeagueApi.Models.Match">
+            <summary>
+            Match Model - Represents a football match between two teams
+            
+            A match is a game between a home team and an away team at a specific venue.
+            It belongs to a season and can have multiple match events (goals, cards, substitutions).
+            The match tracks both teams, location, timing, and final score.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.MatchId">
+            <summary>
+            Unique identifier for the match (Primary Key)
+            Auto-generated by the database
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.HomeTeamId">
+            <summary>
+            Foreign key: ID of the team playing at home
+            Links to the Team table
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.AwayTeamId">
+            <summary>
+            Foreign key: ID of the team playing away
+            Links to the Team table
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.SeasonId">
+            <summary>
+            Foreign key: ID of the season this match belongs to
+            Every match must be part of a specific season
+            Links to the Season table
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.VenueId">
+            <summary>
+            Foreign key: ID of the venue where this match is played
+            Links to the Venue table (stadium/ground location)
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.KickoffTime">
+            <summary>
+            The date and time when the match kicks off
+            Determines when the match is scheduled to start
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.HomeScore">
+            <summary>
+            The final score for the home team
+            Updated after the match is completed
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.AwayScore">
+            <summary>
+            The final score for the away team
+            Updated after the match is completed
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.HomeTeam">
+            <summary>
+            Navigation property: Reference to the home Team object
+            [JsonIgnore] prevents the entire team object from being serialized
+            in API responses to keep responses lightweight
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.AwayTeam">
+            <summary>
+            Navigation property: Reference to the away Team object
+            [JsonIgnore] prevents the entire team object from being serialized
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.Season">
+            <summary>
+            Navigation property: Reference to the Season this match belongs to
+            [JsonIgnore] prevents the season object from being serialized
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.Venue">
+            <summary>
+            Navigation property: Reference to the Venue where the match is played
+            [JsonIgnore] prevents the venue object from being serialized
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Match.MatchEvents">
+            <summary>
+            Navigation property: Collection of all events that occurred during this match
+            Includes goals, yellow/red cards, substitutions, etc.
+            Related through the MatchEvent.MatchId foreign key
+            [JsonIgnore] prevents nested event data in responses
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Models.MatchEvent">
+            <summary>
+            MatchEvent Model - Represents an event that occurs during a match
+            
+            Examples of match events include: goals scored, yellow/red cards, substitutions, own goals, etc.
+            Each event is linked to a specific match and occurs at a specific minute.
+            A player is optionally associated (e.g., yellow cards might not have a player in the model).
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.MatchEvent.MatchEventId">
+            <summary>
+            Unique identifier for the match event (Primary Key)
+            Auto-generated by the database
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.MatchEvent.MatchId">
+            <summary>
+            Foreign key: ID of the match this event occurred in
+            Links to the Match table
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.MatchEvent.PlayerId">
+            <summary>
+            Foreign key: ID of the player involved in this event (optional)
+            Nullable because some events (e.g., fan incidents) may not involve a specific player
+            Links to the Player table
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.MatchEvent.Minute">
+            <summary>
+            The minute (game time) when the event occurred
+            For example, a goal in the 45th minute would have Minute = 45
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.MatchEvent.EventType">
+            <summary>
+            The type of event that occurred
+            Examples: "Goal", "YellowCard", "RedCard", "Substitution", "OwnGoal", etc.
+            This is a string to allow flexibility in event types without enum constraints
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.MatchEvent.Match">
+            <summary>
+            Navigation property: Reference to the Match this event belongs to
+            [JsonIgnore] prevents the entire match object from being serialized
+            in API responses to keep responses lightweight
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.MatchEvent.Player">
+            <summary>
+            Navigation property: Reference to the Player involved in this event (if applicable)
+            [JsonIgnore] prevents the entire player object from being serialized
+            Will be null if the event doesn't involve a specific player
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Models.Player">
+            <summary>
+            Player Model - Represents a football player in the league
+            
+            This model stores information about individual players and their team assignment.
+            The Team navigation property is marked with [JsonIgnore] to prevent circular references
+            when serializing to JSON (avoiding infinitely nested data).
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Player.PlayerId">
+            <summary>
+            Unique identifier for the player (Primary Key)
+            Auto-generated by the database
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Player.FullName">
+            <summary>
+            The full name of the player
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Player.ShirtNumber">
+            <summary>
+            The shirt number worn by the player (typically 1-99)
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Player.Position">
+            <summary>
+            The player's position on the field (e.g., "Goalkeeper", "Defender", "Midfielder", "Forward")
+            Nullable because some players may not have a position defined
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Player.TeamId">
+            <summary>
+            Foreign key reference to the team this player plays for
+            Links this player to a Team record in the database
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Player.Team">
+            <summary>
+            Navigation property: Reference to the Team this player belongs to
+            [JsonIgnore] prevents the full team object from being serialized in API responses
+            This avoids circular reference issues (Player -> Team -> Players -> Player...)
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Models.Season">
+            <summary>
+            Season Model - Represents a football league season
+            
+            A season is a time period (typically one year) in which all matches are played.
+            For example, the 2025/26 season runs from a specified start date to an end date.
+            All matches in the league must belong to a season.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Season.SeasonId">
+            <summary>
+            Unique identifier for the season (Primary Key)
+            Auto-generated by the database
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Season.Name">
+            <summary>
+            The name/identifier for the season (e.g., "2025/26", "Premier League 2025-26")
+            Typically formatted as start year slash end year
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Season.StartDate">
+            <summary>
+            The date when this season starts (e.g., August 1, 2025)
+            Matches cannot be scheduled before this date
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Season.EndDate">
+            <summary>
+            The date when this season ends (e.g., May 31, 2026)
+            Matches cannot be scheduled after this date
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Season.Matches">
+            <summary>
+            Navigation property: Collection of all matches that belong to this season
+            Related through the Match.SeasonId foreign key
+            [JsonIgnore] prevents the full list of matches from being serialized
+            to avoid overly large API responses with nested match data
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Models.Team">
+            <summary>
+            Team Model - Represents a football team in the league
+            
+            This is a domain model that maps to the Teams database table.
+            It contains the team's basic information and navigation properties
+            for relationships (players who play for the team, matches they play in)
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Team.TeamId">
+            <summary>
+            Unique identifier for the team (Primary Key)
+            Auto-generated by the database
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Team.Name">
+            <summary>
+            The name of the team (e.g., "Arsenal")
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Team.Coach">
+            <summary>
+            The name of the team's head coach
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Team.FoundedYear">
+            <summary>
+            The year the team was founded
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Team.HomeMatches">
+            <summary>
+            Navigation property: Collection of matches where this team played at home
+            Related through the Match.HomeTeamId foreign key
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Team.AwayMatches">
+            <summary>
+            Navigation property: Collection of matches where this team played away
+            Related through the Match.AwayTeamId foreign key
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Team.Players">
+            <summary>
+            Navigation property: Collection of players that currently play for this team
+            Related through the Player.TeamId foreign key
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Models.Venue">
+            <summary>
+            Venue Model - Represents a football stadium or venue
+            
+            A venue is a physical location (stadium, ground) where matches are played.
+            Multiple matches can be played at the same venue throughout a season.
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Venue.VenueId">
+            <summary>
+            Unique identifier for the venue (Primary Key)
+            Auto-generated by the database
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Venue.Name">
+            <summary>
+            The name of the venue/stadium (e.g., "Old Trafford", "Anfield")
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Venue.Address">
+            <summary>
+            The physical address of the venue (street, city, postcode)
+            Nullable because some venues may not have a recorded address
+            </summary>
+        </member>
+        <member name="P:FootballLeagueApi.Models.Venue.Matches">
+            <summary>
+            Navigation property: Collection of all matches played at this venue
+            Related through the Match.VenueId foreign key
+            [JsonIgnore] prevents the full list of matches from being serialized
+            to avoid overly large API responses
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Repositories.ITeamRepository">
+            <summary>
+            ITeamRepository Interface - Defines data access operations for teams
+            
+            This interface abstracts all database operations for teams.
+            By programming to this interface rather than a concrete class,
+            we create a layer between business logic and database code.
+            This allows easy testing with mock repositories.
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.ITeamRepository.GetAllAsync">
+            <summary>
+            Retrieve all teams from the database
+            Returns all Team entities in the database
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.ITeamRepository.GetByIdAsync(System.Int32)">
+            <summary>
+            Retrieve a specific team by its ID
+            Returns the Team if found, or null if not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.ITeamRepository.AddAsync(FootballLeagueApi.Models.Team)">
+            <summary>
+            Add a new team to the database context
+            Note: Changes are not saved until SaveChangesAsync is called
+            This allows batching multiple operations before committing
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.ITeamRepository.UpdateAsync(FootballLeagueApi.Models.Team)">
+            <summary>
+            Update an existing team (mark it as modified)
+            The actual database update happens when SaveChangesAsync is called
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.ITeamRepository.DeleteAsync(FootballLeagueApi.Models.Team)">
+            <summary>
+            Delete a team from the database context
+            Changes are persisted when SaveChangesAsync is called
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.ITeamRepository.SaveChangesAsync">
+            <summary>
+            Persist all pending changes to the database
+            Sends all Add/Update/Delete operations to the database
+            Returns true if successful, false if there were errors
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Repositories.TeamRepository">
+            <summary>
+            TeamRepository - Implements data access operations for teams
+            
+            This class directly interfaces with Entity Framework Core and the database.
+            It implements ITeamRepository, providing concrete implementations of all
+            data access methods for teams.
+            </summary>
+        </member>
+        <member name="F:FootballLeagueApi.Repositories.TeamRepository._context">
+            <summary>
+            The Entity Framework Core database context
+            Provides access to the database and its entities
+            Made readonly to prevent accidental reassignment
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.TeamRepository.#ctor(FootballLeagueApi.Data.LeagueContext)">
+            <summary>
+            Constructor accepting LeagueContext through dependency injection
+            The context is provided by the DI container configured in Program.cs
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.TeamRepository.GetAllAsync">
+            <summary>
+            Retrieve all teams from the database
+            Uses LINQ to EF Core to query the Teams table
+            ToListAsync executes the query asynchronously
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.TeamRepository.GetByIdAsync(System.Int32)">
+            <summary>
+            Retrieve a specific team by ID
+            FindAsync is an efficient method that uses the primary key
+            Returns the Team if found, null if not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.TeamRepository.AddAsync(FootballLeagueApi.Models.Team)">
+            <summary>
+            Add a new team to the database context
+            This marks the team as "Added" in the change tracker
+            The team is not actually saved until SaveChangesAsync is called
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.TeamRepository.UpdateAsync(FootballLeagueApi.Models.Team)">
+            <summary>
+            Mark a team as modified in the database context
+            This tells EF Core to prepare an UPDATE statement
+            Changes aren't persisted until SaveChangesAsync is called
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.TeamRepository.DeleteAsync(FootballLeagueApi.Models.Team)">
+            <summary>
+            Mark a team for deletion from the database context
+            This tells EF Core to prepare a DELETE statement
+            The team is actually deleted when SaveChangesAsync is called
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Repositories.TeamRepository.SaveChangesAsync">
+            <summary>
+            Persist all pending changes to the database
+            This sends all Add/Update/Delete operations to SQL Server
+            Returns true if at least one change was saved, false otherwise
+            SaveChangesAsync returns the number of affected rows
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Services.IMatchService">
+            <summary>
+            IMatchService Interface - Defines business logic operations for matches
+            
+            This interface defines the contract for match-related business operations.
+            Matches represent games between two teams with scores and associated events.
+            This service likely includes validation (e.g., home team != away team).
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IMatchService.GetAllAsync">
+            <summary>
+            Retrieve all matches from the database
+            Returns an enumerable of all Match objects
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IMatchService.GetByIdAsync(System.Int32)">
+            <summary>
+            Retrieve a specific match by its ID
+            Returns the Match if found, or null if not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IMatchService.CreateAsync(FootballLeagueApi.Models.Match)">
+            <summary>
+            Create a new match
+            Accepts a Match with HomeTeamId, AwayTeamId, SeasonId, VenueId, and KickoffTime
+            May throw exceptions if business rules are violated (e.g., team not found)
+            Returns the created Match with its auto-generated MatchId
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IMatchService.UpdateAsync(System.Int32,FootballLeagueApi.Models.Match)">
+            <summary>
+            Update an existing match (e.g., record final score)
+            Returns true if successful, false if ID mismatch or match not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IMatchService.DeleteAsync(System.Int32)">
+            <summary>
+            Delete a match by its ID
+            Returns true if successful, false if match not found
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Services.IPlayerService">
+            <summary>
+            IPlayerService Interface - Defines business logic operations for players
+            
+            This interface defines the contract for player-related business operations.
+            Services implement CRUD operations plus any business logic specific to players.
+            All methods are async for non-blocking database I/O.
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IPlayerService.GetAllAsync">
+            <summary>
+            Retrieve all players from the database
+            Returns an enumerable of all Player objects
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IPlayerService.GetByIdAsync(System.Int32)">
+            <summary>
+            Retrieve a specific player by their ID
+            Returns the Player if found, or null if not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IPlayerService.CreateAsync(FootballLeagueApi.Models.Player)">
+            <summary>
+            Create a new player
+            Accepts a Player with FullName, ShirtNumber, Position, and TeamId
+            Returns the created Player with its auto-generated PlayerId
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IPlayerService.UpdateAsync(System.Int32,FootballLeagueApi.Models.Player)">
+            <summary>
+            Update an existing player
+            Returns true if successful, false if ID mismatch or player not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.IPlayerService.DeleteAsync(System.Int32)">
+            <summary>
+            Delete a player by their ID
+            Returns true if successful, false if player not found
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Services.ISeasonService">
+            <summary>
+            ISeasonService Interface - Defines business logic operations for seasons
+            
+            This interface defines the contract for season-related business operations.
+            Seasons represent the time periods during which league matches are played.
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ISeasonService.GetAllAsync">
+            <summary>
+            Retrieve all seasons from the database
+            Returns an enumerable of all Season objects
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ISeasonService.GetByIdAsync(System.Int32)">
+            <summary>
+            Retrieve a specific season by its ID
+            Returns the Season if found, or null if not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ISeasonService.CreateAsync(FootballLeagueApi.Models.Season)">
+            <summary>
+            Create a new season
+            Accepts a Season with Name, StartDate, and EndDate
+            Returns the created Season with its auto-generated SeasonId
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ISeasonService.UpdateAsync(System.Int32,FootballLeagueApi.Models.Season)">
+            <summary>
+            Update an existing season (e.g., extend end date, change name)
+            Returns true if successful, false if ID mismatch or season not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ISeasonService.DeleteAsync(System.Int32)">
+            <summary>
+            Delete a season by its ID
+            Returns true if successful, false if season not found
+            Note: May be prevented if season has associated matches
+            </summary>
+        </member>
+        <member name="T:FootballLeagueApi.Services.ITeamService">
+            <summary>
+            ITeamService Interface - Defines business logic operations for teams
+            
+            This interface defines the contract for team-related business operations.
+            Services implement business logic like validation and data coordination.
+            The controller depends on this interface, not the concrete implementation,
+            allowing for easy testing with mock implementations.
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ITeamService.GetAllAsync">
+            <summary>
+            Retrieve all teams from the database
+            Returns an enumerable of all Team objects
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ITeamService.GetByIdAsync(System.Int32)">
+            <summary>
+            Retrieve a specific team by its ID
+            Returns the Team if found, or null if not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ITeamService.CreateAsync(FootballLeagueApi.Models.Team)">
+            <summary>
+            Create a new team in the database
+            Accepts a Team model with Name, Coach, and FoundedYear
+            Returns the created Team with its auto-generated TeamId
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ITeamService.UpdateAsync(System.Int32,FootballLeagueApi.Models.Team)">
+            <summary>
+            Update an existing team
+            Parameters:
+              id - The TeamId of the team to update
+              team - The updated Team object
+            Returns true if successful, false if the ID doesn't match or team not found
+            </summary>
+        </member>
+        <member name="M:FootballLeagueApi.Services.ITeamService.DeleteAsync(System.Int32)">
+            <summary>
+            Delete a team by its ID
+            Returns true if successful, false if team not found
+            Note: Deletion is prevented if the team has scheduled matches (referential integrity)
+            </summary>
+        </member>
+    </members>
+</doc>

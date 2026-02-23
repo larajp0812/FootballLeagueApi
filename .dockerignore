@@ -1,0 +1,47 @@
+# Git files
+.git
+.gitignore
+
+# Build and runtime directories
+bin
+obj
+out
+.vs
+.vscode
+
+# IDE and editor files
+*.sln
+*.code-workspace
+.idea
+*.swp
+*.swo
+*~
+
+# Dependencies
+node_modules
+packages
+
+# Logs
+*.log
+*.logs
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+.coverage
+.trx
+
+# Docker artifacts
+.dockerfile

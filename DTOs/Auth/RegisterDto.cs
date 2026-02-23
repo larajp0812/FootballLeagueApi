@@ -1,34 +1,33 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace FootballLeagueApi.DTOs.Auth
 {
     /// <summary>
     /// RegisterDto - Data Transfer Object for user registration requests
-    /// 
-    /// This DTO represents the data expected in a POST /api/auth/register request.
-    /// New users provide this information to create an account in the system.
-    /// The UserManager (from ASP.NET Identity) validates and securely stores this data,
-    /// automatically hashing the password.
     /// </summary>
     public class RegisterDto
     {
         /// <summary>
         /// The desired username for the account
-        /// Must be unique in the system (enforced by Identity)
-        /// REQUIRED - cannot be null or empty
         /// </summary>
+        [Required(ErrorMessage = "Username is required")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Username must be between 3 and 50 characters")]
         public string UserName { get; set; }
 
         /// <summary>
         /// The user's email address
-        /// Also enforced as unique by Identity
         /// </summary>
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
         public string Email { get; set; }
 
         /// <summary>
         /// The user's password
-        /// ASP.NET Identity automatically hashes this password
-        /// Never stored in plaintext in the database
-        /// The user should send this encrypted via HTTPS
         /// </summary>
+        [Required(ErrorMessage = "Password is required")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$",
+            ErrorMessage = "Password must contain uppercase, lowercase, number, and special character")]
         public string Password { get; set; }
     }
 }

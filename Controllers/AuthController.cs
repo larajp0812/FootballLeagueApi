@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using FootballLeagueApi.DTOs.Auth;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace FootballLeagueApi.Controllers
 {
@@ -19,17 +23,18 @@ namespace FootballLeagueApi.Controllers
         /// Provides methods for creating users, checking passwords, and managing user accounts
         /// </summary>
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<AuthController> _logger;
+            private readonly ILogger<AuthController> _logger;
+            private readonly IConfiguration _config;
 
-        /// <summary>
-        /// Constructor accepting UserManager and ILogger through dependency injection
-        /// UserManager is provided by the Identity framework and logger for diagnostics
-        /// </summary>
-        public AuthController(UserManager<IdentityUser> userManager, ILogger<AuthController> logger)
-        {
-            _userManager = userManager;
-            _logger = logger;
-        }
+            /// <summary>
+            /// Constructor accepting UserManager, IConfiguration and ILogger through dependency injection
+            /// </summary>
+            public AuthController(UserManager<IdentityUser> userManager, IConfiguration config, ILogger<AuthController> logger)
+            {
+                _userManager = userManager;
+                _config = config;
+                _logger = logger;
+            }
 
         /// <summary>
         /// POST /api/auth/register - Register a new user account
@@ -81,6 +86,60 @@ namespace FootballLeagueApi.Controllers
                 _logger.LogError(ex, "Error during user registration for email: {Email}", model.Email);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// POST /api/auth/login - Authenticate user and return JWT token
+        /// </summary>
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDto model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                _logger.LogWarning("Login failed: user with email {Email} not found", model.Email);
+                return Unauthorized();
+            }
+
+            var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (!passwordValid)
+            {
+                _logger.LogWarning("Login failed: invalid password for {Email}", model.Email);
+                return Unauthorized();
+            }
+
+            // Build JWT
+            var jwtSection = _config.GetSection("Jwt");
+            var key = jwtSection.GetValue<string>("Key");
+            var issuer = jwtSection.GetValue<string>("Issuer");
+            var audience = jwtSection.GetValue<string>("Audience");
+            var expiresMinutes = jwtSection.GetValue<int>("ExpiresMinutes");
+
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName ?? user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
+            };
+
+            var keyBytes = Encoding.UTF8.GetBytes(key);
+            var securityKey = new SymmetricSecurityKey(keyBytes);
+            var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(expiresMinutes),
+                signingCredentials: creds
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Ok(new { token = tokenString, expires = token.ValidTo });
         }
     }
 }

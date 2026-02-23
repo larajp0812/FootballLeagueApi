@@ -15,12 +15,14 @@ namespace FootballLeagueApi.Tests.Controllers
     public class SeasonsControllerTests
     {
         private readonly Mock<ISeasonService> _mockSeasonService;
+        private readonly Mock<ILogger<SeasonsController>> _mockLogger;
         private readonly SeasonsController _controller;
 
         public SeasonsControllerTests()
         {
             _mockSeasonService = new Mock<ISeasonService>();
-            _controller = new SeasonsController(_mockSeasonService.Object);
+            _mockLogger = new Mock<ILogger<SeasonsController>>();
+            _controller = new SeasonsController(_mockSeasonService.Object, _mockLogger.Object);
         }
 
         [Fact]

@@ -15,12 +15,14 @@ namespace FootballLeagueApi.Tests.Controllers
     public class VenuesControllerTests
     {
         private readonly Mock<IVenueService> _mockVenueService;
+        private readonly Mock<ILogger<VenuesController>> _mockLogger;
         private readonly VenuesController _controller;
 
         public VenuesControllerTests()
         {
             _mockVenueService = new Mock<IVenueService>();
-            _controller = new VenuesController(_mockVenueService.Object);
+            _mockLogger = new Mock<ILogger<VenuesController>>();
+            _controller = new VenuesController(_mockVenueService.Object, _mockLogger.Object);
         }
 
         [Fact]
