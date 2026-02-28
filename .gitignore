@@ -1,0 +1,6 @@
+# Build and runtime directories
+/bin
+/obj
+/out
+/.vs
+/.vscode

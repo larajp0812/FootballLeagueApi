@@ -53,5 +53,10 @@ namespace FootballLeagueApi.DTOs
                 TeamId = teamId
             };
         }
+
+        internal static Player ToModel(PlayerUpdateDto dto, int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
