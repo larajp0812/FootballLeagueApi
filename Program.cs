@@ -26,6 +26,9 @@ builder.Logging.AddDebug();
 builder.Logging.AddEventSourceLogger();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
+const string adminRole = "Admin";
+const string userRole = "User";
+
 // ========== LAYER 1: DATABASE CONFIGURATION ==========
 // Configure the Entity Framework Core DbContext with SQLite database
 // - Reads connection string from appsettings.json
@@ -44,6 +47,9 @@ builder.Services.AddDbContext<LeagueContext>(options =>
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<LeagueContext>()  // Uses our LeagueContext for storage
     .AddDefaultTokenProviders();                // Email/SMS token generation
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
 // ========== LAYER 3: JWT BEARER TOKEN CONFIGURATION ==========
 // JWT (JSON Web Token) enables stateless authentication:
@@ -148,6 +154,56 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("RoleSeeding");
+
+    if (!await roleManager.RoleExistsAsync(userRole))
+    {
+        await roleManager.CreateAsync(new IdentityRole(userRole));
+        logger.LogInformation("Seeded role {RoleName}", userRole);
+    }
+
+    if (!await roleManager.RoleExistsAsync(adminRole))
+    {
+        await roleManager.CreateAsync(new IdentityRole(adminRole));
+        logger.LogInformation("Seeded role {RoleName}", adminRole);
+    }
+
+    var adminEmail = builder.Configuration["AdminUser:Email"];
+    var adminPassword = builder.Configuration["AdminUser:Password"];
+    var adminUserName = builder.Configuration["AdminUser:UserName"] ?? "admin";
+
+    if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword))
+    {
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+        if (adminUser == null)
+        {
+            adminUser = new IdentityUser
+            {
+                UserName = adminUserName,
+                Email = adminEmail,
+                EmailConfirmed = true
+            };
+
+            var createAdminResult = await userManager.CreateAsync(adminUser, adminPassword);
+            if (!createAdminResult.Succeeded)
+            {
+                logger.LogWarning("Could not create seeded admin user: {Errors}",
+                    string.Join(", ", createAdminResult.Errors.Select(e => e.Description)));
+            }
+        }
+
+        if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, adminRole))
+        {
+            await userManager.AddToRoleAsync(adminUser, adminRole);
+            logger.LogInformation("Assigned {RoleName} role to seeded admin user", adminRole);
+        }
+    }
+}
 
 // ========== MIDDLEWARE PIPELINE EXECUTION ORDER ==========
 // Middleware processes requests sequentially: request flows down, response flows up

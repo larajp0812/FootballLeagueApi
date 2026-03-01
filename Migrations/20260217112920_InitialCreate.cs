@@ -72,7 +72,7 @@ namespace FootballLeagueApi.Migrations
                     TeamId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Coach = table.Column<string>(type: "TEXT", nullable: true)
+                    ManagerUserId = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

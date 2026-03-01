@@ -1,6 +1,146 @@
 @FootballLeagueApi_HostAddress = http://localhost:5240
+@adminEmail = laraj-p@hotmail.co.uk
+@adminPassword = CHANGE_ME_ADMIN_PASSWORD
+@userEmail = viva-user@example.com
+@userPassword = Password123!
 
-GET {{FootballLeagueApi_HostAddress}}/weatherforecast/
+### 1) Register normal user (Expected: 200)
+POST {{FootballLeagueApi_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+	"userName": "viva_user",
+	"email": "{{userEmail}}",
+	"password": "{{userPassword}}"
+}
+
+###
+
+### 2) Login normal user (copy token from response)
+# @name loginUser
+POST {{FootballLeagueApi_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+	"email": "{{userEmail}}",
+	"password": "{{userPassword}}"
+}
+
+###
+
+### 3) Login admin user (copy token from response)
+# @name loginAdmin
+POST {{FootballLeagueApi_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+	"email": "{{adminEmail}}",
+	"password": "{{adminPassword}}"
+}
+
+###
+
+### 4) Public GET without token (Expected: 200)
+GET {{FootballLeagueApi_HostAddress}}/api/teams
 Accept: application/json
+
+###
+
+### 5) Protected POST without token (Expected: 401)
+POST {{FootballLeagueApi_HostAddress}}/api/teams
+Content-Type: application/json
+
+{
+	"name": "Viva FC",
+	"coach": "Coach Viva",
+	"foundedYear": 2020
+}
+
+###
+
+### 6) Protected POST with USER token (Expected: 201)
+### Replace TOKEN_USER with token from request #2
+POST {{FootballLeagueApi_HostAddress}}/api/teams
+Authorization: Bearer TOKEN_USER
+Content-Type: application/json
+
+{
+	"name": "Viva FC",
+	"coach": "Coach Viva",
+	"foundedYear": 2020
+}
+
+###
+
+### 7) DELETE with USER token (Expected: 403)
+### Replace 1 with an existing TeamId and TOKEN_USER with token from request #2
+DELETE {{FootballLeagueApi_HostAddress}}/api/teams/1
+Authorization: Bearer TOKEN_USER
+
+###
+
+### 8) DELETE with ADMIN token (Expected: 204 or 404)
+### Replace 1 with an existing TeamId and TOKEN_ADMIN with token from request #3
+DELETE {{FootballLeagueApi_HostAddress}}/api/teams/1
+Authorization: Bearer TOKEN_ADMIN
+
+###
+
+### 9) List roles (Expected: 200, Admin token required)
+### Replace TOKEN_ADMIN with token from request #3
+GET {{FootballLeagueApi_HostAddress}}/api/roles
+Authorization: Bearer TOKEN_ADMIN
+
+###
+
+### 10) Create role (Expected: 200, Admin token required)
+### Replace TOKEN_ADMIN with token from request #3
+POST {{FootballLeagueApi_HostAddress}}/api/roles
+Authorization: Bearer TOKEN_ADMIN
+Content-Type: application/json
+
+{
+	"roleName": "Editor"
+}
+
+###
+
+### 11) Get role by id (Expected: 200/404, Admin token required)
+### Replace ROLE_ID and TOKEN_ADMIN
+GET {{FootballLeagueApi_HostAddress}}/api/roles/ROLE_ID
+Authorization: Bearer TOKEN_ADMIN
+
+###
+
+### 12) Assign role to user (Expected: 200, Admin token required)
+### Replace USER_ID and TOKEN_ADMIN
+POST {{FootballLeagueApi_HostAddress}}/api/roles/assign-role-to-user
+Authorization: Bearer TOKEN_ADMIN
+Content-Type: application/json
+
+{
+	"userId": "USER_ID",
+	"roleName": "Editor"
+}
+
+###
+
+### 13) Update role name (Expected: 200/404, Admin token required)
+### Replace ROLE_ID and TOKEN_ADMIN
+PUT {{FootballLeagueApi_HostAddress}}/api/roles
+Authorization: Bearer TOKEN_ADMIN
+Content-Type: application/json
+
+{
+	"roleId": "ROLE_ID",
+	"newRoleName": "EditorUpdated"
+}
+
+###
+
+### 14) Delete role (Expected: 200/404, Admin token required)
+### Replace ROLE_ID and TOKEN_ADMIN
+DELETE {{FootballLeagueApi_HostAddress}}/api/roles/ROLE_ID
+Authorization: Bearer TOKEN_ADMIN
 
 ###

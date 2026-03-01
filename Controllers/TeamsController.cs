@@ -1,6 +1,7 @@
 using FootballLeagueApi.DTOs;
 using FootballLeagueApi.Models;
 using FootballLeagueApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootballLeagueApi.Controllers
@@ -120,6 +121,7 @@ namespace FootballLeagueApi.Controllers
         /// <response code="400">Invalid team data provided</response>
         /// <response code="500">Internal server error occurred</response>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(TeamReadDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -157,6 +159,7 @@ namespace FootballLeagueApi.Controllers
         /// <response code="400">Invalid team data or update operation failed</response>
         /// <response code="500">Internal server error occurred</response>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -206,6 +209,7 @@ namespace FootballLeagueApi.Controllers
         /// <response code="404">Team with specified ID not found</response>
         /// <response code="500">Internal server error occurred</response>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

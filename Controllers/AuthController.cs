@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using FootballLeagueApi.DTOs.Auth;
+using FootballLeagueApi.Services;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FootballLeagueApi.Controllers
 {
@@ -25,15 +27,17 @@ namespace FootballLeagueApi.Controllers
         private readonly UserManager<IdentityUser> _userManager;
             private readonly ILogger<AuthController> _logger;
             private readonly IConfiguration _config;
+            private readonly IEmailService _emailService;
 
             /// <summary>
             /// Constructor accepting UserManager, IConfiguration and ILogger through dependency injection
             /// </summary>
-            public AuthController(UserManager<IdentityUser> userManager, IConfiguration config, ILogger<AuthController> logger)
+            public AuthController(UserManager<IdentityUser> userManager, IConfiguration config, ILogger<AuthController> logger, IEmailService emailService)
             {
                 _userManager = userManager;
                 _config = config;
                 _logger = logger;
+                _emailService = emailService;
             }
 
         /// <summary>
@@ -83,6 +87,7 @@ namespace FootballLeagueApi.Controllers
         /// }
         /// </summary>
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterDto model)
         {
             try
@@ -137,6 +142,24 @@ namespace FootballLeagueApi.Controllers
                     return BadRequest(result.Errors);
                 }
 
+                var roleResult = await _userManager.AddToRoleAsync(user, "User");
+                if (!roleResult.Succeeded)
+                {
+                    _logger.LogWarning("Could not assign default role to {Email}: {Errors}", model.Email,
+                        string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+                }
+
+                try
+                {
+                    var subject = "Welcome to Football League API";
+                    var body = $"<p>Hello {user.UserName},</p><p>Your account was created successfully.</p>";
+                    await _emailService.SendEmailAsync(user.Email!, subject, body);
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogWarning(emailEx, "User registered but welcome email failed for {Email}", model.Email);
+                }
+
                 // ===== STEP 5: REGISTRATION SUCCESSFUL =====
                 _logger.LogInformation("User registered successfully: {Email}", model.Email);
                 // User can now login with their email and password
@@ -181,6 +204,7 @@ namespace FootballLeagueApi.Controllers
         ///   400 Bad Request if email/password validation fails
         /// </summary>
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginDto model)
         {
             // Validate email and password are provided and match data annotation rules
@@ -238,6 +262,12 @@ namespace FootballLeagueApi.Controllers
                 // Useful for identifying user without another database lookup
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
             };
+
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             // ===== STEP 5: CREATE SIGNING CREDENTIALS =====
             // HMAC-SHA256 signing ensures token integrity

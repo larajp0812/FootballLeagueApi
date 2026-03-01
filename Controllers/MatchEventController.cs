@@ -1,6 +1,7 @@
 using FootballLeagueApi.DTOs;
 using FootballLeagueApi.Models;
 using FootballLeagueApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootballLeagueApi.Controllers
@@ -81,6 +82,7 @@ namespace FootballLeagueApi.Controllers
         /// <response code="201">Match event created successfully</response>
         /// <response code="400">Invalid event data or business rule violation</response>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(MatchEventReadDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create(MatchEventCreateDto dto)
@@ -111,6 +113,7 @@ namespace FootballLeagueApi.Controllers
         /// <response code="204">Match event updated successfully</response>
         /// <response code="404">Match event not found</response>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, MatchEventUpdateDto dto)
@@ -143,6 +146,7 @@ namespace FootballLeagueApi.Controllers
         /// <response code="204">Match event deleted successfully</response>
         /// <response code="404">Match event not found</response>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
