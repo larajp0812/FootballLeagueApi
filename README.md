@@ -131,7 +131,8 @@ If the connection string is not set, telemetry export is effectively disabled.
 ## Authentication & Authorization
 
 - `POST /api/auth/register` registers a user and returns JWT token
-- `POST /api/auth/login` returns JWT token and expiry
+- `POST /api/auth/login` returns JWT, expiry, refresh token, and refresh token expiry
+- `POST /api/auth/refresh` exchanges a valid refresh token for a new access token
 - Protected endpoints require: `Authorization: Bearer <token>`
 - Role checks are enforced on admin-only operations
 - Roles `User` and `Admin` are seeded on startup
@@ -150,7 +151,29 @@ If the connection string is not set, telemetry export is effectively disabled.
 ```json
 {
   "token": "<jwt-token>",
-  "expires": "2026-03-01T10:00:00Z"
+  "expires": "2026-03-01T10:00:00Z",
+  "refreshToken": "<refresh-token>",
+  "refreshTokenExpires": "2026-03-08T10:00:00Z"
+}
+```
+
+### Refresh request
+
+```json
+{
+  "email": "user@example.com",
+  "refreshToken": "<refresh-token>"
+}
+```
+
+### Refresh response
+
+```json
+{
+  "token": "<new-jwt-token>",
+  "expires": "2026-03-01T11:00:00Z",
+  "refreshToken": "<new-refresh-token>",
+  "refreshTokenExpires": "2026-03-08T11:00:00Z"
 }
 ```
 

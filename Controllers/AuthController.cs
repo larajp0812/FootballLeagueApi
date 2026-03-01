@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography;
 
 namespace FootballLeagueApi.Controllers
 {
@@ -20,6 +21,10 @@ namespace FootballLeagueApi.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private const string RefreshTokenProvider = "FootballLeagueApi";
+        private const string RefreshTokenName = "RefreshToken";
+        private const string RefreshTokenExpiryName = "RefreshTokenExpiryUtc";
+
         /// <summary>
         /// Dependency-injected UserManager from ASP.NET Core Identity
         /// Provides methods for creating users, checking passwords, and managing user accounts
@@ -251,8 +256,62 @@ namespace FootballLeagueApi.Controllers
             }
 
             var (tokenString, expires) = await GenerateJwtTokenAsync(user);
+            var refreshToken = GenerateRefreshToken();
+            var refreshTokenExpires = DateTime.UtcNow.AddDays(7);
+            await SaveRefreshTokenAsync(user, refreshToken, refreshTokenExpires);
+
             _logger.LogInformation("User {Email} logged in successfully", user.Email);
-            return Ok(new { token = tokenString, expires });
+            return Ok(new { token = tokenString, expires, refreshToken, refreshTokenExpires });
+        }
+
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Refresh(RefreshTokenRequestDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                _logger.LogWarning("Refresh failed: user with email {Email} not found", model.Email);
+                return Unauthorized();
+            }
+
+            var storedRefreshToken = await _userManager.GetAuthenticationTokenAsync(
+                user,
+                RefreshTokenProvider,
+                RefreshTokenName);
+
+            var storedRefreshTokenExpiry = await _userManager.GetAuthenticationTokenAsync(
+                user,
+                RefreshTokenProvider,
+                RefreshTokenExpiryName);
+
+            if (string.IsNullOrWhiteSpace(storedRefreshToken) ||
+                string.IsNullOrWhiteSpace(storedRefreshTokenExpiry) ||
+                !string.Equals(storedRefreshToken, model.RefreshToken, StringComparison.Ordinal) ||
+                !DateTime.TryParse(storedRefreshTokenExpiry, out var expiryUtc) ||
+                expiryUtc <= DateTime.UtcNow)
+            {
+                _logger.LogWarning("Refresh failed: invalid or expired refresh token for {Email}", model.Email);
+                return Unauthorized();
+            }
+
+            var (token, expires) = await GenerateJwtTokenAsync(user);
+            var newRefreshToken = GenerateRefreshToken();
+            var newRefreshTokenExpires = DateTime.UtcNow.AddDays(7);
+            await SaveRefreshTokenAsync(user, newRefreshToken, newRefreshTokenExpires);
+
+            return Ok(new
+            {
+                token,
+                expires,
+                refreshToken = newRefreshToken,
+                refreshTokenExpires = newRefreshTokenExpires
+            });
         }
 
         private async Task<(string Token, DateTime Expires)> GenerateJwtTokenAsync(IdentityUser user)
@@ -293,6 +352,22 @@ namespace FootballLeagueApi.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
             return (tokenString, expires);
+        }
+
+        private static string GenerateRefreshToken()
+        {
+            var randomBytes = RandomNumberGenerator.GetBytes(64);
+            return Convert.ToBase64String(randomBytes);
+        }
+
+        private async Task SaveRefreshTokenAsync(IdentityUser user, string refreshToken, DateTime refreshTokenExpires)
+        {
+            await _userManager.SetAuthenticationTokenAsync(user, RefreshTokenProvider, RefreshTokenName, refreshToken);
+            await _userManager.SetAuthenticationTokenAsync(
+                user,
+                RefreshTokenProvider,
+                RefreshTokenExpiryName,
+                refreshTokenExpires.ToUniversalTime().ToString("O"));
         }
     }
 }

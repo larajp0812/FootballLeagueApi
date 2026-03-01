@@ -28,6 +28,18 @@ Content-Type: application/json
 
 ###
 
+### 2b) Refresh access token using refresh token from login (Expected: 200)
+### Replace REFRESH_TOKEN with refreshToken value from request #2 response
+POST {{FootballLeagueApi_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+
+{
+	"email": "{{userEmail}}",
+	"refreshToken": "REFRESH_TOKEN"
+}
+
+###
+
 ### 3) Login admin user (copy token from response)
 # @name loginAdmin
 POST {{FootballLeagueApi_HostAddress}}/api/auth/login
