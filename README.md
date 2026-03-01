@@ -10,6 +10,7 @@ It follows a layered architecture with Controllers, Services, and Repositories, 
 - ASP.NET Core Identity for user management
 - JWT authentication with role-based authorization (User/Admin)
 - Optional SMTP email delivery for welcome/JWT onboarding messages
+- Global rate limiting (per IP)
 - DTO-based contracts and DataAnnotations validation
 - Global exception middleware + structured logging
 - Swagger/OpenAPI documentation
@@ -122,6 +123,7 @@ If configured, registration sends a welcome email that includes the JWT and quic
 - Protected endpoints require: `Authorization: Bearer <token>`
 - Role checks are enforced on admin-only operations
 - Roles `User` and `Admin` are seeded on startup
+- If SMTP is configured, registration also sends a formatted welcome email containing the JWT and Swagger usage steps
 
 ### Register response
 
@@ -148,6 +150,36 @@ If configured, registration sends a welcome email that includes the JWT and quic
 4. Authorize and call protected endpoints
 
 If SMTP is configured, the registration email also includes these Swagger steps.
+
+## HTTPS & Transport Security
+
+- HTTPS redirection is enabled in the middleware pipeline.
+- JWT bearer options require HTTPS metadata.
+- Local development runs on HTTPS launch profile ports (see `launchSettings.json`).
+
+For production, terminate TLS at the edge (App Service/Ingress/Reverse Proxy) and keep HTTPS enforced end-to-end.
+
+## Rate Limiting
+
+- A global fixed-window limiter is enabled.
+- Limit: **100 requests per minute per client IP**.
+- Exceeded requests return **HTTP 429 Too Many Requests**.
+- Policy applies globally to all API endpoints.
+
+Implementation is configured in [Program.cs](Program.cs).
+
+### Quick verification
+
+You can verify throttling by sending repeated requests quickly to any endpoint (for example with Swagger or a REST client). Once the per-minute limit is exceeded, the API responds with `429 Too Many Requests`.
+
+Example response (simplified):
+
+```json
+{
+  "status": 429,
+  "title": "Too Many Requests"
+}
+```
 
 ## Database
 

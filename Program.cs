@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using FootballLeagueApi.Repositories;
 using FootballLeagueApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
+using System.Threading.RateLimiting;
 
 /// <summary>
 /// Application startup and service registration.
@@ -104,6 +106,24 @@ builder.Services.AddScoped<IMatchEventService, MatchEventService>();
 
 // CORS configuration
 builder.Services.AddCors();
+
+// Rate limiting configuration
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+});
 
 // OpenAPI/Swagger configuration
 builder.Services.AddEndpointsApiExplorer();
@@ -211,6 +231,9 @@ app.UseCors(policy =>
     policy.AllowAnyHeader()
           .AllowAnyMethod()
           .AllowAnyOrigin());
+
+// Rate limiting middleware.
+app.UseRateLimiter();
 
 // Authentication middleware.
 app.UseAuthentication();
