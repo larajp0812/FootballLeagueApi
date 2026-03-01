@@ -69,7 +69,7 @@ Tests/         Unit tests
 
 Swagger UI is available at:
 
-- `https://localhost:7128/swagger` (or your launch profile HTTPS port)
+- `https://localhost:5240/swagger` (or your launch profile HTTPS port)
 
 ## Configuration
 

@@ -10,12 +10,9 @@ using Microsoft.OpenApi;
 using System.Text;
 
 /// <summary>
-/// Application Configuration and Dependency Injection Setup
-/// This is the entry point for the ASP.NET Core application. It configures:
-/// - Database connection and Entity Framework Core
-/// - User authentication and authorization (Identity)
-/// - Dependency Injection for services and repositories
-/// - API middleware (CORS, HTTPS, Swagger, Logging, Error Handling)
+/// Application startup and service registration.
+/// Configures data access, authentication/authorization, dependency injection,
+/// API tooling, and the HTTP middleware pipeline.
 /// </summary>
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,127 +27,85 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 const string adminRole = "Admin";
 const string userRole = "User";
 
-// ========== LAYER 1: DATABASE CONFIGURATION ==========
-// Configure the Entity Framework Core DbContext with SQLite database
-// - Reads connection string from appsettings.json
-// - Development: SQLite (local file-based, zero config)
-// - Production: Can switch to SQL Server via connection string
+// Database configuration
+// Registers EF Core DbContext using the configured connection string.
 builder.Services.AddDbContext<LeagueContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ========== LAYER 2: IDENTITY CONFIGURATION ==========
-// Configure ASP.NET Core Identity for user authentication
-// This provides:
-// - UserManager for creating/managing users
-// - PasswordHasher that uses PBKDF2 with salt (secure hash algorithm)
-// - Roles and claims for authorization
-// - Stored in AspNetUsers and AspNetRoles tables (in LeagueContext)
+// Identity configuration
+// Enables user/role management and stores identity data in LeagueContext.
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<LeagueContext>()  // Uses our LeagueContext for storage
-    .AddDefaultTokenProviders();                // Email/SMS token generation
+    .AddEntityFrameworkStores<LeagueContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
-// ========== LAYER 3: JWT BEARER TOKEN CONFIGURATION ==========
-// JWT (JSON Web Token) enables stateless authentication:
-// - User logs in → receives signed token with claims (user ID, email, expires)
-// - Token stored client-side (browser, mobile app)
-// - Each request includes token in Authorization header
-// - Server validates signature with secret key (no database lookup needed)
-// - Token expires after ~60 minutes (security)
-
-// Read JWT settings from appsettings.json [Jwt] section
+// JWT Bearer authentication configuration
+// Reads token settings from the Jwt configuration section.
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var jwtKey = jwtSection.GetValue<string>("Key");      // Secret key for signing
-var jwtIssuer = jwtSection.GetValue<string>("Issuer");  // Who issued the token (us)
-var jwtAudience = jwtSection.GetValue<string>("Audience"); // Who can use token
+var jwtKey = jwtSection.GetValue<string>("Key");
+var jwtIssuer = jwtSection.GetValue<string>("Issuer");
+var jwtAudience = jwtSection.GetValue<string>("Audience");
 
 builder.Services.AddAuthentication(options =>
 {
-    // Set JWT Bearer as the default authentication scheme for all [Authorize] attributes
+    // Use JWT Bearer as the default authentication scheme.
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;  // Return 401 if no token
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = true;  // Only accept tokens over HTTPS (security)
-        options.SaveToken = true;             // Store token in HttpContext.Items for controller access
-        
-        // Token validation parameters - what makes a token valid
+        options.RequireHttpsMetadata = true;
+        options.SaveToken = true;
+
+        // Token validation settings.
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,                                          // Check issuer matches appsettings
-            ValidateAudience = true,                                        // Check audience matches appsettings
-            ValidateLifetime = true,                                        // Check token hasn't expired
-            ValidateIssuerSigningKey = true,                                // Check signature is valid
-            ValidIssuer = jwtIssuer,                                        // Required issuer value
-            ValidAudience = jwtAudience,                                    // Required audience value
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))  // Secret key for validation
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
-// Register controllers that handle HTTP requests
+// MVC controllers
 builder.Services.AddControllers();
 
-// ========== LAYER 4: DEPENDENCY INJECTION (DI) REGISTRATION ==========
-// Register all Services and Repositories in the DI container
-// This wires up the layered architecture:
-//
-// HTTP Request Flow:
-// Controller → Service → Repository → DbContext (EF Core) → Database
-//
-// DI Scope: AddScoped
-// - New instance created per HTTP request
-// - Reused within same request (important for DbContext unit of work)
-// - Disposed when request completes
-// - Best for: Services, Repositories, DbContext
-//
-// Example: When a controller needs ITeamService:
-// 1. DI container looks up registration: ITeamService → TeamService
-// 2. TeamService needs ITeamRepository, so DI creates TeamRepository
-// 3. TeamRepository needs LeagueContext (DbContext), so DI creates it
-// 4. All three wired together automatically
-// 5. Controller receives fully-initialized TeamService
-//
-// Benefits:
-// - Loose coupling: Controller depends on interface, not concrete class
-// - Testable: Can mock ITeamService for unit tests
-// - Flexible: Can swap implementations without changing controllers
+// Dependency injection registrations
+// Scoped lifetime is used for repositories and services (one instance per request).
 
-// Season Module
+// Season module
 builder.Services.AddScoped<ISeasonRepository, SeasonRepository>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 
-// Team Module
+// Team module
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 
-// Player Module
+// Player module
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 
-// Venue Module
+// Venue module
 builder.Services.AddScoped<IVenueRepository, VenueRepository>();
 builder.Services.AddScoped<IVenueService, VenueService>();
 
-// Match Module
+// Match module
 builder.Services.AddScoped<IMatchRepository, MatchRepository>();
 builder.Services.AddScoped<IMatchService, MatchService>();
 
-// Match Event Module
+// Match event module
 builder.Services.AddScoped<IMatchEventRepository, MatchEventRepository>();
 builder.Services.AddScoped<IMatchEventService, MatchEventService>();
 
-// ========== LAYER 5: MIDDLEWARE CONFIGURATION ==========
-// Enable Cross-Origin Resource Sharing (CORS)
-// Allows browsers to make requests from different domains
-// In development: AllowAnyOrigin for testing
-// In production: Restrict to specific trusted domains
+// CORS configuration
 builder.Services.AddCors();
 
-// Add Swagger/OpenAPI for interactive API documentation
-// Accessible at http://localhost:5000/swagger
+// OpenAPI/Swagger configuration
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -182,6 +137,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Seed default roles and optional admin user from configuration.
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -232,26 +188,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ========== MIDDLEWARE PIPELINE EXECUTION ORDER ==========
-// Middleware processes requests sequentially: request flows down, response flows up
-// Order matters! Authentication must run before Authorization, etc.
-// 
-// Request Flow:
-// 1. HttpsRedirection (Convert HTTP to HTTPS)
-// 2. GlobalExceptionHandlingMiddleware (Catch all exceptions)
-// 3. CORS (Check cross-origin permissions)
-// 4. Authentication (Who are you? Extract JWT claims)
-// 5. Authorization (Do you have permission? Check [Authorize] attributes)
-// 6. Controllers (Route to correct action)
-// 
-// Response Flow (opposite direction): 
-// Controllers → Authorization → Authentication → CORS → Exception Handler → HTTPS
+// HTTP request pipeline
+// Note: middleware order is significant.
 
-// ========== SWAGGER - API DOCUMENTATION ==========
-// Generate and serve interactive API documentation
-// In development: Helpful for testing and understanding API
-// In production: Often disabled for security and performance
-// Access at: https://localhost:7128/swagger/index.html
+// Swagger UI
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
@@ -259,62 +199,27 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "Football League API v1");
 });
 
-// ========== HTTPS REDIRECTION ==========
-// Force all HTTP requests to HTTPS
-// Security: Prevents man-in-the-middle attacks
-// Must run BEFORE other middleware
+// Redirect HTTP requests to HTTPS.
 app.UseHttpsRedirection();
 
-// ========== GLOBAL EXCEPTION HANDLING ==========
-// Centralized exception catching middleware
-// Catches ALL unhandled exceptions from controllers/services
-// Prevents stack traces from leaking to clients
-// Returns consistent error response format:
-// { "statusCode": 500, "message": "An error occurred", "details": "...", "timestamp": "..." }
-// 
-// Why centralized exception handling?
-// - Avoids duplicating try/catch in every controller
-// - Consistent error format across entire API
-// - Centralized logging of all errors
-// - Easy to modify error handling in one place
+// Global exception handling middleware.
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
-// ========== CORS - CROSS-ORIGIN RESOURCE SHARING ==========
-// Allow requests from different origins (domains)
-// Example: Frontend on localhost:3000 calls API on localhost:5000
-// Without CORS: Browser blocks request for security
-// With AllowAnyOrigin: Allow requests from any domain (development only!)
-// 
-// Production best practice:
-// .WithOrigins("https://example.com", "https://app.example.com")
-//  .AllowAnyHeader()
-//  .AllowAnyMethod()
+// CORS policy for development/local testing.
+// For production, replace with explicit allowed origins.
 app.UseCors(policy =>
-    policy.AllowAnyHeader()          // Accept any custom headers
-          .AllowAnyMethod()           // Accept GET, POST, PUT, DELETE, etc.
-          .AllowAnyOrigin());         // Accept requests from any domain
+    policy.AllowAnyHeader()
+          .AllowAnyMethod()
+          .AllowAnyOrigin());
 
-// ========== AUTHENTICATION MIDDLEWARE ==========
-// Validates JWT tokens in Authorization header
-// Extracts claims (user ID, email, etc.) and adds to HttpContext.User
-// If token invalid → 401 Unauthorized (stops here)
-// If token valid → Continues to Authorization middleware
+// Authentication middleware.
 app.UseAuthentication();
 
-// ========== AUTHORIZATION MIDDLEWARE ==========
-// Checks if authenticated user has permission for requested route
-// Reads [Authorize] and [AllowAnonymous] attributes
-// If not authorized → 403 Forbidden (stops here)
-// If authorized → Continues to controller
+// Authorization middleware.
 app.UseAuthorization();
 
-// ========== ROUTE MAPPING ==========
-// Map all [HttpGet], [HttpPost], [Route] attributes from controllers
-// Routes requests to correct controller action
-// Example: POST /api/teams → TeamsController.Create()
+// Map attribute-routed controllers.
 app.MapControllers();
 
-// ========== START APPLICATION ==========
-// Listen for incoming HTTP requests on configured ports (5000, 7128 by default)
-// Non-blocking: keeps running until process is terminated (Ctrl+C)
+// Start the application.
 app.Run();
