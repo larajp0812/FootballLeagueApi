@@ -9,6 +9,7 @@ It follows a layered architecture with Controllers, Services, and Repositories, 
 - RESTful CRUD endpoints across core football entities
 - ASP.NET Core Identity for user management
 - JWT authentication with role-based authorization (User/Admin)
+- Optional SMTP email delivery for welcome/JWT onboarding messages
 - DTO-based contracts and DataAnnotations validation
 - Global exception middleware + structured logging
 - Swagger/OpenAPI documentation
@@ -86,6 +87,22 @@ Configuration is read from `appsettings.json`, `appsettings.Development.json`, e
 }
 ```
 
+### Optional email settings (SMTP)
+
+If configured, registration sends a welcome email that includes the JWT and quick Swagger authorization steps.
+
+```json
+"EmailSettings": {
+  "SmtpHost": "smtp.example.com",
+  "SmtpPort": 587,
+  "SmtpUsername": "smtp-user",
+  "SmtpPassword": "smtp-password",
+  "FromEmail": "no-reply@example.com",
+  "FromName": "Football League API",
+  "EnableSsl": true
+}
+```
+
 ### Admin seed user
 
 ```json
@@ -100,11 +117,28 @@ Configuration is read from `appsettings.json`, `appsettings.Development.json`, e
 
 ## Authentication & Authorization
 
-- `POST /api/auth/register` registers a user
+- `POST /api/auth/register` registers a user and returns JWT token
 - `POST /api/auth/login` returns JWT token and expiry
 - Protected endpoints require: `Authorization: Bearer <token>`
 - Role checks are enforced on admin-only operations
 - Roles `User` and `Admin` are seeded on startup
+
+### Register response
+
+```json
+{
+  "token": "<jwt-token>"
+}
+```
+
+### Login response
+
+```json
+{
+  "token": "<jwt-token>",
+  "expires": "2026-03-01T10:00:00Z"
+}
+```
 
 ### Swagger Bearer Token Usage
 
@@ -112,6 +146,8 @@ Configuration is read from `appsettings.json`, `appsettings.Development.json`, e
 2. Click **Authorize**
 3. Paste token value only (without `Bearer `)
 4. Authorize and call protected endpoints
+
+If SMTP is configured, the registration email also includes these Swagger steps.
 
 ## Database
 

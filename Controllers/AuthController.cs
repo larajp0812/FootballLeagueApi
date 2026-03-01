@@ -149,10 +149,26 @@ namespace FootballLeagueApi.Controllers
                         string.Join(", ", roleResult.Errors.Select(e => e.Description)));
                 }
 
+                var (token, _) = await GenerateJwtTokenAsync(user);
+
                 try
                 {
-                    var subject = "Welcome to Football League API";
-                    var body = $"<p>Hello {user.UserName},</p><p>Your account was created successfully.</p>";
+                    var subject = "Football League API - JWT Token";
+                    var body = $@"
+                        <div style='font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#111827;'>
+                            <h2 style='margin:0 0 12px;'>Welcome to Football League API</h2>
+                            <p style='margin:0 0 12px;'>Hi {user.UserName}, your account has been created successfully.</p>
+                            <p style='margin:0 0 8px;'><strong>Your JWT token:</strong></p>
+                            <pre style='white-space:pre-wrap;word-break:break-all;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:12px;margin:0 0 12px;'>{token}</pre>
+                            <p style='margin:0 0 8px;'><strong>How to use this token in Swagger:</strong></p>
+                            <ol style='margin:0 0 12px 20px;padding:0;'>
+                                <li>Open Swagger UI (<code>/swagger</code>).</li>
+                                <li>Click <strong>Authorize</strong> (top-right).</li>
+                                <li>Paste the token value into the input field.</li>
+                                <li>Submit and call protected endpoints.</li>
+                            </ol>
+                            <p style='margin:0;color:#6b7280;font-size:12px;'>Keep this token private. Anyone with this token can access your account until it expires.</p>
+                        </div>";
                     await _emailService.SendEmailAsync(user.Email!, subject, body);
                 }
                 catch (Exception emailEx)
@@ -162,8 +178,7 @@ namespace FootballLeagueApi.Controllers
 
                 // ===== STEP 5: REGISTRATION SUCCESSFUL =====
                 _logger.LogInformation("User registered successfully: {Email}", model.Email);
-                // User can now login with their email and password
-                return Ok("User registered successfully.");
+                return Ok(new { token });
             }
             catch (Exception ex)
             {
@@ -235,31 +250,26 @@ namespace FootballLeagueApi.Controllers
                 return Unauthorized();
             }
 
-            // ===== STEP 3: READ JWT CONFIGURATION =====
-            // Load JWT settings from appsettings.json [Jwt] section
-            var jwtSection = _config.GetSection("Jwt");
-            var key = jwtSection.GetValue<string>("Key");             // Secret key for signing
-            var issuer = jwtSection.GetValue<string>("Issuer");       // "FootballLeagueApi"
-            var audience = jwtSection.GetValue<string>("Audience");   // "FootballLeagueApiUsers"
-            var expiresMinutes = jwtSection.GetValue<int>("ExpiresMinutes");  // Usually 60
+            var (tokenString, expires) = await GenerateJwtTokenAsync(user);
+            _logger.LogInformation("User {Email} logged in successfully", user.Email);
+            return Ok(new { token = tokenString, expires });
+        }
 
-            // ===== STEP 4: CREATE CLAIMS =====
-            // Claims are key-value pairs that describe the user
-            // These will be embedded in the JWT token payload
-            // Client can read these without decrypting (JWT is Base64 encoded, not encrypted!)
-            // Server validates signature to ensure token wasn't modified
+        private async Task<(string Token, DateTime Expires)> GenerateJwtTokenAsync(IdentityUser user)
+        {
+            var jwtSection = _config.GetSection("Jwt");
+            var key = jwtSection.GetValue<string>("Key")
+                      ?? throw new InvalidOperationException("JWT key is not configured.");
+            var issuer = jwtSection.GetValue<string>("Issuer")
+                         ?? throw new InvalidOperationException("JWT issuer is not configured.");
+            var audience = jwtSection.GetValue<string>("Audience")
+                           ?? throw new InvalidOperationException("JWT audience is not configured.");
+            var expiresMinutes = jwtSection.GetValue<int>("ExpiresMinutes");
+
             var claims = new List<Claim>
             {
-                // Subject (sub): Unique identifier for this user
-                // Usually: UserName if available, fallback to Email
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName ?? user.Email),
-                
-                // JWT ID (jti): Unique identifier for this specific token
-                // Useful for token revocation (blacklist)
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName ?? user.Email ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                
-                // Email claim: User's email address
-                // Useful for identifying user without another database lookup
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
             };
 
@@ -269,33 +279,20 @@ namespace FootballLeagueApi.Controllers
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            // ===== STEP 5: CREATE SIGNING CREDENTIALS =====
-            // HMAC-SHA256 signing ensures token integrity
-            // Only server knows the key, so only server can generate valid signatures
-            var keyBytes = Encoding.UTF8.GetBytes(key);
-            var securityKey = new SymmetricSecurityKey(keyBytes);
-            var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.UtcNow.AddMinutes(expiresMinutes);
 
-            // ===== STEP 6: BUILD JWT TOKEN OBJECT =====
-            // Construct the JWT with all components
             var token = new JwtSecurityToken(
-                issuer: issuer,                    // Who issued it
-                audience: audience,                // Who can use it
-                claims: claims,                    // User information
-                expires: DateTime.UtcNow.AddMinutes(expiresMinutes),  // Expiry time
-                signingCredentials: creds          // Signature (HMAC-SHA256)
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: expires,
+                signingCredentials: credentials
             );
 
-            // ===== STEP 7: SERIALIZE TOKEN TO STRING =====
-            // Convert JWT object to Base64-encoded string format
-            // Format: Header.Payload.Signature
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-            // ===== STEP 8: RETURN TOKEN TO CLIENT =====
-            // Client must store this token and send it in Authorization header for future requests:
-            // Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-            _logger.LogInformation("User {Email} logged in successfully", user.Email);
-            return Ok(new { token = tokenString, expires = token.ValidTo });
+            return (tokenString, expires);
         }
     }
 }
