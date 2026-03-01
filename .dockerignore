@@ -31,7 +31,7 @@ packages
 .env.*.local
 
 # Database files
-*.db
+# *.db
 *.db-shm
 *.db-wal
 
