@@ -86,28 +86,14 @@ Configuration is read from `appsettings.json`, `appsettings.Development.json`, e
 }
 ```
 
-### Optional email settings
+### Admin seed user
 
 ```json
-"EmailSettings": {
-  "SmtpHost": "",
-  "SmtpPort": 587,
-  "SmtpUsername": "",
-  "SmtpPassword": "",
-  "FromEmail": "",
-  "FromName": "Football League API",
-  "EnableSsl": true
-}
-```
-
-### Optional admin seed user
-
-```json
-"AdminUser": {
-  "UserName": "admin",
-  "Email": "",
-  "Password": ""
-}
+  "AdminUser": {
+    "UserName": "admin",
+    "Email": "admin@admin.com",
+    "Password": "Password123!"
+  }
 ```
 
 > Security note: do not commit real secrets. Prefer environment variables or user secrets for sensitive values.
