@@ -107,6 +107,12 @@ builder.Services.AddScoped<IMatchEventService, MatchEventService>();
 // CORS configuration
 builder.Services.AddCors();
 
+// Health checks
+builder.Services.AddHealthChecks();
+
+// Azure monitoring (Application Insights)
+builder.Services.AddApplicationInsightsTelemetry();
+
 // Rate limiting configuration
 builder.Services.AddRateLimiter(options =>
 {

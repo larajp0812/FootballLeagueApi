@@ -11,6 +11,8 @@ It follows a layered architecture with Controllers, Services, and Repositories, 
 - JWT authentication with role-based authorization (User/Admin)
 - Optional SMTP email delivery for welcome/JWT onboarding messages
 - Global rate limiting (per IP)
+- Health checks endpoint for platform readiness probing
+- Azure monitoring support with Application Insights
 - DTO-based contracts and DataAnnotations validation
 - Global exception middleware + structured logging
 - Swagger/OpenAPI documentation
@@ -104,6 +106,16 @@ If configured, registration sends a welcome email that includes the JWT and quic
 }
 ```
 
+### Optional Azure monitoring settings
+
+Application Insights is enabled in code. Set the connection string via configuration or environment variable:
+
+```bash
+APPLICATIONINSIGHTS_CONNECTION_STRING=<your-app-insights-connection-string>
+```
+
+If the connection string is not set, telemetry export is effectively disabled.
+
 ### Admin seed user
 
 ```json
@@ -158,6 +170,19 @@ If SMTP is configured, the registration email also includes these Swagger steps.
 - Local development runs on HTTPS launch profile ports (see `launchSettings.json`).
 
 For production, terminate TLS at the edge (App Service/Ingress/Reverse Proxy) and keep HTTPS enforced end-to-end.
+
+## Health Checks & Monitoring
+
+- Health endpoint: `GET /health`
+- Intended for infrastructure probes and readiness checks (for example Azure App Service Health Check path)
+- Endpoint is lightweight and returns healthy/unhealthy status from the ASP.NET Core health check pipeline
+- Application Insights telemetry can be enabled with `APPLICATIONINSIGHTS_CONNECTION_STRING`
+
+### Azure App Service recommendation
+
+- In Azure App Service, set **Health check path** to `/health`.
+- Configure `APPLICATIONINSIGHTS_CONNECTION_STRING` in App Service Configuration.
+- Review traces/requests/exceptions in Application Insights and set alerts in Azure Monitor.
 
 ## Rate Limiting
 
