@@ -154,25 +154,42 @@ namespace FootballLeagueApi.Controllers
                         string.Join(", ", roleResult.Errors.Select(e => e.Description)));
                 }
 
-                var (token, _) = await GenerateJwtTokenAsync(user);
+                var (token, tokenExpires) = await GenerateJwtTokenAsync(user);
+                var refreshToken = GenerateRefreshToken();
+                var refreshTokenExpires = DateTime.UtcNow.AddDays(7);
+                await SaveRefreshTokenAsync(user, refreshToken, refreshTokenExpires);
 
                 try
                 {
-                    var subject = "Football League API - JWT Token";
+                    var subject = "Football League API - Access and Refresh Tokens";
                     var body = $@"
                         <div style='font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#111827;'>
                             <h2 style='margin:0 0 12px;'>Welcome to Football League API</h2>
                             <p style='margin:0 0 12px;'>Hi {user.UserName}, your account has been created successfully.</p>
-                            <p style='margin:0 0 8px;'><strong>Your JWT token:</strong></p>
+                            <p style='margin:0 0 8px;'><strong>Your access token (JWT):</strong></p>
                             <pre style='white-space:pre-wrap;word-break:break-all;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:12px;margin:0 0 12px;'>{token}</pre>
-                            <p style='margin:0 0 8px;'><strong>How to use this token in Swagger:</strong></p>
+                            <p style='margin:0 0 8px;'><strong>Access token expiry (UTC):</strong> {tokenExpires:O}</p>
+                            <p style='margin:0 0 8px;'><strong>How to use your access token in Swagger:</strong></p>
                             <ol style='margin:0 0 12px 20px;padding:0;'>
                                 <li>Open Swagger UI (<code>/swagger</code>).</li>
                                 <li>Click <strong>Authorize</strong> (top-right).</li>
-                                <li>Paste the token value into the input field.</li>
+                                <li>Paste the access token value into the input field.</li>
                                 <li>Submit and call protected endpoints.</li>
                             </ol>
-                            <p style='margin:0;color:#6b7280;font-size:12px;'>Keep this token private. Anyone with this token can access your account until it expires.</p>
+                            <p style='margin:0 0 8px;'><strong>Your refresh token:</strong></p>
+                            <pre style='white-space:pre-wrap;word-break:break-all;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:12px;margin:0 0 12px;'>{refreshToken}</pre>
+                            <p style='margin:0 0 8px;'><strong>Refresh token expiry (UTC):</strong> {refreshTokenExpires:O}</p>
+                            <p style='margin:0 0 8px;'><strong>How to refresh your access token:</strong></p>
+                            <ol style='margin:0 0 12px 20px;padding:0;'>
+                                <li>Call <code>POST /api/auth/refresh</code>.</li>
+                                <li>Use this JSON body:</li>
+                            </ol>
+                            <pre style='white-space:pre-wrap;word-break:break-word;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:12px;margin:0 0 12px;'>{{
+    ""email"": ""{user.Email}"",
+    ""refreshToken"": ""{refreshToken}""
+}}</pre>
+                            <p style='margin:0;color:#6b7280;font-size:12px;'>Keep both tokens private. Anyone with these tokens can access or renew access to your account until they expire or are rotated.</p>
+                            <p style='margin:12px 0 0;'>Kind regards,<br/>Football League API Team</p>
                         </div>";
                     await _emailService.SendEmailAsync(user.Email!, subject, body);
                 }
@@ -264,6 +281,15 @@ namespace FootballLeagueApi.Controllers
             return Ok(new { token = tokenString, expires, refreshToken, refreshTokenExpires });
         }
 
+        /// <summary>
+        /// POST /api/auth/refresh - Validate a refresh token and issue a new access token pair.
+        /// </summary>
+        /// <param name="model">Refresh token request containing the user's email and current refresh token.</param>
+        /// <returns>
+        ///   200 OK with a new access token and refresh token when successful;
+        ///   400 Bad Request for invalid request payload;
+        ///   401 Unauthorized when the refresh token is invalid or expired.
+        /// </returns>
         [HttpPost("refresh")]
         [AllowAnonymous]
         public async Task<IActionResult> Refresh(RefreshTokenRequestDto model)
