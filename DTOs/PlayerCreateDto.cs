@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace FootballLeagueApi.DTOs
 {
     /// <summary>
@@ -21,7 +23,9 @@ namespace FootballLeagueApi.DTOs
         /// <summary>
         /// The player's position on the field (e.g., "Goalkeeper", "Defender", "Midfielder", "Forward")
         /// </summary>
-        public string? Position { get; set; }
+        [Required]
+        [AllowedPlayerPosition]
+        public string Position { get; set; }
 
         /// <summary>
         /// The ID of the team this player will play for

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace FootballLeagueApi.DTOs
 {
     /// <summary>
@@ -21,6 +23,8 @@ namespace FootballLeagueApi.DTOs
         /// <summary>
         /// The player's position on the field
         /// </summary>
-        public string? Position { get; set; }
+        [Required]
+        [AllowedPlayerPosition]
+        public string Position { get; set; }
     }
 }

@@ -27,6 +27,18 @@ const initialForm = {
   teamId: "",
 };
 
+const playerPositions = [
+  "Goalkeeper",
+  "Centre-Back",
+  "Full-Back",
+  "Wing-Back",
+  "Defensive Midfielder",
+  "Central Midfielder",
+  "Attacking Midfielder",
+  "Winger",
+  "Forward/Striker",
+];
+
 function PlayersPage() {
   const { role } = useAuth();
   const [players, setPlayers] = useState([]);
@@ -38,6 +50,8 @@ function PlayersPage() {
   const [editingPlayerId, setEditingPlayerId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("list");
+  const [teamFilterId, setTeamFilterId] = useState("");
+  const [positionFilter, setPositionFilter] = useState("");
 
   const isAdmin = role === "Admin";
 
@@ -53,6 +67,22 @@ function PlayersPage() {
     });
     return lookup;
   }, [teams]);
+
+  const positionOptions = useMemo(() => playerPositions, []);
+
+  const filteredPlayers = useMemo(() => {
+    return sortedPlayers.filter((player) => {
+      if (teamFilterId && String(player.teamId) !== teamFilterId) {
+        return false;
+      }
+
+      if (positionFilter && (player.position ?? "") !== positionFilter) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [sortedPlayers, teamFilterId, positionFilter]);
 
   async function loadData() {
     setLoading(true);
@@ -108,7 +138,7 @@ function PlayersPage() {
       const commonData = {
         fullName: form.fullName.trim(),
         shirtNumber: Number(form.shirtNumber),
-        position: form.position.trim() || null,
+        position: form.position,
       };
 
       if (editingPlayerId) {
@@ -183,6 +213,43 @@ function PlayersPage() {
                 </Button>
               </div>
 
+              <Row className="g-3 mb-3">
+                <Col xs={12} md={4}>
+                  <Form.Group controlId="playerFilterTeam">
+                    <Form.Label className="mb-1">Filter by Team</Form.Label>
+                    <Form.Select
+                      value={teamFilterId}
+                      onChange={(event) => setTeamFilterId(event.target.value)}
+                    >
+                      <option value="">All Teams</option>
+                      {teams.map((team) => (
+                        <option key={team.teamId} value={String(team.teamId)}>
+                          {team.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+                <Col xs={12} md={4}>
+                  <Form.Group controlId="playerFilterPosition">
+                    <Form.Label className="mb-1">Filter by Position</Form.Label>
+                    <Form.Select
+                      value={positionFilter}
+                      onChange={(event) =>
+                        setPositionFilter(event.target.value)
+                      }
+                    >
+                      <option value="">All Positions</option>
+                      {positionOptions.map((position) => (
+                        <option key={position} value={position}>
+                          {position}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
+
               {loading ? (
                 <LoadingState message="Loading players..." />
               ) : (
@@ -199,7 +266,7 @@ function PlayersPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sortedPlayers.map((player) => (
+                      {filteredPlayers.map((player) => (
                         <tr key={player.playerId}>
                           <td>{player.playerId}</td>
                           <td>{player.fullName}</td>
@@ -281,12 +348,19 @@ function PlayersPage() {
                   <Col xs={12} md={6}>
                     <Form.Group controlId="position">
                       <Form.Label>Position</Form.Label>
-                      <Form.Control
+                      <Form.Select
                         name="position"
                         value={form.position}
                         onChange={handleInputChange}
-                        placeholder="e.g. Midfielder"
-                      />
+                        required
+                      >
+                        <option value="">Select position</option>
+                        {playerPositions.map((position) => (
+                          <option key={position} value={position}>
+                            {position}
+                          </option>
+                        ))}
+                      </Form.Select>
                     </Form.Group>
                   </Col>
 

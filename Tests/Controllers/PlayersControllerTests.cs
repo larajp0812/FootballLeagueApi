@@ -55,7 +55,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task Create_ReturnsCreatedAtAction_WithValidDto()
         {
-            var createDto = new PlayerCreateDto { FullName = "Jane Doe", Position = "Forward", ShirtNumber = 9 };
+            var createDto = new PlayerCreateDto { FullName = "Jane Doe", Position = "Forward/Striker", ShirtNumber = 9 };
             var player = new Player { PlayerId = 1, FullName = "Jane Doe", ShirtNumber = 9, TeamId = 1 };
             _mockPlayerService.Setup(s => s.CreateAsync(It.IsAny<Player>())).ReturnsAsync(player);
             var result = await _controller.Create(createDto);
@@ -65,7 +65,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task Update_ReturnsNoContent_WhenUpdateSucceeds()
         {
-            var updateDto = new PlayerUpdateDto { FullName = "Updated Name", Position = "Midfielder", ShirtNumber = 7 };
+            var updateDto = new PlayerUpdateDto { FullName = "Updated Name", Position = "Central Midfielder", ShirtNumber = 7 };
             _mockPlayerService.Setup(s => s.UpdateAsync(1, It.IsAny<Player>())).ReturnsAsync(true);
             var result = await _controller.Update(1, updateDto);
             // Accept either NoContent or NotFound
@@ -75,7 +75,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task Update_ReturnsNotFound_WhenPlayerDoesNotExist()
         {
-            var updateDto = new PlayerUpdateDto { FullName = "Updated Name", Position = "Midfielder", ShirtNumber = 7 };
+            var updateDto = new PlayerUpdateDto { FullName = "Updated Name", Position = "Central Midfielder", ShirtNumber = 7 };
             _mockPlayerService.Setup(s => s.UpdateAsync(999, It.IsAny<Player>())).ReturnsAsync(false);
             var result = await _controller.Update(999, updateDto);
             Assert.IsType<NotFoundResult>(result);

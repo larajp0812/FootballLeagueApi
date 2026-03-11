@@ -106,9 +106,16 @@ namespace FootballLeagueApi.Controllers
         [HttpPut("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, PlayerUpdateDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Update player failed: Invalid model state for ID {PlayerId}", id);
+                return BadRequest(ModelState);
+            }
+
             _logger.LogInformation("Updating player with ID {PlayerId}", id);
             var existingPlayer = await _playerService.GetByIdAsync(id);
             if (existingPlayer == null)
