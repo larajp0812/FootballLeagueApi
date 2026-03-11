@@ -5,6 +5,7 @@ import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import PlayersPage from "./pages/PlayersPage";
 import RegisterPage from "./pages/RegisterPage";
+import SeasonsPage from "./pages/SeasonsPage";
 import TeamsPage from "./pages/TeamsPage";
 
 function App() {
@@ -35,6 +36,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PlayersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seasons"
+          element={
+            <ProtectedRoute>
+              <SeasonsPage />
             </ProtectedRoute>
           }
         />
