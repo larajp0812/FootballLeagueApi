@@ -1,5 +1,48 @@
 body {
   margin: 0;
   min-width: 320px;
-  background-color: #f8f9fa;
+  background-color: #0d1b2a;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.dashboard-shell {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+}
+
+.dashboard-cards-grid {
+  align-items: stretch;
+}
+
+.module-card {
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  position: relative;
+}
+
+.module-card-body {
+  padding: 1.15rem;
+  height: 100%;
+  text-align: center;
+  align-items: center;
+}
+
+.module-card-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  color: #ffffff;
+}
+
+.module-card-text {
+  color: rgba(255, 255, 255, 0.8);
 }

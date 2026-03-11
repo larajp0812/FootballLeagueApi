@@ -1,5 +1,4 @@
 import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { Link } from "react-router-dom";
@@ -47,22 +46,34 @@ function DashboardPage() {
   ];
 
   return (
-    <PageContainer>
-      <Row className="g-3">
-        {modules.map((module) => (
-          <Col key={module.title} xs={12} md={6} lg={4}>
-            <Card className="h-100">
-              <Card.Body className="d-flex flex-column">
-                <Card.Title className="mb-2">{module.title}</Card.Title>
-                <Card.Text className="mb-3">{module.description}</Card.Text>
-                <Button as={Link} to={module.route} className="mt-auto">
-                  Open {module.title}
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+    <PageContainer
+      title="League Management Hub"
+      subtitle="Manage teams, players, fixtures, and league operations"
+      titleClassName="text-white"
+      subtitleClassName="text-light"
+    >
+      <div className="dashboard-shell">
+        <Row className="g-4 dashboard-cards-grid">
+          {modules.map((module) => (
+            <Col key={module.title} xs={12} md={6} lg={4}>
+              <div className="module-card h-100">
+                <div className="module-card-body d-flex flex-column">
+                  <h3 className="module-card-title">{module.title}</h3>
+                  <p className="module-card-text mb-3">{module.description}</p>
+                  <Button
+                    as={Link}
+                    to={module.route}
+                    variant="outline-light"
+                    className="mt-auto w-100"
+                  >
+                    Open {module.title}
+                  </Button>
+                </div>
+              </div>
+            </Col>
+          ))}
+        </Row>
+      </div>
     </PageContainer>
   );
 }
