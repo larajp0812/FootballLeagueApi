@@ -8,6 +8,98 @@ body {
   min-height: 100vh;
 }
 
+.app-navbar {
+  background: #0b1624 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .nav-link,
+.app-navbar .navbar-text {
+  color: #ffffff !important;
+}
+
+.app-page .nav-tabs {
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.app-page .nav-tabs .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.app-page .nav-tabs .nav-link.active {
+  color: #0d1b2a;
+  background-color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+.app-page .card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  color: #ffffff;
+}
+
+.app-page .card .text-muted,
+.app-page .text-muted {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.app-page .form-label,
+.app-page .table,
+.app-page .table th,
+.app-page .table td,
+.app-page h2,
+.app-page h3 {
+  color: #ffffff;
+}
+
+.app-page .table-striped > tbody > tr:nth-of-type(odd) > * {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.app-page .table-hover > tbody > tr:hover > * {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.app-page .form-control,
+.app-page .form-select {
+  background-color: rgba(13, 27, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+}
+
+.app-page .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.app-page .form-control:focus,
+.app-page .form-select:focus {
+  background-color: rgba(13, 27, 42, 0.95);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.15);
+}
+
+.app-page .btn-outline-primary,
+.app-page .btn-outline-secondary,
+.app-page .btn-outline-success,
+.app-page .btn-outline-warning,
+.app-page .btn-outline-danger {
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
+}
+
+.app-page .btn-outline-primary:hover,
+.app-page .btn-outline-secondary:hover,
+.app-page .btn-outline-success:hover,
+.app-page .btn-outline-warning:hover,
+.app-page .btn-outline-danger:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
 .dashboard-shell {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.15);

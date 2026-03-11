@@ -24,6 +24,7 @@ function AppNavbar() {
     <Navbar
       bg="dark"
       variant="dark"
+      className="app-navbar"
       expand="xl"
       expanded={expanded}
       onToggle={setExpanded}
