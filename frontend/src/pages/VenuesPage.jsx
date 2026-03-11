@@ -132,7 +132,11 @@ function VenuesPage() {
       <ErrorAlert message={error} onClose={() => setError("")} />
 
       {statusMessage ? (
-        <Alert variant="success" dismissible onClose={() => setStatusMessage("")}>
+        <Alert
+          variant="success"
+          dismissible
+          onClose={() => setStatusMessage("")}
+        >
           {statusMessage}
         </Alert>
       ) : null}
@@ -143,7 +147,11 @@ function VenuesPage() {
             <Card.Body>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h2 className="h5 mb-0">All Venues</h2>
-                <Button variant="outline-primary" onClick={loadVenues} disabled={loading}>
+                <Button
+                  variant="outline-primary"
+                  onClick={loadVenues}
+                  disabled={loading}
+                >
                   Refresh
                 </Button>
               </div>
@@ -196,7 +204,10 @@ function VenuesPage() {
           </Card>
         </Tab>
 
-        <Tab eventKey="form" title={editingId ? "Update Venue" : "Create Venue"}>
+        <Tab
+          eventKey="form"
+          title={editingId ? "Update Venue" : "Create Venue"}
+        >
           <Card>
             <Card.Body>
               <h2 className="h5 mb-3">
@@ -230,7 +241,11 @@ function VenuesPage() {
 
                 <div className="d-flex gap-2 mt-3">
                   <Button type="submit" disabled={saving}>
-                    {saving ? "Saving..." : editingId ? "Update Venue" : "Create Venue"}
+                    {saving
+                      ? "Saving..."
+                      : editingId
+                        ? "Update Venue"
+                        : "Create Venue"}
                   </Button>
                   <Button type="button" variant="secondary" onClick={resetForm}>
                     Clear
