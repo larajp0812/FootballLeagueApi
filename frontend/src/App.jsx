@@ -3,6 +3,7 @@ import AppNavbar from "./components/AppNavbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
+import MatchEventsPage from "./pages/MatchEventsPage";
 import MatchesPage from "./pages/MatchesPage";
 import PlayersPage from "./pages/PlayersPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -62,6 +63,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MatchesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/matchevents"
+          element={
+            <ProtectedRoute>
+              <MatchEventsPage />
             </ProtectedRoute>
           }
         />

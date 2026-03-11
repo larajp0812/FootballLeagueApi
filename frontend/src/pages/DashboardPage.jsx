@@ -50,8 +50,9 @@ function DashboardPage() {
     {
       title: "Match Events",
       description: "Track goals, cards, substitutions, and key events.",
-      status: "Next",
-      variant: "secondary",
+      route: "/matchevents",
+      status: "Live",
+      variant: "success",
     },
     {
       title: "Roles",
@@ -83,7 +84,8 @@ function DashboardPage() {
               <Card.Title>Current Coverage</Card.Title>
               <Card.Text className="mb-0">
                 Live now: Teams + Players + Seasons + Venues + Matches modules.
-                Remaining endpoints are listed below for the next commits.
+                + Match Events modules. Remaining endpoints are listed below for
+                the next commits.
               </Card.Text>
             </Card.Body>
           </Card>

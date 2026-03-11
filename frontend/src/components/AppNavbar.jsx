@@ -42,6 +42,9 @@ function AppNavbar() {
                 <Nav.Link as={Link} to="/matches">
                   Matches
                 </Nav.Link>
+                <Nav.Link as={Link} to="/matchevents">
+                  Match Events
+                </Nav.Link>
               </>
             )}
           </Nav>
