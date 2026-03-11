@@ -31,7 +31,17 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task GetAll_ReturnsOkResult_WithMatchesList()
         {
-            var matches = new List<MatchModel> { new MatchModel { MatchId = 1, HomeTeamId = 1, AwayTeamId = 2, SeasonId = 1, VenueId = 1 } };
+            var matches = new List<MatchModel>
+            {
+                new MatchModel
+                {
+                    MatchId = 1,
+                    HomeTeamId = 1,
+                    AwayTeamId = 2,
+                    SeasonId = 1,
+                    HomeTeam = new Team { TeamId = 1, Name = "Home", Venue = "Home Stadium" }
+                }
+            };
             _mockMatchService.Setup(s => s.GetAllAsync()).ReturnsAsync(matches);
             var result = await _controller.GetAll();
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -41,7 +51,14 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task GetById_ReturnsOkResult_WhenMatchExists()
         {
-            var match = new MatchModel { MatchId = 1, HomeTeamId = 1, AwayTeamId = 2, SeasonId = 1, VenueId = 1 };
+            var match = new MatchModel
+            {
+                MatchId = 1,
+                HomeTeamId = 1,
+                AwayTeamId = 2,
+                SeasonId = 1,
+                HomeTeam = new Team { TeamId = 1, Name = "Home", Venue = "Home Stadium" }
+            };
             _mockMatchService.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(match);
             var result = await _controller.GetById(1);
             Assert.IsType<OkObjectResult>(result);
@@ -58,8 +75,15 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task Create_ReturnsCreatedAtAction_WithValidDto()
         {
-            var createDto = new MatchCreateDto { HomeTeamId = 1, AwayTeamId = 2, SeasonId = 1, VenueId = 1, KickoffTime = DateTime.Now };
-            var match = new MatchModel { MatchId = 1, HomeTeamId = 1, AwayTeamId = 2, SeasonId = 1, VenueId = 1 };
+            var createDto = new MatchCreateDto { HomeTeamId = 1, AwayTeamId = 2, SeasonId = 1, KickoffTime = DateTime.Now };
+            var match = new MatchModel
+            {
+                MatchId = 1,
+                HomeTeamId = 1,
+                AwayTeamId = 2,
+                SeasonId = 1,
+                HomeTeam = new Team { TeamId = 1, Name = "Home", Venue = "Home Stadium" }
+            };
             _mockMatchService.Setup(s => s.CreateAsync(It.IsAny<MatchModel>())).ReturnsAsync(match);
             var result = await _controller.Create(createDto);
             Assert.IsType<CreatedAtActionResult>(result);

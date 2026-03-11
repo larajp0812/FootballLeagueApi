@@ -46,9 +46,6 @@ function AppNavbar() {
                 <Nav.Link as={Link} to="/seasons" onClick={handleNavClick}>
                   Seasons
                 </Nav.Link>
-                <Nav.Link as={Link} to="/venues" onClick={handleNavClick}>
-                  Venues
-                </Nav.Link>
                 <Nav.Link as={Link} to="/matches" onClick={handleNavClick}>
                   Matches
                 </Nav.Link>

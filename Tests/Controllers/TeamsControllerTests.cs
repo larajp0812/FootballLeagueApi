@@ -28,7 +28,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task GetAll_ReturnsOkResult_WithTeamsList()
         {
-            var teams = new List<Team> { new Team { TeamId = 1, Name = "Team A" } };
+            var teams = new List<Team> { new Team { TeamId = 1, Name = "Team A", Venue = "Team A Stadium" } };
             _mockTeamService.Setup(s => s.GetAllAsync()).ReturnsAsync(teams);
             var result = await _controller.GetAll();
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -38,7 +38,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task GetById_ReturnsOkResult_WhenTeamExists()
         {
-            var team = new Team { TeamId = 1, Name = "Team A" };
+            var team = new Team { TeamId = 1, Name = "Team A", Venue = "Team A Stadium" };
             _mockTeamService.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(team);
             var result = await _controller.GetById(1);
             Assert.IsType<OkObjectResult>(result);
@@ -55,8 +55,8 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task Create_ReturnsCreatedAtAction_WithValidDto()
         {
-            var createDto = new TeamCreateDto { Name = "NewTeam", Coach = "Coach", FoundedYear = 2000 };
-            var team = new Team { TeamId = 1, Name = "NewTeam" };
+            var createDto = new TeamCreateDto { Name = "NewTeam", Coach = "Coach", FoundedYear = 2000, Venue = "New Stadium" };
+            var team = new Team { TeamId = 1, Name = "NewTeam", Venue = "New Stadium" };
             _mockTeamService.Setup(s => s.CreateAsync(It.IsAny<Team>())).ReturnsAsync(team);
             var result = await _controller.Create(createDto);
             Assert.IsType<CreatedAtActionResult>(result);
@@ -65,7 +65,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task Update_ReturnsNoContent_WhenUpdateSucceeds()
         {
-            var updateDto = new TeamUpdateDto { Name = "Updated", Coach = "Coach", FoundedYear = 2000 };
+            var updateDto = new TeamUpdateDto { Name = "Updated", Coach = "Coach", FoundedYear = 2000, Venue = "Updated Stadium" };
             _mockTeamService.Setup(s => s.UpdateAsync(1, It.IsAny<Team>())).ReturnsAsync(true);
             var result = await _controller.Update(1, updateDto);
             Assert.IsType<NoContentResult>(result);
@@ -74,7 +74,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task Update_ReturnsNotFound_WhenTeamDoesNotExist()
         {
-            var updateDto = new TeamUpdateDto { Name = "Updated", Coach = "Coach", FoundedYear = 2000 };
+            var updateDto = new TeamUpdateDto { Name = "Updated", Coach = "Coach", FoundedYear = 2000, Venue = "Updated Stadium" };
             _mockTeamService.Setup(s => s.UpdateAsync(999, It.IsAny<Team>())).ReturnsAsync(false);
             var result = await _controller.Update(999, updateDto);
             Assert.IsType<NotFoundResult>(result);
@@ -94,6 +94,18 @@ namespace FootballLeagueApi.Tests.Controllers
             _mockTeamService.Setup(s => s.DeleteAsync(999)).ReturnsAsync(false);
             var result = await _controller.Delete(999);
             Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Delete_ReturnsConflict_WhenTeamHasDependencies()
+        {
+            _mockTeamService
+                .Setup(s => s.DeleteAsync(1))
+                .ThrowsAsync(new InvalidOperationException("Cannot delete team because it is referenced by existing matches."));
+
+            var result = await _controller.Delete(1);
+
+            Assert.IsType<ConflictObjectResult>(result);
         }
     }
 }

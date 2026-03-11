@@ -207,6 +207,18 @@ namespace FootballLeagueApi.Services
                 // Return false and let controller return 404 Not Found
                 return false;
             }
+
+            if (await _repo.HasPlayersAsync(id))
+            {
+                _logger.LogWarning("Delete blocked: Team with ID {TeamId} has assigned players", id);
+                throw new InvalidOperationException("Cannot delete team because it still has players assigned. Reassign or delete those players first.");
+            }
+
+            if (await _repo.HasMatchesAsync(id))
+            {
+                _logger.LogWarning("Delete blocked: Team with ID {TeamId} is referenced by matches", id);
+                throw new InvalidOperationException("Cannot delete team because it is referenced by existing matches.");
+            }
             
             // Delete from EF Core: Mark for deletion
             await _repo.DeleteAsync(team);

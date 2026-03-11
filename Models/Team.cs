@@ -31,6 +31,11 @@ namespace FootballLeagueApi.Models
         public int FoundedYear { get; set; }
 
         /// <summary>
+        /// The home venue/stadium for this team
+        /// </summary>
+        public string Venue { get; set; }
+
+        /// <summary>
         /// Navigation property: Collection of matches where this team played at home
         /// Related through the Match.HomeTeamId foreign key
         /// </summary>

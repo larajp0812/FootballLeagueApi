@@ -41,6 +41,14 @@ function normalizeError(status, payload) {
     return payload.title;
   }
 
+  if (payload.error) {
+    return payload.error;
+  }
+
+  if (payload.message) {
+    return payload.message;
+  }
+
   if (payload.errors && typeof payload.errors === "object") {
     const values = Object.values(payload.errors).flat();
     if (values.length > 0) return values.join(", ");

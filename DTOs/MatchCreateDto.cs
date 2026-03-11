@@ -4,7 +4,7 @@ namespace FootballLeagueApi.DTOs
     /// MatchCreateDto - Data Transfer Object for creating a new match
     /// 
     /// Used in POST /api/matches requests to schedule a new match.
-    /// Requires home team, away team, season, venue, and kickoff time.
+    /// Requires home team, away team, season, and kickoff time.
     /// </summary>
     public class MatchCreateDto
     {
@@ -22,11 +22,6 @@ namespace FootballLeagueApi.DTOs
         /// The ID of the season this match belongs to
         /// </summary>
         public int SeasonId { get; set; }
-
-        /// <summary>
-        /// The ID of the venue where this match will be played
-        /// </summary>
-        public int VenueId { get; set; }
 
         /// <summary>
         /// The date and time when the match kicks off

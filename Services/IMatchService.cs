@@ -25,7 +25,7 @@ namespace FootballLeagueApi.Services
 
         /// <summary>
         /// Create a new match
-        /// Accepts a Match with HomeTeamId, AwayTeamId, SeasonId, VenueId, and KickoffTime
+        /// Accepts a Match with HomeTeamId, AwayTeamId, SeasonId, and KickoffTime
         /// May throw exceptions if business rules are violated (e.g., team not found)
         /// Returns the created Match with its auto-generated MatchId
         /// </summary>

@@ -29,9 +29,9 @@ namespace FootballLeagueApi.DTOs
         public int SeasonId { get; set; }
 
         /// <summary>
-        /// The ID of the venue where this match is played
+        /// The venue where this match is played (derived from the home team)
         /// </summary>
-        public int VenueId { get; set; }
+        public string Venue { get; set; }
 
         /// <summary>
         /// The date and time when the match kicks off

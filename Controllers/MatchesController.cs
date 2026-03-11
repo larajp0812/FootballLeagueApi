@@ -9,7 +9,7 @@ namespace FootballLeagueApi.Controllers
     /// <summary>
     /// Matches Controller - Manages REST API operations for league matches
     /// 
-    /// A match represents a game between two teams (home and away) played at a specific venue during a season.
+    /// A match represents a game between two teams (home and away) played during a season.
     /// Each match has a scheduled kickoff time and can optionally have results (goals, attendance).
     /// Matches are associated with match events (goals, red cards, substitutions, etc.) that track specific occurrences during play.
     /// 
@@ -53,7 +53,7 @@ namespace FootballLeagueApi.Controllers
         /// Retrieve a specific match by ID
         /// </summary>
         /// <param name="id">Match ID</param>
-        /// <returns>MatchReadDto with match details including teams, venue, and kickoff time</returns>
+        /// <returns>MatchReadDto with match details including teams, derived venue, and kickoff time</returns>
         /// <response code="200">Match found</response>
         /// <response code="404">Match not found</response>
         [HttpGet("{id}")]
@@ -75,7 +75,7 @@ namespace FootballLeagueApi.Controllers
         /// <summary>
         /// Create a new match
         /// </summary>
-        /// <param name="dto">MatchCreateDto with match details (home team, away team, season, venue, kickoff time)</param>
+        /// <param name="dto">MatchCreateDto with match details (home team, away team, season, kickoff time)</param>
         /// <returns>Created MatchReadDto with assigned ID</returns>
         /// <response code="201">Match created successfully</response>
         /// <response code="400">Invalid match data or business rule violation</response>
@@ -114,25 +114,28 @@ namespace FootballLeagueApi.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(int id, MatchUpdateDto dto)
         {
-            _logger.LogInformation("Updating match with ID {MatchId}", id);
-            var match = await _matchService.GetByIdAsync(id);
-            if (match == null)
+            try
             {
-                _logger.LogWarning("Match with ID {MatchId} not found for update", id);
-                return NotFound();
-            }
-            var updated = MatchMapper.ToModel(dto, id, match.HomeTeamId, match.AwayTeamId, match.SeasonId, match.VenueId);
-            var success = await _matchService.UpdateAsync(id, updated);
-            if (!success)
-            {
-                _logger.LogWarning("Failed to update match with ID {MatchId}", id);
-                return BadRequest();
-            }
+                _logger.LogInformation("Updating match with ID {MatchId}", id);
+                var updated = MatchMapper.ToModel(dto, id);
+                var success = await _matchService.UpdateAsync(id, updated);
+                if (!success)
+                {
+                    _logger.LogWarning("Match with ID {MatchId} not found for update", id);
+                    return NotFound();
+                }
 
-            _logger.LogInformation("Successfully updated match with ID {MatchId}", id);
-            return NoContent();
+                _logger.LogInformation("Successfully updated match with ID {MatchId}", id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error updating match: {ErrorMessage}", ex.Message);
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         /// <summary>

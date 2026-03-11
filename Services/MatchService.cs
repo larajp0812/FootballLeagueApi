@@ -8,18 +8,15 @@ namespace FootballLeagueApi.Services
         private readonly IMatchRepository _matchRepo;
         private readonly ITeamRepository _teamRepo;
         private readonly ISeasonRepository _seasonRepo;
-        private readonly IVenueRepository _venueRepo;
 
         public MatchService(
             IMatchRepository matchRepo,
             ITeamRepository teamRepo,
-            ISeasonRepository seasonRepo,
-            IVenueRepository venueRepo)
+            ISeasonRepository seasonRepo)
         {
             _matchRepo = matchRepo;
             _teamRepo = teamRepo;
             _seasonRepo = seasonRepo;
-            _venueRepo = venueRepo;
         }
 
         public async Task<IEnumerable<Match>> GetAllAsync()
@@ -47,9 +44,6 @@ namespace FootballLeagueApi.Services
             if (await _seasonRepo.GetByIdAsync(match.SeasonId) == null)
                 throw new Exception("Season does not exist.");
 
-            if (await _venueRepo.GetByIdAsync(match.VenueId) == null)
-                throw new Exception("Venue does not exist.");
-
             await _matchRepo.AddAsync(match);
             await _matchRepo.SaveChangesAsync();
             return match;
@@ -63,6 +57,22 @@ namespace FootballLeagueApi.Services
             var existing = await _matchRepo.GetByIdAsync(id);
             if (existing == null)
                 return false;
+
+            if (match.HomeTeamId == match.AwayTeamId)
+                throw new Exception("Home and Away teams cannot be the same.");
+
+            if (await _teamRepo.GetByIdAsync(match.HomeTeamId) == null)
+                throw new Exception("Home team does not exist.");
+
+            if (await _teamRepo.GetByIdAsync(match.AwayTeamId) == null)
+                throw new Exception("Away team does not exist.");
+
+            if (await _seasonRepo.GetByIdAsync(match.SeasonId) == null)
+                throw new Exception("Season does not exist.");
+
+            existing.HomeTeamId = match.HomeTeamId;
+            existing.AwayTeamId = match.AwayTeamId;
+            existing.SeasonId = match.SeasonId;
 
             existing.KickoffTime = match.KickoffTime;
             existing.HomeScore = match.HomeScore;

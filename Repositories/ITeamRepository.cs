@@ -44,6 +44,16 @@ namespace FootballLeagueApi.Repositories
         Task DeleteAsync(Team team);
 
         /// <summary>
+        /// Check if a team has any players assigned
+        /// </summary>
+        Task<bool> HasPlayersAsync(int teamId);
+
+        /// <summary>
+        /// Check if a team is referenced by any matches (home or away)
+        /// </summary>
+        Task<bool> HasMatchesAsync(int teamId);
+
+        /// <summary>
         /// Persist all pending changes to the database
         /// Sends all Add/Update/Delete operations to the database
         /// Returns true if successful, false if there were errors

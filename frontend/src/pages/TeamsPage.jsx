@@ -23,6 +23,7 @@ const initialForm = {
   name: "",
   coach: "",
   foundedYear: "",
+  venue: "",
 };
 
 function TeamsPage() {
@@ -71,6 +72,7 @@ function TeamsPage() {
       name: team.name,
       coach: team.coach,
       foundedYear: String(team.foundedYear),
+      venue: team.venue ?? "",
     });
     setStatusMessage("Editing selected team");
   }
@@ -91,6 +93,7 @@ function TeamsPage() {
         name: form.name.trim(),
         coach: form.coach.trim(),
         foundedYear: Number(form.foundedYear),
+        venue: form.venue.trim(),
       };
 
       if (editingId) {
@@ -169,6 +172,7 @@ function TeamsPage() {
                         <th>ID</th>
                         <th>Name</th>
                         <th>Coach</th>
+                        <th>Venue</th>
                         <th>Founded Year</th>
                         <th>Actions</th>
                       </tr>
@@ -179,6 +183,7 @@ function TeamsPage() {
                           <td>{team.teamId}</td>
                           <td>{team.name}</td>
                           <td>{team.coach}</td>
+                          <td>{team.venue}</td>
                           <td>{team.foundedYear}</td>
                           <td>
                             <div className="d-flex gap-2">
@@ -248,6 +253,17 @@ function TeamsPage() {
                         type="number"
                         min="1800"
                         value={form.foundedYear}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col xs={12} md={6}>
+                    <Form.Group controlId="teamVenue">
+                      <Form.Label>Home Venue</Form.Label>
+                      <Form.Control
+                        name="venue"
+                        value={form.venue}
                         onChange={handleInputChange}
                         required
                       />

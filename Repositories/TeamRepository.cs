@@ -79,6 +79,17 @@ namespace FootballLeagueApi.Repositories
             _context.Teams.Remove(team);
         }
 
+        public async Task<bool> HasPlayersAsync(int teamId)
+        {
+            return await _context.Players.AnyAsync(player => player.TeamId == teamId);
+        }
+
+        public async Task<bool> HasMatchesAsync(int teamId)
+        {
+            return await _context.Matches.AnyAsync(match =>
+                match.HomeTeamId == teamId || match.AwayTeamId == teamId);
+        }
+
         /// <summary>
         /// Persist all pending changes to the database
         /// This sends all Add/Update/Delete operations to SQL Server

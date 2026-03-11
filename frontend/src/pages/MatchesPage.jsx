@@ -20,13 +20,11 @@ import {
 } from "../services/matchService";
 import { getSeasons } from "../services/seasonService";
 import { getTeams } from "../services/teamService";
-import { getVenues } from "../services/venueService";
 
 const initialForm = {
   homeTeamId: "",
   awayTeamId: "",
   seasonId: "",
-  venueId: "",
   kickoffTime: "",
   homeScore: "0",
   awayScore: "0",
@@ -49,7 +47,6 @@ function MatchesPage() {
   const [matches, setMatches] = useState([]);
   const [teams, setTeams] = useState([]);
   const [seasons, setSeasons] = useState([]);
-  const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -77,29 +74,26 @@ function MatchesPage() {
     return map;
   }, [seasons]);
 
-  const venueNameById = useMemo(() => {
+  const teamVenueById = useMemo(() => {
     const map = new Map();
-    venues.forEach((item) => map.set(item.venueId, item.name));
+    teams.forEach((item) => map.set(item.teamId, item.venue));
     return map;
-  }, [venues]);
+  }, [teams]);
 
   async function loadData() {
     setLoading(true);
     setError("");
 
     try {
-      const [matchesData, teamsData, seasonsData, venuesData] =
-        await Promise.all([
-          getMatches(),
-          getTeams(),
-          getSeasons(),
-          getVenues(),
-        ]);
+      const [matchesData, teamsData, seasonsData] = await Promise.all([
+        getMatches(),
+        getTeams(),
+        getSeasons(),
+      ]);
 
       setMatches(Array.isArray(matchesData) ? matchesData : []);
       setTeams(Array.isArray(teamsData) ? teamsData : []);
       setSeasons(Array.isArray(seasonsData) ? seasonsData : []);
-      setVenues(Array.isArray(venuesData) ? venuesData : []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -127,7 +121,6 @@ function MatchesPage() {
       homeTeamId: String(match.homeTeamId),
       awayTeamId: String(match.awayTeamId),
       seasonId: String(match.seasonId),
-      venueId: String(match.venueId),
       kickoffTime: toDateTimeLocal(match.kickoffTime),
       homeScore: String(match.homeScore),
       awayScore: String(match.awayScore),
@@ -144,7 +137,14 @@ function MatchesPage() {
 
     try {
       if (editingId) {
+        if (form.homeTeamId === form.awayTeamId) {
+          throw new Error("Home and away team must be different");
+        }
+
         await updateMatch(editingId, {
+          homeTeamId: Number(form.homeTeamId),
+          awayTeamId: Number(form.awayTeamId),
+          seasonId: Number(form.seasonId),
           homeScore: Number(form.homeScore),
           awayScore: Number(form.awayScore),
           kickoffTime: new Date(form.kickoffTime).toISOString(),
@@ -159,7 +159,6 @@ function MatchesPage() {
           homeTeamId: Number(form.homeTeamId),
           awayTeamId: Number(form.awayTeamId),
           seasonId: Number(form.seasonId),
-          venueId: Number(form.venueId),
           homeScore: Number(form.homeScore),
           awayScore: Number(form.awayScore),
           kickoffTime: new Date(form.kickoffTime).toISOString(),
@@ -263,8 +262,9 @@ function MatchesPage() {
                               `#${match.seasonId}`}
                           </td>
                           <td>
-                            {venueNameById.get(match.venueId) ??
-                              `#${match.venueId}`}
+                            {match.venue ||
+                              teamVenueById.get(match.homeTeamId) ||
+                              "-"}
                           </td>
                           <td>{formatDateTime(match.kickoffTime)}</td>
                           <td>{`${match.homeScore} - ${match.awayScore}`}</td>
@@ -316,7 +316,6 @@ function MatchesPage() {
                         name="homeTeamId"
                         value={form.homeTeamId}
                         onChange={handleInputChange}
-                        disabled={Boolean(editingId)}
                         required
                       >
                         <option value="">Select home team</option>
@@ -336,7 +335,6 @@ function MatchesPage() {
                         name="awayTeamId"
                         value={form.awayTeamId}
                         onChange={handleInputChange}
-                        disabled={Boolean(editingId)}
                         required
                       >
                         <option value="">Select away team</option>
@@ -356,32 +354,11 @@ function MatchesPage() {
                         name="seasonId"
                         value={form.seasonId}
                         onChange={handleInputChange}
-                        disabled={Boolean(editingId)}
                         required
                       >
                         <option value="">Select season</option>
                         {seasons.map((item) => (
                           <option key={item.seasonId} value={item.seasonId}>
-                            {item.name}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={12} md={4}>
-                    <Form.Group controlId="venueId">
-                      <Form.Label>Venue</Form.Label>
-                      <Form.Select
-                        name="venueId"
-                        value={form.venueId}
-                        onChange={handleInputChange}
-                        disabled={Boolean(editingId)}
-                        required
-                      >
-                        <option value="">Select venue</option>
-                        {venues.map((item) => (
-                          <option key={item.venueId} value={item.venueId}>
                             {item.name}
                           </option>
                         ))}
@@ -449,8 +426,7 @@ function MatchesPage() {
 
               {editingId ? (
                 <Alert variant="secondary" className="mt-3 mb-0">
-                  On update, team/season/venue stay unchanged because backend
-                  update DTO only accepts scores and kickoff time.
+                  Venue is automatically based on the selected home team.
                 </Alert>
               ) : null}
             </Card.Body>

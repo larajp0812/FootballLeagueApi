@@ -101,10 +101,6 @@ builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 
-// Venue module
-builder.Services.AddScoped<IVenueRepository, VenueRepository>();
-builder.Services.AddScoped<IVenueService, VenueService>();
-
 // Match module
 builder.Services.AddScoped<IMatchRepository, MatchRepository>();
 builder.Services.AddScoped<IMatchService, MatchService>();

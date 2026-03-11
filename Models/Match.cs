@@ -39,12 +39,6 @@ namespace FootballLeagueApi.Models
         public int SeasonId { get; set; }
 
         /// <summary>
-        /// Foreign key: ID of the venue where this match is played
-        /// Links to the Venue table (stadium/ground location)
-        /// </summary>
-        public int VenueId { get; set; }
-
-        /// <summary>
         /// The date and time when the match kicks off
         /// Determines when the match is scheduled to start
         /// </summary>
@@ -83,13 +77,6 @@ namespace FootballLeagueApi.Models
         /// </summary>
         [JsonIgnore]
         public Season? Season { get; set; }
-
-        /// <summary>
-        /// Navigation property: Reference to the Venue where the match is played
-        /// [JsonIgnore] prevents the venue object from being serialized
-        /// </summary>
-        [JsonIgnore]
-        public Venue? Venue { get; set; }
 
         /// <summary>
         /// Navigation property: Collection of all events that occurred during this match

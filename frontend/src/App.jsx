@@ -11,7 +11,6 @@ import RegisterPage from "./pages/RegisterPage";
 import RolesPage from "./pages/RolesPage";
 import SeasonsPage from "./pages/SeasonsPage";
 import TeamsPage from "./pages/TeamsPage";
-import VenuesPage from "./pages/VenuesPage";
 
 function App() {
   return (
@@ -49,14 +48,6 @@ function App() {
           element={
             <ProtectedRoute>
               <SeasonsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/venues"
-          element={
-            <ProtectedRoute>
-              <VenuesPage />
             </ProtectedRoute>
           }
         />

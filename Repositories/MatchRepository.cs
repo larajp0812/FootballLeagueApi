@@ -19,7 +19,6 @@ namespace FootballLeagueApi.Repositories
                 .Include(m => m.HomeTeam)
                 .Include(m => m.AwayTeam)
                 .Include(m => m.Season)
-                .Include(m => m.Venue)
                 .ToListAsync();
         }
 
@@ -29,7 +28,6 @@ namespace FootballLeagueApi.Repositories
                 .Include(m => m.HomeTeam)
                 .Include(m => m.AwayTeam)
                 .Include(m => m.Season)
-                .Include(m => m.Venue)
                 .FirstOrDefaultAsync(m => m.MatchId == id);
         }
 

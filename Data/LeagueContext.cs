@@ -39,11 +39,6 @@ namespace FootballLeagueApi.Data
         public DbSet<Match> Matches { get; set; }
 
         /// <summary>
-        /// Venues table - stores stadium/venue information
-        /// </summary>
-        public DbSet<Venue> Venues { get; set; }
-
-        /// <summary>
         /// MatchEvents table - stores individual events within matches (goals, cards, etc.)
         /// </summary>
         public DbSet<MatchEvent> MatchEvents { get; set; }

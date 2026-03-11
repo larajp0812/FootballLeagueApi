@@ -3,6 +3,7 @@ using System;
 using FootballLeagueApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FootballLeagueApi.Migrations
 {
     [DbContext(typeof(LeagueContext))]
-    partial class LeagueContextModelSnapshot : ModelSnapshot
+    [Migration("20260311184545_TeamOwnsVenue")]
+    partial class TeamOwnsVenue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -41,6 +44,9 @@ namespace FootballLeagueApi.Migrations
                     b.Property<int>("SeasonId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("VenueId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("MatchId");
 
                     b.HasIndex("AwayTeamId");
@@ -48,6 +54,8 @@ namespace FootballLeagueApi.Migrations
                     b.HasIndex("HomeTeamId");
 
                     b.HasIndex("SeasonId");
+
+                    b.HasIndex("VenueId");
 
                     b.ToTable("Matches");
                 });
@@ -151,6 +159,24 @@ namespace FootballLeagueApi.Migrations
                     b.HasKey("TeamId");
 
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("FootballLeagueApi.Models.Venue", b =>
+                {
+                    b.Property<int>("VenueId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("VenueId");
+
+                    b.ToTable("Venues");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -365,6 +391,10 @@ namespace FootballLeagueApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FootballLeagueApi.Models.Venue", null)
+                        .WithMany("Matches")
+                        .HasForeignKey("VenueId");
+
                     b.Navigation("AwayTeam");
 
                     b.Navigation("HomeTeam");
@@ -468,6 +498,11 @@ namespace FootballLeagueApi.Migrations
                     b.Navigation("HomeMatches");
 
                     b.Navigation("Players");
+                });
+
+            modelBuilder.Entity("FootballLeagueApi.Models.Venue", b =>
+                {
+                    b.Navigation("Matches");
                 });
 #pragma warning restore 612, 618
         }

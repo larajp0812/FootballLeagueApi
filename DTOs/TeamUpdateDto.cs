@@ -23,5 +23,10 @@ namespace FootballLeagueApi.DTOs
         /// The updated year the team was founded
         /// </summary>
         public int FoundedYear { get; set; }
+
+        /// <summary>
+        /// The updated home venue/stadium for the team
+        /// </summary>
+        public string Venue { get; set; }
     }
 }

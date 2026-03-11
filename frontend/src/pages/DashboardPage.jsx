@@ -27,13 +27,9 @@ function DashboardPage() {
       route: "/seasons",
     },
     {
-      title: "Venues",
-      description: "Manage stadium and venue information.",
-      route: "/venues",
-    },
-    {
       title: "Matches",
-      description: "Schedule and update fixtures with teams and venues.",
+      description:
+        "Schedule and update fixtures with venue auto-set from home team.",
       route: "/matches",
     },
     {

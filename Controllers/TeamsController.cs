@@ -174,7 +174,8 @@ namespace FootballLeagueApi.Controllers
                     TeamId = id,
                     Name = dto.Name,
                     Coach = dto.Coach,
-                    FoundedYear = dto.FoundedYear
+                    FoundedYear = dto.FoundedYear,
+                    Venue = dto.Venue
                 };
 
                 var success = await _teamService.UpdateAsync(id, team);
@@ -207,11 +208,13 @@ namespace FootballLeagueApi.Controllers
         /// </returns>
         /// <response code="204">Team deleted successfully</response>
         /// <response code="404">Team with specified ID not found</response>
+        /// <response code="409">Team cannot be deleted because it has dependent records</response>
         /// <response code="500">Internal server error occurred</response>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id)
         {
@@ -227,6 +230,11 @@ namespace FootballLeagueApi.Controllers
 
                 _logger.LogInformation("Successfully deleted team with ID {TeamId}", id);
                 return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Delete blocked for team with ID {TeamId}", id);
+                return Conflict(new { error = ex.Message });
             }
             catch (Exception ex)
             {

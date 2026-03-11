@@ -19,7 +19,7 @@ namespace FootballLeagueApi.DTOs
                 HomeTeamId = match.HomeTeamId,
                 AwayTeamId = match.AwayTeamId,
                 SeasonId = match.SeasonId,
-                VenueId = match.VenueId,
+                Venue = match.HomeTeam?.Venue ?? string.Empty,
                 KickoffTime = match.KickoffTime,
                 HomeScore = match.HomeScore,
                 AwayScore = match.AwayScore
@@ -37,7 +37,6 @@ namespace FootballLeagueApi.DTOs
                 HomeTeamId = dto.HomeTeamId,
                 AwayTeamId = dto.AwayTeamId,
                 SeasonId = dto.SeasonId,
-                VenueId = dto.VenueId,
                 KickoffTime = dto.KickoffTime,
                 HomeScore = dto.HomeScore,
                 AwayScore = dto.AwayScore
@@ -48,15 +47,14 @@ namespace FootballLeagueApi.DTOs
         /// Convert a MatchUpdateDto to a Match domain model
         /// Used when updating an existing match
         /// </summary>
-        public static Match ToModel(MatchUpdateDto dto, int matchId, int homeTeamId, int awayTeamId, int seasonId, int venueId)
+        public static Match ToModel(MatchUpdateDto dto, int matchId)
         {
             return new Match
             {
                 MatchId = matchId,
-                HomeTeamId = homeTeamId,
-                AwayTeamId = awayTeamId,
-                SeasonId = seasonId,
-                VenueId = venueId,
+                HomeTeamId = dto.HomeTeamId,
+                AwayTeamId = dto.AwayTeamId,
+                SeasonId = dto.SeasonId,
                 KickoffTime = dto.KickoffTime,
                 HomeScore = dto.HomeScore,
                 AwayScore = dto.AwayScore
