@@ -137,6 +137,7 @@ function TeamsPage() {
     <PageContainer
       title="Teams"
       subtitle="CRUD module integrated with /api/teams endpoints"
+      className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
 
