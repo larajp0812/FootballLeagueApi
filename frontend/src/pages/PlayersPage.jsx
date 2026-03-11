@@ -180,6 +180,7 @@ function PlayersPage() {
     <PageContainer
       title="Players"
       subtitle="CRUD module integrated with /api/players endpoints"
+      className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
 
