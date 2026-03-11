@@ -11,12 +11,6 @@ using Microsoft.OpenApi;
 using System.Text;
 using System.Threading.RateLimiting;
 
-/// <summary>
-/// Application startup and service registration.
-/// Configures data access, authentication/authorization, dependency injection,
-/// API tooling, and the HTTP middleware pipeline.
-/// </summary>
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure logging
@@ -49,6 +43,21 @@ var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSection.GetValue<string>("Key");
 var jwtIssuer = jwtSection.GetValue<string>("Issuer");
 var jwtAudience = jwtSection.GetValue<string>("Audience");
+
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    throw new InvalidOperationException("JWT configuration is missing: Jwt:Key");
+}
+
+if (string.IsNullOrWhiteSpace(jwtIssuer))
+{
+    throw new InvalidOperationException("JWT configuration is missing: Jwt:Issuer");
+}
+
+if (string.IsNullOrWhiteSpace(jwtAudience))
+{
+    throw new InvalidOperationException("JWT configuration is missing: Jwt:Audience");
+}
 
 builder.Services.AddAuthentication(options =>
 {
@@ -99,6 +108,7 @@ builder.Services.AddScoped<IVenueService, VenueService>();
 // Match module
 builder.Services.AddScoped<IMatchRepository, MatchRepository>();
 builder.Services.AddScoped<IMatchService, MatchService>();
+builder.Services.AddScoped<IStandingsService, StandingsService>();
 
 // Match event module
 builder.Services.AddScoped<IMatchEventRepository, MatchEventRepository>();

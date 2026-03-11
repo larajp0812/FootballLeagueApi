@@ -47,7 +47,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task GetById_ReturnsNotFound_WhenTeamDoesNotExist()
         {
-            _mockTeamService.Setup(s => s.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Team)null);
+            _mockTeamService.Setup(s => s.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Team?)null);
             var result = await _controller.GetById(999);
             Assert.IsType<NotFoundResult>(result);
         }

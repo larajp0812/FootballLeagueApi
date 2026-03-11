@@ -48,6 +48,13 @@ function DashboardPage() {
       variant: "success",
     },
     {
+      title: "League Table",
+      description: "Automatic standings with points and goal difference.",
+      route: "/table",
+      status: "Live",
+      variant: "success",
+    },
+    {
       title: "Match Events",
       description: "Track goals, cards, substitutions, and key events.",
       route: "/matchevents",
@@ -85,7 +92,7 @@ function DashboardPage() {
               <Card.Title>Current Coverage</Card.Title>
               <Card.Text className="mb-0">
                 Live now: Teams + Players + Seasons + Venues + Matches modules.
-                + Match Events + Roles modules.
+                + League Table + Match Events + Roles modules.
               </Card.Text>
             </Card.Body>
           </Card>

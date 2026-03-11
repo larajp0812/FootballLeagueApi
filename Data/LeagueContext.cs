@@ -3,14 +3,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using FootballLeagueApi.Models;
 
-/// <summary>
-/// LeagueContext - Entity Framework Core Database Context
-/// 
-/// This class inherits from IdentityDbContext to include ASP.NET Identity tables (users, roles)
-/// It defines DbSets for each domain entity, which map to database tables
-/// It also configures relationships and constraints through Fluent API in OnModelCreating
-/// </summary>
-
 namespace FootballLeagueApi.Data
 {
     public class LeagueContext : IdentityDbContext<IdentityUser>

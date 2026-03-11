@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AppNavbar from "./components/AppNavbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
+import LeagueTablePage from "./pages/LeagueTablePage";
 import LoginPage from "./pages/LoginPage";
 import MatchEventsPage from "./pages/MatchEventsPage";
 import MatchesPage from "./pages/MatchesPage";
@@ -64,6 +65,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MatchesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/table"
+          element={
+            <ProtectedRoute>
+              <LeagueTablePage />
             </ProtectedRoute>
           }
         />

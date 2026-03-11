@@ -47,7 +47,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task GetById_ReturnsNotFound_WhenVenueDoesNotExist()
         {
-            _mockVenueService.Setup(s => s.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Venue)null);
+            _mockVenueService.Setup(s => s.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Venue?)null);
             var result = await _controller.GetById(999);
             Assert.IsType<NotFoundResult>(result);
         }

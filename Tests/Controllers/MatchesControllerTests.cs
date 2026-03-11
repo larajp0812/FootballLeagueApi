@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MatchModel = FootballLeagueApi.Models.Match;
 
+#pragma warning disable CS1591
+
 namespace FootballLeagueApi.Tests.Controllers
 {
     public class MatchesControllerTests
@@ -48,7 +50,7 @@ namespace FootballLeagueApi.Tests.Controllers
         [Fact]
         public async Task GetById_ReturnsNotFound_WhenMatchDoesNotExist()
         {
-            _mockMatchService.Setup(s => s.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((MatchModel)null);
+            _mockMatchService.Setup(s => s.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((MatchModel?)null);
             var result = await _controller.GetById(999);
             Assert.IsType<NotFoundResult>(result);
         }
@@ -99,3 +101,5 @@ namespace FootballLeagueApi.Tests.Controllers
         }
     }
 }
+
+#pragma warning restore CS1591
