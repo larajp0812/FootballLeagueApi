@@ -28,6 +28,7 @@ function LoginPage() {
     <PageContainer
       title="Login"
       subtitle="Sign in to access protected CRUD endpoints from your .NET API"
+      className="app-page"
     >
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={6}>
