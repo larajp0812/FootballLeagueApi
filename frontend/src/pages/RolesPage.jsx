@@ -168,6 +168,7 @@ function RolesPage() {
       <PageContainer
         title="Roles"
         subtitle="Admin role management integrated with /api/roles endpoints"
+        className="app-page"
       >
         <Alert variant="warning" className="mb-0">
           This page is for Admin users only. If you should have access, log out
@@ -181,6 +182,7 @@ function RolesPage() {
     <PageContainer
       title="Roles"
       subtitle="Admin role management integrated with /api/roles endpoints"
+      className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
 
