@@ -4,11 +4,8 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { Link } from "react-router-dom";
 import PageContainer from "../components/PageContainer";
-import { useAuth } from "../contexts/AuthContext";
 
 function DashboardPage() {
-  const { role } = useAuth();
-
   const modules = [
     {
       title: "Teams",

@@ -46,7 +46,19 @@ function normalizeError(status, payload) {
   }
 
   if (payload.message) {
+    if (
+      payload.message ===
+        "An internal server error occurred. Please try again later." &&
+      payload.details
+    ) {
+      return payload.details;
+    }
+
     return payload.message;
+  }
+
+  if (payload.details) {
+    return payload.details;
   }
 
   if (payload.errors && typeof payload.errors === "object") {

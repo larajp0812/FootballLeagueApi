@@ -51,7 +51,19 @@ namespace FootballLeagueApi.Middleware
 
                 case ArgumentException:
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                    response.Message = "Invalid argument provided.";
+                    response.Message = exception.Message;
+                    response.StatusCode = StatusCodes.Status400BadRequest;
+                    break;
+
+                case InvalidOperationException:
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
+                    response.Message = exception.Message;
+                    response.StatusCode = StatusCodes.Status409Conflict;
+                    break;
+
+                case ApplicationException:
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    response.Message = exception.Message;
                     response.StatusCode = StatusCodes.Status400BadRequest;
                     break;
 
