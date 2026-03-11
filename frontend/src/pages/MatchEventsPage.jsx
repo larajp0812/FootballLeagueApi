@@ -166,6 +166,7 @@ function MatchEventsPage() {
     <PageContainer
       title="Match Events"
       subtitle="CRUD module integrated with /api/matchevents endpoints"
+      className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
 
