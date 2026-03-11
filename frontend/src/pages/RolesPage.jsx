@@ -41,7 +41,15 @@ function RolesPage() {
   const [assignForm, setAssignForm] = useState(initialAssignForm);
   const [editingRoleId, setEditingRoleId] = useState(null);
 
-  const isAdmin = role === "Admin";
+  const isAdmin = typeof role === "string" && role.toLowerCase() === "admin";
+
+  function getRolesErrorMessage(err, fallback) {
+    if (err?.status === 401) {
+      return "Unauthorized for roles endpoint. Please log out and log back in with an Admin account.";
+    }
+
+    return err?.message || fallback;
+  }
 
   const sortedRoles = useMemo(() => {
     const source = Array.isArray(roles) ? roles : [];
@@ -58,15 +66,20 @@ function RolesPage() {
       const data = await getRoles();
       setRoles(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err.message);
+      setError(getRolesErrorMessage(err, "Failed to load roles"));
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
+    if (!isAdmin) {
+      setRoles([]);
+      return;
+    }
+
     loadRoles();
-  }, []);
+  }, [isAdmin]);
 
   function handleRoleInputChange(event) {
     const { name, value } = event.target;
@@ -107,7 +120,7 @@ function RolesPage() {
       resetRoleForm();
       await loadRoles();
     } catch (err) {
-      setError(err.message);
+      setError(getRolesErrorMessage(err, "Failed to save role"));
     } finally {
       setSaving(false);
     }
@@ -126,7 +139,7 @@ function RolesPage() {
       setStatusMessage("Role deleted successfully");
       await loadRoles();
     } catch (err) {
-      setError(err.message);
+      setError(getRolesErrorMessage(err, "Failed to delete role"));
     }
   }
 
@@ -141,10 +154,24 @@ function RolesPage() {
       setStatusMessage("Role assigned to user successfully");
       setAssignForm(initialAssignForm);
     } catch (err) {
-      setError(err.message);
+      setError(getRolesErrorMessage(err, "Failed to assign role"));
     } finally {
       setAssigning(false);
     }
+  }
+
+  if (!isAdmin) {
+    return (
+      <PageContainer
+        title="Roles"
+        subtitle="Admin role management integrated with /api/roles endpoints"
+      >
+        <Alert variant="warning" className="mb-0">
+          This page is for Admin users only. If you should have access, log out
+          and log back in with the Admin account.
+        </Alert>
+      </PageContainer>
+    );
   }
 
   return (
@@ -152,10 +179,6 @@ function RolesPage() {
       title="Roles"
       subtitle="Admin role management integrated with /api/roles endpoints"
     >
-      {!isAdmin ? (
-        <Alert variant="danger">This page is for Admin users only.</Alert>
-      ) : null}
-
       <ErrorAlert message={error} onClose={() => setError("")} />
 
       {statusMessage ? (

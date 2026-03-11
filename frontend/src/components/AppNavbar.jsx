@@ -1,20 +1,34 @@
+import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 function AppNavbar() {
   const { isAuthenticated, role, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    setExpanded(false);
+  }, [location.pathname]);
 
   function handleLogout() {
     logout();
     navigate("/login");
+    setExpanded(false);
   }
 
   return (
-    <Navbar bg="dark" variant="dark" expand="xl">
+    <Navbar
+      bg="dark"
+      variant="dark"
+      expand="xl"
+      expanded={expanded}
+      onToggle={setExpanded}
+    >
       <Container>
         <Navbar.Brand as={Link} to="/">
           Football League Frontend

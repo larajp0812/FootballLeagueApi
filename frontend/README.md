@@ -72,3 +72,36 @@ Unit testing uses Vitest + React Testing Library.
 Current baseline test:
 
 - `src/components/LoadingState.test.jsx`
+
+## Rubric Mapping (CW2)
+
+- **Project Setup & Architecture**
+  - Folder structure: `src/components`, `src/pages`, `src/services`, `src/contexts`, `src/test`
+  - Config/env: `VITE_API_BASE_URL` via `.env` and fallback in `src/services/apiClient.js`
+  - Global state: Context API in `src/contexts/AuthContext.jsx`
+
+- **API Consumption**
+  - Backend integration through service layer in `src/services/*.js`
+  - CRUD + auth + roles + standings routes consumed from frontend pages
+  - Error/loading handled with reusable components: `ErrorAlert`, `LoadingState`
+
+- **UI Development & Responsiveness**
+  - Responsive layout with Bootstrap/React-Bootstrap grid and components
+  - Responsive navbar with burger collapse behavior in `src/components/AppNavbar.jsx`
+
+- **Component Reusability & Code Quality**
+  - Reusable shared components: `PageContainer`, `ProtectedRoute`, `LoadingState`, `ErrorAlert`
+  - Separation of UI and API logic using page + service structure
+
+- **React Best Practices**
+  - SPA navigation with React Router in `src/App.jsx`
+  - Auth state centralized in Context to reduce prop drilling
+  - Route guards via `ProtectedRoute`
+
+- **Testing & Debugging**
+  - Frontend unit tests via Vitest + React Testing Library
+  - Backend tests included in root project (`/Tests`) for API/service validation
+
+- **Version Control & CI/CD**
+  - CI/CD workflow in root: `.github/workflows/ci-cd.yml`
+  - Structured commit history with feature and cleanup commits
