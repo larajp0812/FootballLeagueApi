@@ -14,7 +14,7 @@ function AppNavbar() {
   }
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg">
+    <Navbar bg="dark" variant="dark" expand="xl">
       <Container>
         <Navbar.Brand as={Link} to="/">
           Football League Frontend
