@@ -87,9 +87,11 @@ body {
 .app-page .table,
 .app-page .table th,
 .app-page .table td,
+.app-page h1,
 .app-page h2,
 .app-page h3 {
   color: #ffffff;
+  padding-bottom: 0.4rem;
 }
 
 .app-page .table {

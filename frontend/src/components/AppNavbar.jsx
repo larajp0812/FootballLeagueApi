@@ -56,9 +56,11 @@ function AppNavbar() {
                 <Nav.Link as={Link} to="/matchevents" onClick={handleNavClick}>
                   Match Events
                 </Nav.Link>
-                <Nav.Link as={Link} to="/roles" onClick={handleNavClick}>
-                  Roles
-                </Nav.Link>
+                {role === "Admin" ? (
+                  <Nav.Link as={Link} to="/roles" onClick={handleNavClick}>
+                    Roles
+                  </Nav.Link>
+                ) : null}
               </>
             )}
           </Nav>
