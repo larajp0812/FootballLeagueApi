@@ -36,8 +36,9 @@ function DashboardPage() {
     {
       title: "Venues",
       description: "Manage stadium and venue information.",
-      status: "Next",
-      variant: "secondary",
+      route: "/venues",
+      status: "Live",
+      variant: "success",
     },
     {
       title: "Matches",
@@ -80,7 +81,7 @@ function DashboardPage() {
             <Card.Body>
               <Card.Title>Current Coverage</Card.Title>
               <Card.Text className="mb-0">
-                Live now: Teams + Players + Seasons modules. Remaining endpoints
+                Live now: Teams + Players + Seasons + Venues modules. Remaining endpoints
                 are listed below for the next commits.
               </Card.Text>
             </Card.Body>
