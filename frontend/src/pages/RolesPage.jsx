@@ -40,6 +40,7 @@ function RolesPage() {
   const [roleForm, setRoleForm] = useState(initialRoleForm);
   const [assignForm, setAssignForm] = useState(initialAssignForm);
   const [editingRoleId, setEditingRoleId] = useState(null);
+  const [activeTab, setActiveTab] = useState("list");
 
   const isAdmin = typeof role === "string" && role.toLowerCase() === "admin";
 
@@ -100,6 +101,7 @@ function RolesPage() {
     setEditingRoleId(selectedRole.id);
     setRoleForm({ roleName: selectedRole.name ?? "" });
     setStatusMessage("Editing selected role");
+    setActiveTab("manage");
   }
 
   async function handleSaveRole(event) {
@@ -118,6 +120,7 @@ function RolesPage() {
       }
 
       resetRoleForm();
+      setActiveTab("list");
       await loadRoles();
     } catch (err) {
       setError(getRolesErrorMessage(err, "Failed to save role"));
@@ -191,7 +194,12 @@ function RolesPage() {
         </Alert>
       ) : null}
 
-      <Tabs defaultActiveKey="list" className="mb-3" justify>
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(key) => setActiveTab(key ?? "list")}
+        className="mb-3"
+        justify
+      >
         <Tab eventKey="list" title="Role List">
           <Card>
             <Card.Body>

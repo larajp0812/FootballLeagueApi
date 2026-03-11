@@ -37,6 +37,7 @@ function PlayersPage() {
   const [form, setForm] = useState(initialForm);
   const [editingPlayerId, setEditingPlayerId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("list");
 
   const isAdmin = role === "Admin";
 
@@ -89,6 +90,7 @@ function PlayersPage() {
       teamId: String(player.teamId),
     });
     setStatusMessage("Editing selected player");
+    setActiveTab("form");
   }
 
   function resetForm() {
@@ -118,6 +120,7 @@ function PlayersPage() {
       }
 
       resetForm();
+      setActiveTab("list");
       await loadData();
     } catch (err) {
       setError(err.message);
@@ -160,7 +163,12 @@ function PlayersPage() {
         </Alert>
       ) : null}
 
-      <Tabs defaultActiveKey="list" className="mb-3" justify>
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(key) => setActiveTab(key ?? "list")}
+        className="mb-3"
+        justify
+      >
         <Tab eventKey="list" title="Player List">
           <Card>
             <Card.Body>

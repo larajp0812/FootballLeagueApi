@@ -41,6 +41,7 @@ function MatchEventsPage() {
   const [statusMessage, setStatusMessage] = useState("");
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
+  const [activeTab, setActiveTab] = useState("list");
 
   const isAdmin = role === "Admin";
 
@@ -107,6 +108,7 @@ function MatchEventsPage() {
       eventType: matchEvent.eventType,
     });
     setStatusMessage("Editing selected match event");
+    setActiveTab("form");
   }
 
   async function handleSave(event) {
@@ -134,6 +136,7 @@ function MatchEventsPage() {
       }
 
       resetForm();
+      setActiveTab("list");
       await loadData();
     } catch (err) {
       setError(err.message);
@@ -176,7 +179,12 @@ function MatchEventsPage() {
         </Alert>
       ) : null}
 
-      <Tabs defaultActiveKey="list" className="mb-3" justify>
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(key) => setActiveTab(key ?? "list")}
+        className="mb-3"
+        justify
+      >
         <Tab eventKey="list" title="Event List">
           <Card>
             <Card.Body>

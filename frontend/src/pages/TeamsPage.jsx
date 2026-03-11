@@ -35,6 +35,7 @@ function TeamsPage() {
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("list");
 
   const isAdmin = role === "Admin";
 
@@ -75,6 +76,7 @@ function TeamsPage() {
       venue: team.venue ?? "",
     });
     setStatusMessage("Editing selected team");
+    setActiveTab("form");
   }
 
   function resetForm() {
@@ -105,6 +107,7 @@ function TeamsPage() {
       }
 
       resetForm();
+      setActiveTab("list");
       await loadTeams();
     } catch (err) {
       setError(err.message);
@@ -147,7 +150,12 @@ function TeamsPage() {
         </Alert>
       ) : null}
 
-      <Tabs defaultActiveKey="list" className="mb-3" justify>
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(key) => setActiveTab(key ?? "list")}
+        className="mb-3"
+        justify
+      >
         <Tab eventKey="list" title="Team List">
           <Card>
             <Card.Body>

@@ -44,6 +44,7 @@ function SeasonsPage() {
   const [statusMessage, setStatusMessage] = useState("");
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
+  const [activeTab, setActiveTab] = useState("list");
 
   const isAdmin = role === "Admin";
 
@@ -88,6 +89,7 @@ function SeasonsPage() {
       endDate: toDateInput(season.endDate),
     });
     setStatusMessage("Editing selected season");
+    setActiveTab("form");
   }
 
   async function handleSave(event) {
@@ -112,6 +114,7 @@ function SeasonsPage() {
       }
 
       resetForm();
+      setActiveTab("list");
       await loadSeasons();
     } catch (err) {
       setError(err.message);
@@ -154,7 +157,12 @@ function SeasonsPage() {
         </Alert>
       ) : null}
 
-      <Tabs defaultActiveKey="list" className="mb-3" justify>
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(key) => setActiveTab(key ?? "list")}
+        className="mb-3"
+        justify
+      >
         <Tab eventKey="list" title="Season List">
           <Card>
             <Card.Body>
