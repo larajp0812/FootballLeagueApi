@@ -56,6 +56,7 @@ function MatchesPage() {
   const [statusMessage, setStatusMessage] = useState("");
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
+  const [activeTab, setActiveTab] = useState("list");
 
   const isAdmin = role === "Admin";
 
@@ -132,6 +133,7 @@ function MatchesPage() {
       awayScore: String(match.awayScore),
     });
     setStatusMessage("Editing selected match");
+    setActiveTab("form");
   }
 
   async function handleSave(event) {
@@ -158,12 +160,15 @@ function MatchesPage() {
           awayTeamId: Number(form.awayTeamId),
           seasonId: Number(form.seasonId),
           venueId: Number(form.venueId),
+          homeScore: Number(form.homeScore),
+          awayScore: Number(form.awayScore),
           kickoffTime: new Date(form.kickoffTime).toISOString(),
         });
         setStatusMessage("Match created successfully");
       }
 
       resetForm();
+      setActiveTab("list");
       await loadData();
     } catch (err) {
       setError(err.message);
@@ -206,7 +211,12 @@ function MatchesPage() {
         </Alert>
       ) : null}
 
-      <Tabs defaultActiveKey="list" className="mb-3" justify>
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(key) => setActiveTab(key ?? "list")}
+        className="mb-3"
+        justify
+      >
         <Tab eventKey="list" title="Match List">
           <Card>
             <Card.Body>

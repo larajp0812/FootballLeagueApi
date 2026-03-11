@@ -1,19 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 function AppNavbar() {
   const { isAuthenticated, role, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [expanded, setExpanded] = useState(false);
 
-  useEffect(() => {
+  function handleNavClick() {
     setExpanded(false);
-  }, [location.pathname]);
+  }
 
   function handleLogout() {
     logout();
@@ -31,38 +30,35 @@ function AppNavbar() {
     >
       <Container>
         <Navbar.Brand as={Link} to="/">
-          Football League Frontend
+          Football League Manager
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="main-nav" />
         <Navbar.Collapse id="main-nav">
           <Nav className="me-auto">
             {isAuthenticated && (
               <>
-                <Nav.Link as={Link} to="/">
-                  Dashboard
-                </Nav.Link>
-                <Nav.Link as={Link} to="/teams">
+                <Nav.Link as={Link} to="/teams" onClick={handleNavClick}>
                   Teams
                 </Nav.Link>
-                <Nav.Link as={Link} to="/players">
+                <Nav.Link as={Link} to="/players" onClick={handleNavClick}>
                   Players
                 </Nav.Link>
-                <Nav.Link as={Link} to="/seasons">
+                <Nav.Link as={Link} to="/seasons" onClick={handleNavClick}>
                   Seasons
                 </Nav.Link>
-                <Nav.Link as={Link} to="/venues">
+                <Nav.Link as={Link} to="/venues" onClick={handleNavClick}>
                   Venues
                 </Nav.Link>
-                <Nav.Link as={Link} to="/matches">
+                <Nav.Link as={Link} to="/matches" onClick={handleNavClick}>
                   Matches
                 </Nav.Link>
-                <Nav.Link as={Link} to="/table">
+                <Nav.Link as={Link} to="/table" onClick={handleNavClick}>
                   League Table
                 </Nav.Link>
-                <Nav.Link as={Link} to="/matchevents">
+                <Nav.Link as={Link} to="/matchevents" onClick={handleNavClick}>
                   Match Events
                 </Nav.Link>
-                <Nav.Link as={Link} to="/roles">
+                <Nav.Link as={Link} to="/roles" onClick={handleNavClick}>
                   Roles
                 </Nav.Link>
               </>
@@ -71,10 +67,10 @@ function AppNavbar() {
           <Nav>
             {!isAuthenticated ? (
               <>
-                <Nav.Link as={Link} to="/login">
+                <Nav.Link as={Link} to="/login" onClick={handleNavClick}>
                   Login
                 </Nav.Link>
-                <Nav.Link as={Link} to="/register">
+                <Nav.Link as={Link} to="/register" onClick={handleNavClick}>
                   Register
                 </Nav.Link>
               </>

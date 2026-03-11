@@ -1,6 +1,10 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "https://localhost:7195";
 
+const tokenStorageKey = "football_token";
+const roleStorageKey = "football_role";
+const unauthorizedEventName = "auth:unauthorized";
+
 async function parseResponse(response) {
   if (response.status === 204) {
     return null;
@@ -46,7 +50,7 @@ function normalizeError(status, payload) {
 }
 
 export async function apiRequest(path, options = {}) {
-  const token = localStorage.getItem("football_token");
+  const token = localStorage.getItem(tokenStorageKey);
   const headers = {
     "Content-Type": "application/json",
     ...(options.headers ?? {}),
@@ -64,6 +68,12 @@ export async function apiRequest(path, options = {}) {
   const payload = await parseResponse(response);
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem(tokenStorageKey);
+      localStorage.removeItem(roleStorageKey);
+      window.dispatchEvent(new Event(unauthorizedEventName));
+    }
+
     const error = new Error(normalizeError(response.status, payload));
     error.status = response.status;
     error.payload = payload;

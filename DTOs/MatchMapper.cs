@@ -39,8 +39,8 @@ namespace FootballLeagueApi.DTOs
                 SeasonId = dto.SeasonId,
                 VenueId = dto.VenueId,
                 KickoffTime = dto.KickoffTime,
-                HomeScore = 0,
-                AwayScore = 0
+                HomeScore = dto.HomeScore,
+                AwayScore = dto.AwayScore
             };
         }
 

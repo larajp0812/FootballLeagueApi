@@ -5,6 +5,7 @@ const AuthContext = createContext(null);
 
 const tokenStorageKey = "football_token";
 const roleStorageKey = "football_role";
+const unauthorizedEventName = "auth:unauthorized";
 
 function parseJwt(token) {
   try {
@@ -54,6 +55,19 @@ export function AuthProvider({ children }) {
     localStorage.setItem(roleStorageKey, derivedRole);
     setRole(derivedRole);
   }, [token]);
+
+  useEffect(() => {
+    function handleUnauthorized() {
+      setToken(null);
+      setError("Session expired. Please log in again.");
+    }
+
+    window.addEventListener(unauthorizedEventName, handleUnauthorized);
+
+    return () => {
+      window.removeEventListener(unauthorizedEventName, handleUnauthorized);
+    };
+  }, []);
 
   async function login(email, password) {
     setLoading(true);

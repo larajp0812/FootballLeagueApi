@@ -60,7 +60,14 @@ namespace FootballLeagueApi.Services
             if (id != match.MatchId)
                 return false;
 
-            await _matchRepo.UpdateAsync(match);
+            var existing = await _matchRepo.GetByIdAsync(id);
+            if (existing == null)
+                return false;
+
+            existing.KickoffTime = match.KickoffTime;
+            existing.HomeScore = match.HomeScore;
+            existing.AwayScore = match.AwayScore;
+
             return await _matchRepo.SaveChangesAsync();
         }
 

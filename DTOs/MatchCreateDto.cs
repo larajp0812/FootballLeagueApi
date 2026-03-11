@@ -32,5 +32,15 @@ namespace FootballLeagueApi.DTOs
         /// The date and time when the match kicks off
         /// </summary>
         public DateTime KickoffTime { get; set; }
+
+        /// <summary>
+        /// Home team's score for the match
+        /// </summary>
+        public int HomeScore { get; set; }
+
+        /// <summary>
+        /// Away team's score for the match
+        /// </summary>
+        public int AwayScore { get; set; }
     }
 }

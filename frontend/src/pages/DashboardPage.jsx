@@ -54,23 +54,7 @@ function DashboardPage() {
   ];
 
   return (
-    <PageContainer
-      title="Football League Control Panel"
-      subtitle="Manage your league data from one place with authenticated API modules"
-    >
-      <Row className="g-3 mb-3">
-        <Col xs={12}>
-          <Card>
-            <Card.Body>
-              <Card.Title>Account</Card.Title>
-              <Card.Text className="mb-0">
-                Logged in role: <strong>{role}</strong>
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
+    <PageContainer>
       <Row className="g-3">
         {modules.map((module) => (
           <Col key={module.title} xs={12} md={6} lg={4}>
