@@ -57,8 +57,9 @@ function DashboardPage() {
     {
       title: "Roles",
       description: "Admin-only role management and assignment.",
-      status: "Next",
-      variant: "secondary",
+      route: "/roles",
+      status: "Live",
+      variant: "success",
     },
   ];
 
@@ -84,8 +85,7 @@ function DashboardPage() {
               <Card.Title>Current Coverage</Card.Title>
               <Card.Text className="mb-0">
                 Live now: Teams + Players + Seasons + Venues + Matches modules.
-                + Match Events modules. Remaining endpoints are listed below for
-                the next commits.
+                + Match Events + Roles modules.
               </Card.Text>
             </Card.Body>
           </Card>

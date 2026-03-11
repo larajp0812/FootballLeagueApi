@@ -7,6 +7,7 @@ import MatchEventsPage from "./pages/MatchEventsPage";
 import MatchesPage from "./pages/MatchesPage";
 import PlayersPage from "./pages/PlayersPage";
 import RegisterPage from "./pages/RegisterPage";
+import RolesPage from "./pages/RolesPage";
 import SeasonsPage from "./pages/SeasonsPage";
 import TeamsPage from "./pages/TeamsPage";
 import VenuesPage from "./pages/VenuesPage";
@@ -71,6 +72,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MatchEventsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/roles"
+          element={
+            <ProtectedRoute>
+              <RolesPage />
             </ProtectedRoute>
           }
         />
