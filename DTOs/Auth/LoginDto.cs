@@ -11,7 +11,7 @@ namespace FootballLeagueApi.DTOs.Auth
         /// The user's email address (used as unique identifier)
         /// </summary>
         [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+        [RegularExpression(@"^[^@\s]+@[^@\s]+$", ErrorMessage = "Please enter a valid email address")]
         public string Email { get; set; }
 
         /// <summary>

@@ -29,6 +29,7 @@ function LoginPage() {
       title="Login"
       subtitle="Sign in to access protected CRUD endpoints from your .NET API"
       className="app-page"
+      titleClassName="text-light text-center"
     >
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={6}>
@@ -39,7 +40,8 @@ function LoginPage() {
                 <Form.Group className="mb-3" controlId="email">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
-                    type="email"
+                    type="text"
+                    inputMode="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

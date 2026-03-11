@@ -27,6 +27,8 @@ function RegisterPage() {
     <PageContainer
       title="Register"
       subtitle="Create a new account and immediately receive a JWT token"
+      className="app-page"
+      titleClassName="text-light text-center"
     >
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={6}>
@@ -47,7 +49,8 @@ function RegisterPage() {
                 <Form.Group className="mb-3" controlId="email">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
-                    type="email"
+                    type="text"
+                    inputMode="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

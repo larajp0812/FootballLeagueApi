@@ -53,7 +53,7 @@ function DashboardPage() {
       subtitleClassName="text-light"
     >
       <div className="dashboard-shell">
-        <Row className="g-4 dashboard-cards-grid">
+        <Row className="g-4 dashboard-cards-grid justify-content-center">
           {modules.map((module) => (
             <Col key={module.title} xs={12} md={6} lg={4}>
               <div className="module-card h-100">

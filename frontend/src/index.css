@@ -28,9 +28,9 @@ body {
 }
 
 .app-page .nav-tabs .nav-link.active {
-  color: #0d1b2a;
-  background-color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
+  background-color: rgba(13, 27, 42, 0.95);
+  border-color: rgba(255, 255, 255, 0.75);
 }
 
 .app-page .card {

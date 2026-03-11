@@ -7,12 +7,19 @@ function PageContainer({
   className = "",
   titleClassName = "text-light",
   subtitleClassName = "text-light-emphasis",
+  hideHeader = false,
 }) {
+  const hasSubtitle = Boolean(subtitle);
+  const titleSpacingClass = hasSubtitle ? "mb-1" : "mb-4";
+
   return (
     <Container className={`py-4 ${className}`.trim()}>
-      <h1 className={`h3 mb-1 ${titleClassName}`.trim()}>{title}</h1>
-      {subtitle ? (
-        <p className={`${subtitleClassName} mb-4`.trim()}>{subtitle}</p>
+      {!hideHeader ? (
+        <>
+          <h1 className={`h3 ${titleSpacingClass} ${titleClassName}`.trim()}>
+            {title}
+          </h1>
+        </>
       ) : null}
       {children}
     </Container>
