@@ -30,7 +30,10 @@ builder.Services.AddDbContext<LeagueContext>(options =>
 
 // Identity configuration
 // Enables user/role management and stores identity data in LeagueContext.
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+})
     .AddEntityFrameworkStores<LeagueContext>()
     .AddDefaultTokenProviders();
 
@@ -192,9 +195,58 @@ using (var scope = app.Services.CreateScope())
     var adminPassword = builder.Configuration["AdminUser:Password"];
     var adminUserName = builder.Configuration["AdminUser:UserName"] ?? "admin";
 
+    var duplicateGroups = userManager.Users
+        .Where(u => !string.IsNullOrWhiteSpace(u.NormalizedEmail))
+        .AsEnumerable()
+        .GroupBy(u => u.NormalizedEmail)
+        .Where(g => g.Count() > 1)
+        .ToList();
+
+    foreach (var group in duplicateGroups)
+    {
+        var orderedUsers = group
+            .OrderByDescending(u => u.EmailConfirmed)
+            .ThenBy(u => u.Id, StringComparer.Ordinal)
+            .ToList();
+
+        var keepUser = orderedUsers.First();
+        var usersToRemove = orderedUsers.Skip(1).ToList();
+
+        logger.LogWarning(
+            "Duplicate email records detected for {NormalizedEmail}. Keeping user {KeepUserId} and removing {RemoveCount} duplicate(s).",
+            group.Key,
+            keepUser.Id,
+            usersToRemove.Count);
+
+        foreach (var duplicateUser in usersToRemove)
+        {
+            var deleteResult = await userManager.DeleteAsync(duplicateUser);
+            if (!deleteResult.Succeeded)
+            {
+                logger.LogWarning(
+                    "Could not remove duplicate user {UserId}: {Errors}",
+                    duplicateUser.Id,
+                    string.Join(", ", deleteResult.Errors.Select(e => e.Description)));
+            }
+        }
+    }
+
     if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword))
     {
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+        var normalizedAdminEmail = userManager.NormalizeEmail(adminEmail);
+        var adminCandidates = userManager.Users
+            .Where(u => u.NormalizedEmail == normalizedAdminEmail)
+            .OrderBy(u => u.Id)
+            .ToList();
+
+        if (adminCandidates.Count > 1)
+        {
+            logger.LogWarning(
+                "Multiple users found for admin email {Email}. Preferring a confirmed record when available.",
+                adminEmail);
+        }
+
+        var adminUser = adminCandidates.FirstOrDefault(u => u.EmailConfirmed) ?? adminCandidates.FirstOrDefault();
         if (adminUser == null)
         {
             adminUser = new IdentityUser
@@ -209,6 +261,17 @@ using (var scope = app.Services.CreateScope())
             {
                 logger.LogWarning("Could not create seeded admin user: {Errors}",
                     string.Join(", ", createAdminResult.Errors.Select(e => e.Description)));
+            }
+        }
+
+        if (adminUser != null && !adminUser.EmailConfirmed)
+        {
+            adminUser.EmailConfirmed = true;
+            var confirmResult = await userManager.UpdateAsync(adminUser);
+            if (!confirmResult.Succeeded)
+            {
+                logger.LogWarning("Could not confirm seeded admin user: {Errors}",
+                    string.Join(", ", confirmResult.Errors.Select(e => e.Description)));
             }
         }
 

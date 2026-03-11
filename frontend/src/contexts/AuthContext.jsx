@@ -74,7 +74,7 @@ export function AuthProvider({ children }) {
     setError("");
 
     try {
-      const response = await loginUser({ email, password });
+      const response = await loginUser({ email: email.trim(), password });
       setToken(response.token);
       return response;
     } catch (err) {
@@ -90,10 +90,11 @@ export function AuthProvider({ children }) {
     setError("");
 
     try {
-      const response = await registerUser({ userName, email, password });
-      if (response.token) {
-        setToken(response.token);
-      }
+      const response = await registerUser({
+        userName: userName.trim(),
+        email: email.trim(),
+        password,
+      });
       return response;
     } catch (err) {
       setError(err.message);

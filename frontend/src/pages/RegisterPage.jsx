@@ -20,13 +20,13 @@ function RegisterPage() {
   async function handleSubmit(event) {
     event.preventDefault();
     await register(userName, email, password);
-    navigate("/", { replace: true });
+    navigate("/login?registered=1", { replace: true });
   }
 
   return (
     <PageContainer
       title="Register"
-      subtitle="Create a new account and immediately receive a JWT token"
+      subtitle="Create an account and confirm your email before first login"
       className="app-page auth-page"
       titleClassName="text-light text-center"
     >

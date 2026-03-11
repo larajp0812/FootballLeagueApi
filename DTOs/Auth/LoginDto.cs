@@ -8,16 +8,16 @@ namespace FootballLeagueApi.DTOs.Auth
     public class LoginDto
     {
         /// <summary>
-        /// The user's email address (used as unique identifier)
+        /// The user's email
         /// </summary>
         [Required(ErrorMessage = "Email is required")]
-        [RegularExpression(@"^[^@\s]+@[^@\s]+$", ErrorMessage = "Please enter a valid email address")]
-        public string Email { get; set; }
+        [EmailAddress(ErrorMessage = "A valid email is required")]
+        public string Email { get; set; } = string.Empty;
 
         /// <summary>
         /// The user's password
         /// </summary>
         [Required(ErrorMessage = "Password is required")]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
     }
 }

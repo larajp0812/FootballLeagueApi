@@ -37,6 +37,11 @@ function normalizeError(status, payload) {
       .join(", ");
   }
 
+  if (payload.errors && typeof payload.errors === "object") {
+    const values = Object.values(payload.errors).flat();
+    if (values.length > 0) return values.join(", ");
+  }
+
   if (payload.title) {
     return payload.title;
   }
@@ -59,11 +64,6 @@ function normalizeError(status, payload) {
 
   if (payload.details) {
     return payload.details;
-  }
-
-  if (payload.errors && typeof payload.errors === "object") {
-    const values = Object.values(payload.errors).flat();
-    if (values.length > 0) return values.join(", ");
   }
 
   return `Request failed with status ${status}`;

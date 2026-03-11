@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
@@ -17,6 +18,9 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = location.state?.from?.pathname || "/";
+  const query = new URLSearchParams(location.search);
+  const registered = query.get("registered") === "1";
+  const confirmed = query.get("confirmed");
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -35,15 +39,34 @@ function LoginPage() {
         <Col xs={12} md={8} lg={6}>
           <Card className="auth-card">
             <Card.Body>
+              {registered ? (
+                <Alert variant="info" className="mb-3">
+                  Registration successful. Please check your email for the
+                  confirmation link.
+                </Alert>
+              ) : null}
+
+              {confirmed === "1" ? (
+                <Alert variant="success" className="mb-3">
+                  Your email has been confirmed. You can log in now.
+                </Alert>
+              ) : null}
+
+              {confirmed === "0" ? (
+                <Alert variant="warning" className="mb-3">
+                  Email confirmation link is invalid or expired.
+                </Alert>
+              ) : null}
+
               <ErrorAlert message={error} onClose={clearError} />
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="email">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
-                    type="text"
-                    inputMode="email"
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
                     required
                   />
                 </Form.Group>
@@ -69,6 +92,9 @@ function LoginPage() {
 
               <p className="mt-3 mb-0 text-center">
                 No account yet? <Link to="/register">Create one</Link>
+              </p>
+              <p className="mt-2 mb-0 text-center">
+                <Link to="/forgot-password">Forgot password?</Link>
               </p>
             </Card.Body>
           </Card>

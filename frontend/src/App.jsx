@@ -2,12 +2,14 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AppNavbar from "./components/AppNavbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import LeagueTablePage from "./pages/LeagueTablePage";
 import LoginPage from "./pages/LoginPage";
 import MatchEventsPage from "./pages/MatchEventsPage";
 import MatchesPage from "./pages/MatchesPage";
 import PlayersPage from "./pages/PlayersPage";
 import RegisterPage from "./pages/RegisterPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import RolesPage from "./pages/RolesPage";
 import SeasonsPage from "./pages/SeasonsPage";
 import TeamsPage from "./pages/TeamsPage";
@@ -19,6 +21,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/"
           element={

@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace FootballLeagueApi.Controllers
 {
@@ -114,6 +115,18 @@ namespace FootballLeagueApi.Controllers
                     return BadRequest(ModelState);
                 }
 
+                var existingByUserName = await FindUserByUserNameSafeAsync(model.UserName);
+                if (existingByUserName != null)
+                {
+                    return BadRequest(new { message = "Username is already taken." });
+                }
+
+                var existingByEmail = await FindUserByEmailSafeAsync(model.Email);
+                if (existingByEmail != null)
+                {
+                    return BadRequest(new { message = "Email address is already registered." });
+                }
+
                 // ===== STEP 2: CREATE IDENTITY USER OBJECT =====
                 // IdentityUser is from ASP.NET Core Identity framework
                 // Stores: UserName, Email, PasswordHash, SecurityStamp, ConcurrencyStamp, etc.
@@ -154,27 +167,37 @@ namespace FootballLeagueApi.Controllers
                         string.Join(", ", roleResult.Errors.Select(e => e.Description)));
                 }
 
-                var (token, _) = await GenerateJwtTokenAsync(user);
-                var refreshToken = GenerateRefreshToken();
-                var refreshTokenExpires = DateTime.UtcNow.AddDays(7);
-                await SaveRefreshTokenAsync(user, refreshToken, refreshTokenExpires);
+                var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var confirmationTokenEncoded = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationToken));
+
+                var confirmUrl = Url.Action(
+                    nameof(ConfirmEmail),
+                    "Auth",
+                    new { userId = user.Id, token = confirmationTokenEncoded },
+                    Request.Scheme);
 
                 try
                 {
-                    var subject = "Welcome to League Management Platform";
+                    var subject = "Confirm your account - League Management Platform";
                     var body = $@"
                         <div style='background:#0d1b2a;padding:24px;font-family:Arial,Helvetica,sans-serif;'>
                             <div style='max-width:560px;margin:0 auto;background:#08111e;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:24px;color:#ffffff;'>
-                                <h2 style='margin:0 0 12px;color:#ffffff;'>Welcome to League Management Platform</h2>
+                                <h2 style='margin:0 0 12px;color:#ffffff;'>Confirm your account</h2>
                                 <p style='margin:0 0 12px;color:rgba(255,255,255,0.9);line-height:1.6;'>
                                     Hi {user.UserName}, your account was created successfully.
                                 </p>
                                 <p style='margin:0 0 12px;color:rgba(255,255,255,0.8);line-height:1.6;'>
-                                    You can now log in and start managing teams, players, matches, seasons, and standings.
+                                    Please confirm your email address to activate your account.
                                 </p>
-                                <div style='margin:16px 0;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);border-radius:10px;color:rgba(255,255,255,0.92);'>
-                                    Signed up with: <strong>{user.Email}</strong>
+                                <div style='margin:18px 0;'>
+                                    <a href='{confirmUrl}' style='display:inline-block;padding:10px 16px;background:#ffffff;color:#08111e;text-decoration:none;border-radius:8px;font-weight:600;'>
+                                        Confirm Email
+                                    </a>
                                 </div>
+                                <p style='margin:0 0 12px;color:rgba(255,255,255,0.72);font-size:13px;line-height:1.5;'>
+                                    If the button does not work, copy and paste this link into your browser:<br/>
+                                    <span style='word-break:break-all;color:#ffffff;'>{confirmUrl}</span>
+                                </p>
                                 <p style='margin:14px 0 0;color:#ffffff;'>Kind regards,<br/>League Management Platform Team</p>
                             </div>
                         </div>";
@@ -187,7 +210,7 @@ namespace FootballLeagueApi.Controllers
 
                 // ===== STEP 5: REGISTRATION SUCCESSFUL =====
                 _logger.LogInformation("User registered successfully: {Email}", model.Email);
-                return Ok(new { token });
+                return Ok(new { message = "Registration successful. Please check your email to confirm your account." });
             }
             catch (Exception ex)
             {
@@ -196,6 +219,30 @@ namespace FootballLeagueApi.Controllers
                 _logger.LogError(ex, "Error during user registration for email: {Email}", model.Email);
                 throw;
             }
+        }
+
+        [HttpGet("confirm-email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+            {
+                return Redirect($"{GetClientBaseUrl()}/login?confirmed=0");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Redirect($"{GetClientBaseUrl()}/login?confirmed=0");
+            }
+
+            var decodedBytes = WebEncoders.Base64UrlDecode(token);
+            var decodedToken = Encoding.UTF8.GetString(decodedBytes);
+            var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+
+            return result.Succeeded
+                ? Redirect($"{GetClientBaseUrl()}/login?confirmed=1")
+                : Redirect($"{GetClientBaseUrl()}/login?confirmed=0");
         }
 
         /// <summary>
@@ -231,20 +278,22 @@ namespace FootballLeagueApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginDto model)
         {
-            // Validate email and password are provided and match data annotation rules
-            // (DataAnnotations: [Required], [EmailAddress] on LoginDto)
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return Unauthorized("Username or password incorrect.");
 
-            // ===== STEP 1: FIND USER BY EMAIL =====
-            // Query AspNetUsers table for user with this email
-            // Returns null if not found
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var loginEmail = model.Email.Trim();
+            var user = await FindUserByEmailSafeAsync(loginEmail);
+
             if (user == null)
             {
-                _logger.LogWarning("Login failed: user with email {Email} not found", model.Email);
-                // Return 401 (don't reveal if email exists - security)
-                return Unauthorized();
+                _logger.LogWarning("Login failed: user with email {Email} not found", loginEmail);
+                return Unauthorized("Username or password incorrect.");
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                _logger.LogWarning("Login blocked: email not confirmed for {Email}", loginEmail);
+                return Unauthorized("Please confirm your email before logging in.");
             }
 
             // ===== STEP 2: VERIFY PASSWORD =====
@@ -254,9 +303,8 @@ namespace FootballLeagueApi.Controllers
             var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!passwordValid)
             {
-                _logger.LogWarning("Login failed: invalid password for {Email}", model.Email);
-                // Return 401 (don't reveal why - security)
-                return Unauthorized();
+                _logger.LogWarning("Login failed: invalid password for {Email}", loginEmail);
+                return Unauthorized("Username or password incorrect.");
             }
 
             var (tokenString, expires) = await GenerateJwtTokenAsync(user);
@@ -286,7 +334,7 @@ namespace FootballLeagueApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await FindUserByEmailSafeAsync(model.Email);
             if (user == null)
             {
                 _logger.LogWarning("Refresh failed: user with email {Email} not found", model.Email);
@@ -325,6 +373,144 @@ namespace FootballLeagueApi.Controllers
                 refreshToken = newRefreshToken,
                 refreshTokenExpires = newRefreshTokenExpires
             });
+        }
+
+        [HttpPost("forgot-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequestDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = await FindUserByEmailSafeAsync(model.Email);
+            if (user == null)
+            {
+                return Ok(new { message = "If an account exists for that email, a reset link has been sent." });
+            }
+
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var resetTokenEncoded = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(resetToken));
+            var resetUrl = $"{GetClientBaseUrl()}/reset-password?email={Uri.EscapeDataString(user.Email ?? string.Empty)}&token={Uri.EscapeDataString(resetTokenEncoded)}";
+
+            try
+            {
+                var subject = "Reset your password - League Management Platform";
+                var body = $@"
+                    <div style='background:#0d1b2a;padding:24px;font-family:Arial,Helvetica,sans-serif;'>
+                        <div style='max-width:560px;margin:0 auto;background:#08111e;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:24px;color:#ffffff;'>
+                            <h2 style='margin:0 0 12px;color:#ffffff;'>Reset your password</h2>
+                            <p style='margin:0 0 12px;color:rgba(255,255,255,0.9);line-height:1.6;'>
+                                We received a request to reset your password.
+                            </p>
+                            <div style='margin:18px 0;'>
+                                <a href='{resetUrl}' style='display:inline-block;padding:10px 16px;background:#ffffff;color:#08111e;text-decoration:none;border-radius:8px;font-weight:600;'>
+                                    Reset Password
+                                </a>
+                            </div>
+                            <p style='margin:0 0 12px;color:rgba(255,255,255,0.72);font-size:13px;line-height:1.5;'>
+                                If the button does not work, copy and paste this link into your browser:<br/>
+                                <span style='word-break:break-all;color:#ffffff;'>{resetUrl}</span>
+                            </p>
+                            <p style='margin:14px 0 0;color:#ffffff;'>Kind regards,<br/>League Management Platform Team</p>
+                        </div>
+                    </div>";
+
+                await _emailService.SendEmailAsync(user.Email!, subject, body);
+            }
+            catch (Exception emailEx)
+            {
+                _logger.LogWarning(emailEx, "Password reset email failed for {Email}", model.Email);
+            }
+
+            return Ok(new { message = "If an account exists for that email, a reset link has been sent." });
+        }
+
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = await FindUserByEmailSafeAsync(model.Email);
+            if (user == null)
+            {
+                return BadRequest("Invalid reset request.");
+            }
+
+            string decodedToken;
+            try
+            {
+                var decodedBytes = WebEncoders.Base64UrlDecode(model.Token);
+                decodedToken = Encoding.UTF8.GetString(decodedBytes);
+            }
+            catch
+            {
+                return BadRequest("Invalid reset token.");
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(new { message = "Password reset successful. You can now log in." });
+        }
+
+        private string GetClientBaseUrl()
+        {
+            var configuredUrl = _config["ClientApp:BaseUrl"];
+            if (!string.IsNullOrWhiteSpace(configuredUrl))
+            {
+                return configuredUrl.TrimEnd('/');
+            }
+
+            return "http://localhost:5173";
+        }
+
+        private Task<IdentityUser?> FindUserByUserNameSafeAsync(string userName)
+        {
+            var normalizedUserName = _userManager.NormalizeName(userName);
+            var matches = _userManager.Users
+                .Where(u => u.NormalizedUserName == normalizedUserName)
+                .OrderBy(u => u.Id)
+                .Take(2)
+                .ToList();
+
+            if (matches.Count > 1)
+            {
+                _logger.LogWarning(
+                    "Multiple users found with username {UserName}. Using first record with Id {UserId}.",
+                    userName,
+                    matches[0].Id);
+            }
+
+            return Task.FromResult(matches.FirstOrDefault());
+        }
+
+        private Task<IdentityUser?> FindUserByEmailSafeAsync(string email)
+        {
+            var normalizedEmail = _userManager.NormalizeEmail(email);
+            var matches = _userManager.Users
+                .Where(u => u.NormalizedEmail == normalizedEmail)
+                .OrderBy(u => u.Id)
+                .Take(2)
+                .ToList();
+
+            if (matches.Count > 1)
+            {
+                _logger.LogWarning(
+                    "Multiple users found with email {Email}. Using first record with Id {UserId}.",
+                    email,
+                    matches[0].Id);
+            }
+
+            return Task.FromResult(matches.FirstOrDefault());
         }
 
         private async Task<(string Token, DateTime Expires)> GenerateJwtTokenAsync(IdentityUser user)
