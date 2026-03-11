@@ -45,6 +45,7 @@ function LeagueTablePage() {
     <PageContainer
       title="League Table"
       subtitle="Server-calculated standings (Win = 3, Draw = 1, Loss = 0), sorted by points then goal difference."
+      className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
 
