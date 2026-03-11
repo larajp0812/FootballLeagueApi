@@ -39,6 +39,45 @@ body {
   color: #ffffff;
 }
 
+.app-page .auth-card {
+  --bs-card-bg: rgba(8, 17, 30, 0.92);
+  --bs-card-color: #ffffff;
+  background: rgba(8, 17, 30, 0.92);
+  background-color: rgba(8, 17, 30, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.auth-page .auth-card,
+.auth-page .auth-card .card-body {
+  background-color: rgba(8, 17, 30, 0.92) !important;
+}
+
+.app-page .auth-card .form-control {
+  --bs-body-bg: rgba(6, 14, 24, 0.95);
+  --bs-body-color: #ffffff;
+  background-color: rgba(6, 14, 24, 0.95);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.app-page .auth-card .form-control:focus {
+  background-color: rgba(6, 14, 24, 0.98);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+}
+
+.auth-page .auth-card .form-control,
+.auth-page .auth-card .form-control:focus,
+.auth-page .auth-card .form-control:-webkit-autofill,
+.auth-page .auth-card .form-control:-webkit-autofill:hover,
+.auth-page .auth-card .form-control:-webkit-autofill:focus {
+  background-color: rgba(6, 14, 24, 0.95) !important;
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: 0 0 0 1000px rgba(6, 14, 24, 0.95) inset !important;
+  transition: background-color 9999s ease-out 0s;
+}
+
 .app-page .card .text-muted,
 .app-page .text-muted {
   color: rgba(255, 255, 255, 0.75) !important;

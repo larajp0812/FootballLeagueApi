@@ -28,12 +28,12 @@ function LoginPage() {
     <PageContainer
       title="Login"
       subtitle="Sign in to access protected CRUD endpoints from your .NET API"
-      className="app-page"
+      className="app-page auth-page"
       titleClassName="text-light text-center"
     >
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={6}>
-          <Card>
+          <Card className="auth-card">
             <Card.Body>
               <ErrorAlert message={error} onClose={clearError} />
               <Form onSubmit={handleSubmit}>
