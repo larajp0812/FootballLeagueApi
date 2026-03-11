@@ -7,7 +7,7 @@ namespace FootballLeagueApi.Services
         public string SmtpUsername { get; set; } = string.Empty;
         public string SmtpPassword { get; set; } = string.Empty;
         public string FromEmail { get; set; } = string.Empty;
-        public string FromName { get; set; } = "Football League API";
+        public string FromName { get; set; } = "League Management Platform";
         public bool EnableSsl { get; set; } = true;
     }
 }

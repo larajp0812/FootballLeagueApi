@@ -154,42 +154,29 @@ namespace FootballLeagueApi.Controllers
                         string.Join(", ", roleResult.Errors.Select(e => e.Description)));
                 }
 
-                var (token, tokenExpires) = await GenerateJwtTokenAsync(user);
+                var (token, _) = await GenerateJwtTokenAsync(user);
                 var refreshToken = GenerateRefreshToken();
                 var refreshTokenExpires = DateTime.UtcNow.AddDays(7);
                 await SaveRefreshTokenAsync(user, refreshToken, refreshTokenExpires);
 
                 try
                 {
-                    var subject = "Football League API - Access and Refresh Tokens";
+                    var subject = "Welcome to League Management Platform";
                     var body = $@"
-                        <div style='font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#111827;'>
-                            <h2 style='margin:0 0 12px;'>Welcome to Football League API</h2>
-                            <p style='margin:0 0 12px;'>Hi {user.UserName}, your account has been created successfully.</p>
-                            <p style='margin:0 0 8px;'><strong>Your access token (JWT):</strong></p>
-                            <pre style='white-space:pre-wrap;word-break:break-all;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:12px;margin:0 0 12px;'>{token}</pre>
-                            <p style='margin:0 0 8px;'><strong>Access token expiry (UTC):</strong> {tokenExpires:O}</p>
-                            <p style='margin:0 0 8px;'><strong>How to use your access token in Swagger:</strong></p>
-                            <ol style='margin:0 0 12px 20px;padding:0;'>
-                                <li>Open Swagger UI (<code>/swagger</code>).</li>
-                                <li>Click <strong>Authorize</strong> (top-right).</li>
-                                <li>Paste the access token value into the input field.</li>
-                                <li>Submit and call protected endpoints.</li>
-                            </ol>
-                            <p style='margin:0 0 8px;'><strong>Your refresh token:</strong></p>
-                            <pre style='white-space:pre-wrap;word-break:break-all;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:12px;margin:0 0 12px;'>{refreshToken}</pre>
-                            <p style='margin:0 0 8px;'><strong>Refresh token expiry (UTC):</strong> {refreshTokenExpires:O}</p>
-                            <p style='margin:0 0 8px;'><strong>How to refresh your access token:</strong></p>
-                            <ol style='margin:0 0 12px 20px;padding:0;'>
-                                <li>Call <code>POST /api/auth/refresh</code>.</li>
-                                <li>Use this JSON body:</li>
-                            </ol>
-                            <pre style='white-space:pre-wrap;word-break:break-word;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:12px;margin:0 0 12px;'>{{
-    ""email"": ""{user.Email}"",
-    ""refreshToken"": ""{refreshToken}""
-}}</pre>
-                            <p style='margin:0;color:#6b7280;font-size:12px;'>Keep both tokens private. Anyone with these tokens can access or renew access to your account until they expire or are rotated.</p>
-                            <p style='margin:12px 0 0;'>Kind regards,<br/>Football League API Team</p>
+                        <div style='background:#0d1b2a;padding:24px;font-family:Arial,Helvetica,sans-serif;'>
+                            <div style='max-width:560px;margin:0 auto;background:#08111e;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:24px;color:#ffffff;'>
+                                <h2 style='margin:0 0 12px;color:#ffffff;'>Welcome to League Management Platform</h2>
+                                <p style='margin:0 0 12px;color:rgba(255,255,255,0.9);line-height:1.6;'>
+                                    Hi {user.UserName}, your account was created successfully.
+                                </p>
+                                <p style='margin:0 0 12px;color:rgba(255,255,255,0.8);line-height:1.6;'>
+                                    You can now log in and start managing teams, players, matches, seasons, and standings.
+                                </p>
+                                <div style='margin:16px 0;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);border-radius:10px;color:rgba(255,255,255,0.92);'>
+                                    Signed up with: <strong>{user.Email}</strong>
+                                </div>
+                                <p style='margin:14px 0 0;color:#ffffff;'>Kind regards,<br/>League Management Platform Team</p>
+                            </div>
                         </div>";
                     await _emailService.SendEmailAsync(user.Email!, subject, body);
                 }

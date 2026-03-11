@@ -15,8 +15,10 @@ import { useAuth } from "../contexts/AuthContext";
 import {
   assignRoleToUser,
   createRole,
+  deleteUserById,
   deleteRole,
   getRoles,
+  getUsers,
   updateRole,
 } from "../services/roleService";
 
@@ -32,9 +34,12 @@ const initialAssignForm = {
 function RolesPage() {
   const { role } = useAuth();
   const [roles, setRoles] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [assigning, setAssigning] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState("");
   const [error, setError] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [roleForm, setRoleForm] = useState(initialRoleForm);
@@ -73,14 +78,50 @@ function RolesPage() {
     }
   }
 
+  async function loadUsers() {
+    setUsersLoading(true);
+    setError("");
+
+    try {
+      const data = await getUsers();
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setError(getRolesErrorMessage(err, "Failed to load users"));
+    } finally {
+      setUsersLoading(false);
+    }
+  }
+
   useEffect(() => {
     if (!isAdmin) {
       setRoles([]);
+      setUsers([]);
       return;
     }
 
     loadRoles();
+    loadUsers();
   }, [isAdmin]);
+
+  async function handleDeleteUser(userId, userName) {
+    if (!window.confirm(`Delete user ${userName}? This cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingUserId(userId);
+    setError("");
+    setStatusMessage("");
+
+    try {
+      await deleteUserById(userId);
+      setStatusMessage("User deleted successfully");
+      await loadUsers();
+    } catch (err) {
+      setError(getRolesErrorMessage(err, "Failed to delete user"));
+    } finally {
+      setDeletingUserId("");
+    }
+  }
 
   function handleRoleInputChange(event) {
     const { name, value } = event.target;
@@ -206,7 +247,7 @@ function RolesPage() {
           <Card>
             <Card.Body>
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="h5 mb-0">All Roles</h2>
+                <h2 className="h5 mb-0">System Roles</h2>
                 <Button
                   variant="outline-primary"
                   onClick={loadRoles}
@@ -225,7 +266,6 @@ function RolesPage() {
                       <tr>
                         <th>Role ID</th>
                         <th>Name</th>
-                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -233,81 +273,12 @@ function RolesPage() {
                         <tr key={item.id}>
                           <td>{item.id}</td>
                           <td>{item.name}</td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="warning"
-                                onClick={() => handleEdit(item)}
-                                disabled={!isAdmin}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="danger"
-                                onClick={() => handleDelete(item.id)}
-                                disabled={!isAdmin}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </Table>
                 </div>
               )}
-            </Card.Body>
-          </Card>
-        </Tab>
-
-        <Tab
-          eventKey="manage"
-          title={editingRoleId ? "Update Role" : "Create Role"}
-        >
-          <Card>
-            <Card.Body>
-              <h2 className="h5 mb-3">
-                {editingRoleId ? "Update Role" : "Create New Role"}
-              </h2>
-              <Form onSubmit={handleSaveRole}>
-                <Row className="g-3">
-                  <Col xs={12} md={8}>
-                    <Form.Group controlId="roleName">
-                      <Form.Label>Role Name</Form.Label>
-                      <Form.Control
-                        name="roleName"
-                        value={roleForm.roleName}
-                        onChange={handleRoleInputChange}
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                <div className="d-flex gap-2 mt-3">
-                  <Button type="submit" disabled={saving || !isAdmin}>
-                    {saving
-                      ? "Saving..."
-                      : editingRoleId
-                        ? "Update Role"
-                        : "Create Role"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={resetRoleForm}
-                  >
-                    Clear
-                  </Button>
-                </div>
-              </Form>
-
-              {saving ? (
-                <LoadingState message="Submitting role request..." />
-              ) : null}
             </Card.Body>
           </Card>
         </Tab>
@@ -359,6 +330,67 @@ function RolesPage() {
               {assigning ? (
                 <LoadingState message="Submitting assignment..." />
               ) : null}
+            </Card.Body>
+          </Card>
+        </Tab>
+
+        <Tab eventKey="users" title="User Accounts">
+          <Card>
+            <Card.Body>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2 className="h5 mb-0">All Registered Users</h2>
+                <Button
+                  variant="outline-primary"
+                  onClick={loadUsers}
+                  disabled={usersLoading}
+                >
+                  Refresh
+                </Button>
+              </div>
+
+              {usersLoading ? (
+                <LoadingState message="Loading users..." />
+              ) : (
+                <div className="table-responsive">
+                  <Table striped hover>
+                    <thead>
+                      <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map((user) => (
+                        <tr key={user.userId}>
+                          <td>{user.userId}</td>
+                          <td>{user.userName}</td>
+                          <td>{user.email}</td>
+                          <td>{user.roles?.join(", ") || "User"}</td>
+                          <td>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() =>
+                                handleDeleteUser(user.userId, user.userName)
+                              }
+                              disabled={
+                                deletingUserId === user.userId || !isAdmin
+                              }
+                            >
+                              {deletingUserId === user.userId
+                                ? "Deleting..."
+                                : "Delete"}
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              )}
             </Card.Body>
           </Card>
         </Tab>

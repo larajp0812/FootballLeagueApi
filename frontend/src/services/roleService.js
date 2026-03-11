@@ -5,7 +5,7 @@ export function getRoles() {
 }
 
 export function getRoleById(roleId) {
-  return apiRequest(`/api/roles/${roleId}`);
+  return apiRequest(`/api/roles/id/${roleId}`);
 }
 
 export function createRole(roleName) {
@@ -32,5 +32,15 @@ export function assignRoleToUser(userId, roleName) {
   return apiRequest("/api/roles/assign-role-to-user", {
     method: "POST",
     body: JSON.stringify({ userId, roleName }),
+  });
+}
+
+export function getUsers() {
+  return apiRequest("/api/roles/users");
+}
+
+export function deleteUserById(userId) {
+  return apiRequest(`/api/roles/users/${userId}`, {
+    method: "DELETE",
   });
 }

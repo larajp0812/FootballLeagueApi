@@ -2,6 +2,7 @@ using FootballLeagueApi.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace FootballLeagueApi.Controllers
 {
@@ -31,7 +32,7 @@ namespace FootballLeagueApi.Controllers
             return Ok(roles);
         }
 
-        [HttpGet("{roleId}")]
+        [HttpGet("id/{roleId}")]
         [ProducesResponseType(typeof(IdentityRole), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetRole(string roleId)
@@ -149,6 +150,56 @@ namespace FootballLeagueApi.Controllers
             if (result.Succeeded)
             {
                 return Ok("Role assigned to user successfully.");
+            }
+
+            return BadRequest(result.Errors);
+        }
+
+        [HttpGet("users")]
+        [ProducesResponseType(typeof(IEnumerable<UserAccountReadDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = _userManager.Users.ToList();
+            var result = new List<UserAccountReadDto>(users.Count);
+
+            foreach (var user in users)
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                result.Add(new UserAccountReadDto
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName ?? string.Empty,
+                    Email = user.Email ?? string.Empty,
+                    Roles = userRoles.ToList()
+                });
+            }
+
+            return Ok(result.OrderBy(u => u.UserName));
+        }
+
+        [HttpDelete("users/{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            var currentUserEmail = User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
+            if (!string.IsNullOrWhiteSpace(currentUserEmail) &&
+                string.Equals(currentUserEmail, user.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest("You cannot delete your own account.");
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok("User deleted successfully.");
             }
 
             return BadRequest(result.Errors);

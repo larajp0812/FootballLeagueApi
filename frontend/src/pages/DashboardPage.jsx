@@ -3,8 +3,12 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { Link } from "react-router-dom";
 import PageContainer from "../components/PageContainer";
+import { useAuth } from "../contexts/AuthContext";
 
 function DashboardPage() {
+  const { role } = useAuth();
+  const isAdmin = typeof role === "string" && role.toLowerCase() === "admin";
+
   const modules = [
     {
       title: "Teams",
@@ -42,8 +46,13 @@ function DashboardPage() {
       title: "Roles",
       description: "Admin-only role management and assignment.",
       route: "/roles",
+      adminOnly: true,
     },
   ];
+
+  const visibleModules = modules.filter(
+    (module) => !module.adminOnly || isAdmin,
+  );
 
   return (
     <PageContainer
@@ -54,7 +63,7 @@ function DashboardPage() {
     >
       <div className="dashboard-shell">
         <Row className="g-4 dashboard-cards-grid justify-content-center">
-          {modules.map((module) => (
+          {visibleModules.map((module) => (
             <Col key={module.title} xs={12} md={6} lg={4}>
               <div className="module-card h-100">
                 <div className="module-card-body d-flex flex-column">
