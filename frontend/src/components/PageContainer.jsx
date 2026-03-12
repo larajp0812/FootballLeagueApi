@@ -10,7 +10,7 @@ function PageContainer({
   hideHeader = false,
 }) {
   const hasSubtitle = Boolean(subtitle);
-  const titleSpacingClass = hasSubtitle ? "mb-3" : "mb-4";
+  const titleSpacingClass = hasSubtitle ? "mb-1" : "mb-4";
 
   return (
     <Container className={`py-4 ${className}`.trim()}>
