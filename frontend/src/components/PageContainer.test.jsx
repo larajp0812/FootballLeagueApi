@@ -7,7 +7,7 @@ describe("PageContainer", () => {
     render(
       <PageContainer title="Test Title">
         <div>Content</div>
-      </PageContainer>
+      </PageContainer>,
     );
 
     expect(screen.getByText("Test Title")).toBeInTheDocument();
@@ -17,7 +17,7 @@ describe("PageContainer", () => {
     render(
       <PageContainer title="Title" subtitle="Test Subtitle">
         <div>Content</div>
-      </PageContainer>
+      </PageContainer>,
     );
 
     expect(screen.getByText("Test Subtitle")).toBeInTheDocument();
@@ -27,7 +27,7 @@ describe("PageContainer", () => {
     render(
       <PageContainer title="Title">
         <div>Child Content</div>
-      </PageContainer>
+      </PageContainer>,
     );
 
     expect(screen.getByText("Child Content")).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("PageContainer", () => {
     const { container } = render(
       <PageContainer title="Title" hideHeader={true}>
         <div>Content</div>
-      </PageContainer>
+      </PageContainer>,
     );
 
     expect(screen.queryByText("Title")).not.toBeInTheDocument();
@@ -48,7 +48,7 @@ describe("PageContainer", () => {
     const { container } = render(
       <PageContainer title="Title" className="custom-class">
         <div>Content</div>
-      </PageContainer>
+      </PageContainer>,
     );
 
     // Find the Container - it should have the custom class

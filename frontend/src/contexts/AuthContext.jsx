@@ -51,18 +51,18 @@ function getRoleFromToken(token) {
 
 /**
  * AuthProvider Component - Global authentication state provider
- * 
+ *
  * Manages authentication state, JWT tokens, and user roles across the app.
  * Provides login, register, and logout functionality through Context.
  * Handles token persistence and automatic session timeout.
- * 
+ *
  * Must wrap the entire application to provide authentication context.
- * 
+ *
  * @component
  * @param {Object} props
  * @param {React.ReactNode} props.children - App components to wrap
  * @returns {React.ReactElement} Context provider wrapping children
- * 
+ *
  * @example
  * // In main.jsx or root component
  * <AuthProvider>

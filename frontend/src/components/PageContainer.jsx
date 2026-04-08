@@ -2,10 +2,10 @@ import Container from "react-bootstrap/Container";
 
 /**
  * PageContainer Component - Consistent page layout wrapper
- * 
+ *
  * Wraps page content with standard Bootstrap container and optional header.
  * Provides consistent spacing, titles, and styling across all pages.
- * 
+ *
  * @component
  * @param {Object} props - Component props
  * @param {React.ReactNode} props.children - Page content to wrap
@@ -16,10 +16,10 @@ import Container from "react-bootstrap/Container";
  * @param {string} [props.subtitleClassName="text-light-emphasis"] - CSS classes for subtitle
  * @param {boolean} [props.hideHeader=false] - Hide the title header entirely
  * @returns {React.ReactElement} Container with header and children
- * 
+ *
  * @example
- * <PageContainer 
- *   title="Teams" 
+ * <PageContainer
+ *   title="Teams"
  *   subtitle="Manage league teams"
  *   className="app-page"
  * >

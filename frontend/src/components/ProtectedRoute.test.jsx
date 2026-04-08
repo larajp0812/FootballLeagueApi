@@ -22,7 +22,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute>
           <div>Protected Content</div>
         </ProtectedRoute>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText("Protected Content")).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute>
           <div>Protected Content</div>
         </ProtectedRoute>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // When redirected, protected content should not be visible

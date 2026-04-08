@@ -44,7 +44,7 @@ describe("authService", () => {
       };
 
       await expect(authService.registerUser(credentials)).rejects.toThrow(
-        "Email already in use"
+        "Email already in use",
       );
     });
   });
@@ -54,7 +54,10 @@ describe("authService", () => {
       const mockResponse = { token: "test-token", role: "User" };
       apiRequest.mockResolvedValue(mockResponse);
 
-      const credentials = { email: "test@example.com", password: "password123" };
+      const credentials = {
+        email: "test@example.com",
+        password: "password123",
+      };
       const result = await authService.loginUser(credentials);
 
       expect(apiRequest).toHaveBeenCalledWith("/api/auth/login", {
@@ -71,7 +74,7 @@ describe("authService", () => {
       const credentials = { email: "test@example.com", password: "wrong" };
 
       await expect(authService.loginUser(credentials)).rejects.toThrow(
-        "Invalid credentials"
+        "Invalid credentials",
       );
     });
   });
