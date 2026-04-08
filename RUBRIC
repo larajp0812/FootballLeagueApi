@@ -1,0 +1,93 @@
+7SENG014W Web Application Development 2026
+React JS Frontend (Consuming the backend API)
+Coursework Description
+For this coursework, you are required to create a single-page React application that consumes the .NET Core Backend API you developed in the first coursework. If the backend API is not fully functional or completed, you may create a JSON file that mimics the backend behavior. However, the priority should always be to fully integrate with the actual backend API.
+Key Requirements:
+• Responsive Design: The application must be responsive on at least two devices (laptop and mobile). Use React Widgets, Tabs, Bootstrap, and React Router for a seamless and responsive user experience.
+• API Consumption: You need to consume all the endpoints from the backend API, covering CRUD operations, authentication, and other required features. If the backend is not functional, you will use a JSON file to mimic the API behavior (this is an option, not extra marks).
+• Single-Page Application (SPA): Ensure that your application behaves as a single-page application, meaning that the page should not reload when navigating between views. Use React Router to handle different routes.
+• Local Storage (Optional): If the backend is incomplete, you must utilize local storage to simulate data persistence for your app.
+• React Best Practices:
+o Component Reusability: Break down your app into reusable components, making your code clean and maintainable.
+o Separation of Concerns: Keep your logic, state, and UI well-separated.
+o State Management: Use state management solutions like Redux or React's Context API to manage the global state and avoid excessive prop drilling.
+o React Router: Utilize React Router for proper navigation within the application.
+The primary goal is to ensure a clean and user-friendly interface with a seamless experience between the frontend and backend, while adhering to React best practices.
+Important Checks:
+
+1. Individual Work: This coursework must be completed independently. You should not collaborate with others or share code. Any form of plagiarism will not be tolerated, and appropriate academic penalties will be applied, including potential failure of the coursework.
+2. Viva: After submitting your project, you will need to attend a viva (oral exam) virtually, date and slots will be announced on Blackboard where you will explain your design decisions and implementation details. The viva is critical; failure to explain key aspects of your project may result in a deduction of marks. It is your responsibility to ensure that you can articulate your design choices and technical implementation.
+3. Integration Requirements: Your Front UI must consume all backend endpoints to ensure the project meets the complexity requirements. Frontend and backend must integrate but will be two different projects.
+4. Ethical Conduct: Please remember that academic integrity is vital. Any attempts to deceive, including plagiarizing code or not properly crediting external sources, will be subject to disciplinary actions. Ensure that your work is authentic and demonstrates your personal effort and understanding.
+
+Submission Guidelines:
+You are required to submit the following for your coursework:
+
+1. GitHub Repository Link: Submit the link to your GitHub repository where all the code for your project is stored. Ensure that your repository is properly organized and follows the required folder structure.
+2. Code Files: You must include all source code (please do not add the node modules folder, all the other folders/files should be included in the submission), including your package.json files, in a zipped version of your project. The zipped file should contain everything required to run the project, including but not limited to code files, configuration files, and any other necessary resources (if your package.json mentions all the dependencies I can download those while testing easily but please don’t add node modules folder in your submission).
+3. Submission Deadline: All submissions must be uploaded to Blackboard no later than 27th April 2026 before 01:00 pm. Late submissions will incur penalties as per the university policy.
+4. Viva: Attendance at the viva is mandatory. You must be available to explain your project and answer questions about your implementation. Not attending the viva will result in a straight zero for the coursework. Slots will be announced on Blackboard.
+   Make sure to follow all submission instructions and ensure everything is uploaded on time to avoid any penalties.
+   Goodluck with your project!
+
+Detailed Rubric for React JS Frontend Coursework (100 Marks)
+
+1. Project Setup & Architecture (10 Marks)
+   o Folder Structure & Organization (3 Marks)
+    Correct folder structure (components, pages, services, redux, etc.) (2)
+    Consistent naming conventions and code organization (1)
+   o Configuration & Dependencies (3 Marks)
+    Proper setup of configuration files (e.g., environment variables, API URLs) (2)
+    Correct use of dependencies and libraries (1)
+   o State Management (4 Marks)
+    Use of Redux or Context API (if applicable) for global state management (2)
+    Proper flow of data across components (2)
+2. API Consumption (15 Marks)
+   o Backend API Integration (15 Marks)
+    Full integration with the backend API (CRUD operations, authentication, etc.) (8)
+    Proper error handling for API requests (4)
+    Correct loading and error states displayed to users (3)
+3. UI Development & Responsiveness (20 Marks)
+   o Responsiveness (10 Marks)
+    Design that works correctly on mobile and laptop views (5)
+    Use of CSS frameworks (Bootstrap, React Widgets, etc.) or custom styles for responsiveness (5)
+   o User Interface (10 Marks)
+    Clear, user-friendly UI that is functional (6)
+    Effective use of UI components (buttons, forms, inputs, etc.) (4)
+4. Component Reusability & Code Quality (15 Marks)
+   o Component Design (7 Marks)
+    Reusable and modular components (5)
+    Effective use of props, state, and lifecycle methods (2)
+   o Code Readability & Maintainability (8 Marks)
+    Well-documented and commented code (3)
+    Clean, maintainable, and efficient code (5)
+5. React Best Practices (20 Marks)
+   o Separation of Concerns (7 Marks)
+    Proper separation of UI, logic, and state management (4)
+    Clean and organized structure for business logic and UI components (3)
+   o Avoiding Prop Drilling (8 Marks)
+    Use of Redux or Context API to avoid excessive prop drilling (5)
+    Efficient passing and usage of data between components (3)
+   o React Router Usage (5 Marks)
+    Proper use of React Router for navigation between views in a single-page application (5)
+6. Testing & Debugging (10 Marks)
+   o Unit Tests (5 Marks)
+    Writing unit tests for components and logic (3)
+    Correct mocking and testing of functions (2)
+   o Debugging & Issue Resolution (5 Marks)
+    Efficient debugging of issues and handling edge cases (3)
+    Thorough testing of the application and handling errors (2)
+7. Deployment & Hosting (5 Marks)
+   o Cloud Deployment (3 Marks)
+    Deployment of the React app on a cloud platform (e.g., Netlify, Heroku, Azure) (3)
+   o CI/CD Integration (2 Marks)
+    Setup of continuous integration/continuous deployment pipeline (e.g., GitHub Actions) (2)
+8. Version Control & GitHub Usage (5 Marks)
+   o GitHub Repository Setup (3 Marks)
+    Proper use of GitHub branching strategy and commit messages (2)
+    A clear README with project setup instructions (1)
+   o Commit History & Best Practices (2 Marks)
+    Regular commits with meaningful messages (2)
+
+Total Marks: 100
+Failure to attend the demo/presentation will result in a potential score of 0% of the total marks, leading to automatic failure. To successfully complete each evaluation, you must attain a minimum score of 40%. Furthermore, an overall minimum of 50% is necessary to pass the module. Therefore, if you achieve a score of 40% in the initial assessment, you must aim for a higher score in this assessment to ensure your overall marks equal or exceed 50%.

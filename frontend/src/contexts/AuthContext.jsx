@@ -1,7 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { loginUser, registerUser } from "../services/authService";
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 const tokenStorageKey = "football_token";
 const roleStorageKey = "football_role";

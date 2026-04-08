@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
@@ -18,7 +18,7 @@ function LeagueTablePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError("");
 
@@ -35,11 +35,11 @@ function LeagueTablePage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [selectedSeasonId]);
 
   useEffect(() => {
     loadData();
-  }, [selectedSeasonId]);
+  }, [selectedSeasonId, loadData]);
 
   return (
     <PageContainer

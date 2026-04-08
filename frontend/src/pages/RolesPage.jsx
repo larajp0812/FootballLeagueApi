@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -14,17 +14,10 @@ import PageContainer from "../components/PageContainer";
 import { useAuth } from "../contexts/AuthContext";
 import {
   assignRoleToUser,
-  createRole,
   deleteUserById,
-  deleteRole,
   getRoles,
   getUsers,
-  updateRole,
 } from "../services/roleService";
-
-const initialRoleForm = {
-  roleName: "",
-};
 
 const initialAssignForm = {
   userId: "",
@@ -37,14 +30,11 @@ function RolesPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [usersLoading, setUsersLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState("");
   const [error, setError] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
-  const [roleForm, setRoleForm] = useState(initialRoleForm);
   const [assignForm, setAssignForm] = useState(initialAssignForm);
-  const [editingRoleId, setEditingRoleId] = useState(null);
   const [activeTab, setActiveTab] = useState("list");
 
   const isAdmin = typeof role === "string" && role.toLowerCase() === "admin";
@@ -64,7 +54,7 @@ function RolesPage() {
     );
   }, [roles]);
 
-  async function loadRoles() {
+  const loadRoles = useCallback(async () => {
     setLoading(true);
     setError("");
 
@@ -76,9 +66,9 @@ function RolesPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     setUsersLoading(true);
     setError("");
 
@@ -90,7 +80,7 @@ function RolesPage() {
     } finally {
       setUsersLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -101,7 +91,7 @@ function RolesPage() {
 
     loadRoles();
     loadUsers();
-  }, [isAdmin]);
+  }, [isAdmin, loadRoles, loadUsers]);
 
   async function handleDeleteUser(userId, userName) {
     if (!window.confirm(`Delete user ${userName}? This cannot be undone.`)) {
@@ -123,68 +113,9 @@ function RolesPage() {
     }
   }
 
-  function handleRoleInputChange(event) {
-    const { name, value } = event.target;
-    setRoleForm((current) => ({ ...current, [name]: value }));
-  }
-
   function handleAssignInputChange(event) {
     const { name, value } = event.target;
     setAssignForm((current) => ({ ...current, [name]: value }));
-  }
-
-  function resetRoleForm() {
-    setEditingRoleId(null);
-    setRoleForm(initialRoleForm);
-  }
-
-  function handleEdit(selectedRole) {
-    setEditingRoleId(selectedRole.id);
-    setRoleForm({ roleName: selectedRole.name ?? "" });
-    setStatusMessage("Editing selected role");
-    setActiveTab("manage");
-  }
-
-  async function handleSaveRole(event) {
-    event.preventDefault();
-    setSaving(true);
-    setError("");
-    setStatusMessage("");
-
-    try {
-      if (editingRoleId) {
-        await updateRole(editingRoleId, roleForm.roleName.trim());
-        setStatusMessage("Role updated successfully");
-      } else {
-        await createRole(roleForm.roleName.trim());
-        setStatusMessage("Role created successfully");
-      }
-
-      resetRoleForm();
-      setActiveTab("list");
-      await loadRoles();
-    } catch (err) {
-      setError(getRolesErrorMessage(err, "Failed to save role"));
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleDelete(roleId) {
-    if (!window.confirm("Delete this role? This cannot be undone.")) {
-      return;
-    }
-
-    setError("");
-    setStatusMessage("");
-
-    try {
-      await deleteRole(roleId);
-      setStatusMessage("Role deleted successfully");
-      await loadRoles();
-    } catch (err) {
-      setError(getRolesErrorMessage(err, "Failed to delete role"));
-    }
   }
 
   async function handleAssignRole(event) {
