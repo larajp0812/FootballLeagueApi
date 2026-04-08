@@ -32,11 +32,13 @@ A modern React single-page application (SPA) that provides a web interface for m
 ## Installation
 
 1. Navigate to the frontend directory:
+
 ```bash
 cd frontend
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -214,38 +216,46 @@ When contributing to this project:
 ## Rubric Compliance (CW2 - 100 Marks)
 
 ### Project Setup & Architecture (10 Marks)
+
 - ✅ Proper folder structure with components, pages, services, contexts, hooks
 - ✅ Environment configuration via `.env` and `VITE_API_BASE_URL`
 - ✅ Global state management using React Context API for authentication
 
 ### API Consumption (15 Marks)
+
 - ✅ Full backend API integration (CRUD operations, authentication, roles, standings)
 - ✅ Comprehensive error handling with `ErrorAlert` component
 - ✅ Loading and error states throughout the application
 
 ### UI Development & Responsiveness (20 Marks)
+
 - ✅ Responsive design using Bootstrap and React-Bootstrap
 - ✅ Mobile-optimized interfaces with collapsible navigation
 - ✅ Clean, user-friendly UI with functional components
 
 ### Component Reusability & Code Quality (15 Marks)
+
 - ✅ Reusable components: `PageContainer`, `ProtectedRoute`, `LoadingState`, `ErrorAlert`
 - ✅ Separation of concerns between UI and API logic
 - ✅ Well-organized component structure
 
 ### React Best Practices (20 Marks)
+
 - ✅ Proper separation of UI, logic, and state management
 - ✅ Avoided prop drilling using Context API
 - ✅ React Router for single-page navigation
 
 ### Testing & Debugging (10 Marks)
+
 - ✅ Unit tests configured with Vitest and React Testing Library
 - ✅ Baseline test structure in place
 
 ### Deployment & Hosting (5 Marks)
+
 - ⏳ Cloud deployment to Netlify/Vercel/Azure pending
 
 ### Version Control & GitHub Usage (5 Marks)
+
 - ✅ Clean git history with meaningful commits
 - ✅ Project properly organized in GitHub repository
 

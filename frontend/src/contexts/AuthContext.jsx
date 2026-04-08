@@ -8,6 +8,12 @@ const tokenStorageKey = "football_token";
 const roleStorageKey = "football_role";
 const unauthorizedEventName = "auth:unauthorized";
 
+/**
+ * Decode JWT token payload (without verification)
+ * @private
+ * @param {string} token - JWT token string
+ * @returns {Object|null} Decoded JWT payload or null if invalid
+ */
 function parseJwt(token) {
   try {
     const base64Url = token.split(".")[1];
@@ -18,6 +24,16 @@ function parseJwt(token) {
   }
 }
 
+/**
+ * Extract user role from JWT token
+ * @private
+ * @param {string} token - JWT token string
+ * @returns {string} User role (e.g., "Admin", "User") or default "User"
+ * @description
+ *   Checks multiple claim names for role information:
+ *   - Simple "role" claim
+ *   - Azure/Microsoft identity framework role claim URI
+ */
 function getRoleFromToken(token) {
   const payload = parseJwt(token);
   if (!payload) return "User";
@@ -33,6 +49,26 @@ function getRoleFromToken(token) {
   return roleClaim ?? "User";
 }
 
+/**
+ * AuthProvider Component - Global authentication state provider
+ * 
+ * Manages authentication state, JWT tokens, and user roles across the app.
+ * Provides login, register, and logout functionality through Context.
+ * Handles token persistence and automatic session timeout.
+ * 
+ * Must wrap the entire application to provide authentication context.
+ * 
+ * @component
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - App components to wrap
+ * @returns {React.ReactElement} Context provider wrapping children
+ * 
+ * @example
+ * // In main.jsx or root component
+ * <AuthProvider>
+ *   <App />
+ * </AuthProvider>
+ */
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() =>
     localStorage.getItem(tokenStorageKey),
