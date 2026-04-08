@@ -34,7 +34,7 @@ describe("PageContainer", () => {
   });
 
   it("hides header when hideHeader prop is true", () => {
-    const { container } = render(
+    render(
       <PageContainer title="Title" hideHeader={true}>
         <div>Content</div>
       </PageContainer>,
