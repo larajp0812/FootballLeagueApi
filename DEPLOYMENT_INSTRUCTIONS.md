@@ -60,11 +60,13 @@ In your GitHub repository:
 3. Add these secrets:
 
 ### Secret 1: AZURE_STATIC_WEB_APPS_TOKEN
+
 - **Name**: `AZURE_STATIC_WEB_APPS_TOKEN`
 - **Value**: Paste the token from Step 3
 - Click **Add secret**
 
 ### Secret 2: AZURE_VITE_API_BASE_URL
+
 - **Name**: `AZURE_VITE_API_BASE_URL`
 - **Value**: Your backend API URL
   - Development: `https://localhost:7195`
@@ -94,6 +96,7 @@ git push origin main
 ```
 
 The GitHub Actions workflow will automatically:
+
 1. Checkout code
 2. Run lint checks
 3. Run tests
@@ -119,11 +122,13 @@ After deployment completes:
 ### Build Fails in GitHub Actions
 
 Check logs:
+
 1. GitHub > Settings > Secrets - verify all secrets are set
 2. Repository > Actions tab - click failed workflow
 3. Look for error messages in Build step
 
 Common issues:
+
 - Missing `AZURE_STATIC_WEB_APPS_TOKEN` secret
 - Build output location not set to `dist`
 - Node version incompatibility
@@ -143,11 +148,13 @@ Common issues:
 ## Environment Variables
 
 ### Development
+
 ```
 VITE_API_BASE_URL=https://localhost:7195
 ```
 
 ### Production (Azure)
+
 ```
 VITE_API_BASE_URL=https://your-production-backend.azurewebsites.net
 ```
@@ -168,6 +175,7 @@ Azure Portal > Static Web App > Logs (using Azure Monitor)
 ### Performance
 
 Use Azure Application Insights for:
+
 - Page load times
 - Error rates
 - User analytics
@@ -197,18 +205,19 @@ Azure Portal > Deployments > Select previous deployment > Redeploy
 
 ## Quick Reference
 
-| Task | Location |
-|------|----------|
-| Deployment status | GitHub Actions tab |
-| App URL | Azure Portal > Static Web App > Browse |
-| Backend API URL | Azure Portal > Static Web App > Configuration |
-| Deployment token | Azure Portal > Static Web App > Deployment tokens |
-| GitHub secrets | GitHub Settings > Secrets and variables |
-| Custom domain | Azure Portal > Custom domains |
+| Task              | Location                                          |
+| ----------------- | ------------------------------------------------- |
+| Deployment status | GitHub Actions tab                                |
+| App URL           | Azure Portal > Static Web App > Browse            |
+| Backend API URL   | Azure Portal > Static Web App > Configuration     |
+| Deployment token  | Azure Portal > Static Web App > Deployment tokens |
+| GitHub secrets    | GitHub Settings > Secrets and variables           |
+| Custom domain     | Azure Portal > Custom domains                     |
 
 ## Support
 
 For issues:
+
 1. Check GitHub Actions logs for build errors
 2. Verify all secrets are set in GitHub
 3. Verify VITE_API_BASE_URL in Azure Configuration

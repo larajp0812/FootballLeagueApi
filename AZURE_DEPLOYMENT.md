@@ -23,6 +23,7 @@
 ### 2. Configure GitHub Integration
 
 During Static Web Apps creation:
+
 1. **Source**: GitHub
 2. Sign in with your GitHub account
 3. Select your repository: `larajp0812/FootballLeagueApi`
@@ -47,6 +48,7 @@ Example: `https://footballleagueapi.azurewebsites.net`
 Azure Static Web Apps automatically creates a GitHub Actions workflow in `.github/workflows/`.
 
 The workflow will:
+
 - Trigger on pushes to `main` branch
 - Install dependencies
 - Run `npm run build` from the `frontend` directory
@@ -55,6 +57,7 @@ The workflow will:
 ### 5. Deployment
 
 1. Push to main branch:
+
 ```bash
 git push origin main
 ```
@@ -73,6 +76,7 @@ git push origin main
 ### 1. Configure Custom Domain (Optional)
 
 In Azure Portal > Static Web App > Custom domains:
+
 - Add your custom domain (e.g., `footballleague.com`)
 - Point DNS records to Azure
 
@@ -83,18 +87,21 @@ Azure automatically provisions SSL certificates via Let's Encrypt.
 ### 3. Set Production Backend URL
 
 Update firewall/CORS rules on your backend API to allow requests from:
+
 - `https://<static-app-name>.azurestaticapps.net`
 - Your custom domain (if configured)
 
 ### 4. Monitor Performance
 
 Use Azure Portal:
+
 - **Application Insights** for performance monitoring
 - **Azure Monitor** for uptime and availability
 
 ## Environment-Specific URLs
 
 After deployment, your app will be available at:
+
 - `https://<static-app-name>.azurestaticapps.net` (auto-generated)
 - Your custom domain (if configured)
 
@@ -103,11 +110,13 @@ After deployment, your app will be available at:
 ### Build Fails
 
 Check GitHub Actions logs:
+
 1. Go to repository > Actions
 2. Click latest workflow run
 3. Look for build errors
 
 Common issues:
+
 - Missing dependencies: Run `npm install` locally and commit `package-lock.json`
 - Node version mismatch: Specify Node version in workflow
 - Environment variables: Ensure `VITE_API_BASE_URL` is set
@@ -122,6 +131,7 @@ Common issues:
 ### "Not Found" After Navigation
 
 Static Web Apps automatically handles SPA routing. If 404 errors occur:
+
 - Verify `staticwebapp.config.json` exists and is correct
 - Rules should rewrite all routes to `index.html`
 
@@ -141,6 +151,7 @@ Pricing: https://azure.microsoft.com/en-us/pricing/details/app-service/static/
 ## Continuous Deployment
 
 Once GitHub workflow is set up:
+
 - Any push to `main` triggers automatic build and deploy
 - Pull requests get preview deployments (if enabled)
 - Rollback to previous versions from Azure Portal

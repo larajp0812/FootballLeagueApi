@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -12,7 +12,11 @@ import PageContainer from "../components/PageContainer";
 import { forgotPassword } from "../services/authService";
 
 function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const query = useMemo(() => new URLSearchParams(location.search), [location]);
+  const emailFromQuery = query.get("email") ?? "";
+
+  const [email, setEmail] = useState(emailFromQuery);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
