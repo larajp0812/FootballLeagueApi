@@ -30,7 +30,9 @@ describe("ErrorAlert", () => {
 
   it("renders as dismissible alert when onClose is provided", () => {
     const mockOnClose = vi.fn();
-    const { container } = render(<ErrorAlert message="Error" onClose={mockOnClose} />);
+    const { container } = render(
+      <ErrorAlert message="Error" onClose={mockOnClose} />,
+    );
 
     // Check that the alert has the dismissible class and contains a close button
     const alert = container.querySelector(".alert");
