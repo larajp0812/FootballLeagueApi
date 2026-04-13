@@ -32,7 +32,7 @@ function PageContainer({
   children,
   className = "",
   titleClassName = "text-light",
-  // subtitleClassName = "text-light-emphasis",
+  subtitleClassName = "text-light-emphasis",
   hideHeader = false,
 }) {
   const hasSubtitle = Boolean(subtitle);
@@ -45,6 +45,9 @@ function PageContainer({
           <h1 className={`h3 ${titleSpacingClass} ${titleClassName}`.trim()}>
             {title}
           </h1>
+          {hasSubtitle && (
+            <p className={`mb-4 ${subtitleClassName}`.trim()}>{subtitle}</p>
+          )}
         </>
       ) : null}
       {children}

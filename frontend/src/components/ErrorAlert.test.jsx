@@ -30,10 +30,13 @@ describe("ErrorAlert", () => {
 
   it("renders as dismissible alert when onClose is provided", () => {
     const mockOnClose = vi.fn();
-    render(<ErrorAlert message="Error" onClose={mockOnClose} />);
+    const { container } = render(<ErrorAlert message="Error" onClose={mockOnClose} />);
 
-    // Alert should have a close button when onClose is provided
-    const dismissButton = screen.getByRole("button");
-    expect(dismissButton).toBeInTheDocument();
+    // Check that the alert has the dismissible class and contains a close button
+    const alert = container.querySelector(".alert");
+    expect(alert).toHaveClass("alert-dismissible");
+
+    const closeButton = container.querySelector(".btn-close");
+    expect(closeButton).toBeInTheDocument();
   });
 });

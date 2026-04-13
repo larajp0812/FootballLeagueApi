@@ -34,14 +34,18 @@ describe("PageContainer", () => {
   });
 
   it("hides header when hideHeader prop is true", () => {
-    render(
+    const { container } = render(
       <PageContainer title="Title" hideHeader={true}>
         <div>Content</div>
       </PageContainer>,
     );
 
-    expect(screen.queryByText("Title")).not.toBeInTheDocument();
-    expect(screen.getByText("Content")).toBeInTheDocument();
+    // Check that no h1 element exists in the rendered component
+    const heading = container.querySelector("h1");
+    expect(heading).toBeNull();
+
+    // Check that content is still rendered
+    expect(container.textContent).toContain("Content");
   });
 
   it("applies custom className", () => {
