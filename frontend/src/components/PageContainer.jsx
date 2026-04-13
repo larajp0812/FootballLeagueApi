@@ -32,7 +32,7 @@ function PageContainer({
   children,
   className = "",
   titleClassName = "text-light",
-  subtitleClassName = "text-light-emphasis",
+  // subtitleClassName = "text-light-emphasis",
   hideHeader = false,
 }) {
   const hasSubtitle = Boolean(subtitle);

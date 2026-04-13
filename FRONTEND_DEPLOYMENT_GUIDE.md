@@ -2,6 +2,8 @@
 
 A simple step-by-step guide to deploy your React frontend to Azure Static Web Apps.
 
+**Note**: Your backend is already deployed on Azure App Service at `https://football-league-backend.azurewebsites.net` — this guide focuses on deploying the frontend only.
+
 ## What You'll Need
 
 - Azure account (free at https://azure.microsoft.com/free)
@@ -66,7 +68,7 @@ Keep this token safe! You'll use it next.
 
 ## Step 4: Update Frontend Environment Variable
 
-Your frontend needs to know where the backend API is located.
+Your frontend needs to know where your backend API is (it's already deployed on Azure).
 
 In the Azure Portal > Your Static Web App:
 
@@ -78,7 +80,7 @@ In the Azure Portal > Your Static Web App:
 
 4. Fill in:
    - **Name**: `VITE_API_BASE_URL`
-   - **Value**: `https://football-league-backend.azurewebsites.net` (your backend URL)
+   - **Value**: `https://football-league-backend.azurewebsites.net` (your existing backend)
    - **Environment**: Production
 
 5. Click **Add**
@@ -106,11 +108,13 @@ git push origin main
 Your new app URL appears in multiple places:
 
 **Option A - Azure Portal**:
+
 1. Go to your Static Web App resource
 2. Click **Overview**
 3. Click the **URL** link
 
 **Option B - GitHub Actions**:
+
 1. Go to the completed workflow in GitHub Actions
 2. Look for "deployment successful" message with the URL
 
@@ -123,6 +127,7 @@ Your new app URL appears in multiple places:
 3. Try clicking around - does it work?
 
 If it doesn't work, check:
+
 - Backend is deployed and running
 - `VITE_API_BASE_URL` is set correctly in Azure Configuration
 - No errors in browser console (F12)
@@ -142,16 +147,19 @@ The deployment happens automatically! Just wait 2-5 minutes for it to complete.
 ## Troubleshooting
 
 ### App loads but shows blank page
+
 - Check browser console: F12 → Console tab → look for errors
 - Verify backend is running
 - Check `VITE_API_BASE_URL` environment variable is correct
 
 ### Frontend loads but API calls fail
-- Backend might not be deployed
+
+- Check that your backend (`football-league-backend.azurewebsites.net`) is running in Azure
 - Check CORS is configured in backend (should allow `*.azurestaticapps.net`)
-- Verify backend URL is correct
+- Verify `VITE_API_BASE_URL` in Azure Configuration matches your backend URL exactly
 
 ### Deployment shows "failed" in GitHub Actions
+
 - Click the failed job to see error messages
 - Common issues:
   - Build output location not `dist`
@@ -159,19 +167,20 @@ The deployment happens automatically! Just wait 2-5 minutes for it to complete.
   - Node version mismatch
 
 ### Want to check deployment status
+
 - GitHub: **Actions** tab → click latest workflow
 - Azure: **Deployments** tab in Static Web App resource
 
 ## Quick Reference
 
-| What | Where |
-|------|-------|
-| Your app URL | Azure Portal > Overview > URL |
-| Deployment token | Azure Portal > Deployment token |
-| GitHub secrets | GitHub > Settings > Secrets and variables > Actions |
+| What                  | Where                                                |
+| --------------------- | ---------------------------------------------------- |
+| Your app URL          | Azure Portal > Overview > URL                        |
+| Deployment token      | Azure Portal > Deployment token                      |
+| GitHub secrets        | GitHub > Settings > Secrets and variables > Actions  |
 | Environment variables | Azure Portal > Configuration > Environment variables |
-| Deployment history | GitHub > Actions tab |
-| Build logs | GitHub > Actions > click workflow |
+| Deployment history    | GitHub > Actions tab                                 |
+| Build logs            | GitHub > Actions > click workflow                    |
 
 ## Need Help?
 
