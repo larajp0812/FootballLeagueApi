@@ -1,18 +1,41 @@
-# Deployment Instructions - Azure App Service
+# Deployment Instructions - Azure Static Web Apps (Frontend) + Azure App Service (Backend)
 
 ## Overview
 
-This project is configured to deploy automatically to Azure App Service when you push to the `main` branch.
+This project deploys the frontend to Azure Static Web Apps (using deployment tokens) and the backend to Azure App Service (using publish profiles) when you push to the `main` branch.
 
 ## Prerequisites
 
 1. **Azure Subscription** - Create free account at https://azure.microsoft.com/free
-2. **Azure App Service Resources** - Frontend and backend App Services created in Azure Portal
+2. **Azure Resources** - Static Web App for frontend, App Service for backend
 3. **GitHub Repository** - This repo with deployment workflows
 
-## Step 1: Create Azure App Service Resources
+## Step 1: Create Azure Resources
 
-### Frontend App Service (football-league-frontend)
+### Frontend Static Web App (football-league-frontend)
+
+1. Go to [Azure Portal](https://portal.azure.com)
+2. Search for **"Static Web Apps"**
+3. Click **Create**
+4. **Basics** tab:
+   - **Subscription**: Your Azure subscription
+   - **Resource Group**: Create new or use existing
+   - **Name**: `football-league-frontend` (must be globally unique)
+   - **Hosting plan**: Free
+   - **Region**: Choose closest to you
+5. **Deployment details** tab:
+   - **Source**: GitHub
+   - **GitHub account**: Connect your GitHub account
+   - **Organization**: Your GitHub username
+   - **Repository**: `FootballLeagueApi`
+   - **Branch**: `main`
+   - **Build Presets**: React
+   - **App location**: `frontend`
+   - **Api location**: Leave blank (backend is separate)
+   - **Output location**: `dist`
+6. Click **Review + create** then **Create**
+
+### Backend App Service (football-league-backend)
 
 1. Go to [Azure Portal](https://portal.azure.com)
 2. Click **Create a resource**
@@ -20,39 +43,27 @@ This project is configured to deploy automatically to Azure App Service when you
 4. Click **Create**
 5. **Basics** tab:
    - **Subscription**: Your Azure subscription
-   - **Resource Group**: Create new or use existing
-   - **Name**: `football-league-frontend` (must be globally unique)
+   - **Resource Group**: Use same as frontend
+   - **Name**: `football-league-backend` (must be globally unique)
    - **Publish**: Code
-   - **Runtime stack**: Node 22 LTS
+   - **Runtime stack**: .NET 8 (LTS)
    - **Operating System**: Linux
-   - **Region**: Choose closest to you
+   - **Region**: Same as frontend
 6. **App Service Plan**:
    - Create new plan or use existing (Free tier available)
 7. Click **Review + create** then **Create**
 
-### Backend App Service (football-league-backend)
+## Step 2: Get Deployment Credentials
 
-1. Repeat the above steps for the backend
-2. **Basics** tab:
-   - **Name**: `football-league-backend` (must be globally unique)
-   - **Runtime stack**: .NET 8 (LTS)
-   - **Operating System**: Linux
+### Frontend Deployment Token (football-league-frontend)
 
-## Step 2: Get Publish Profiles
-
-For Azure App Service deployment, you need publish profiles (not deployment tokens):
-
-### Frontend Publish Profile (football-league-frontend)
-
-1. Go to your **Azure App Service** resource named `football-league-frontend`
-2. Click **Deployment Center** in the left sidebar
-3. Click **FTPS credentials** tab
-4. Click **Download publish profile**
-5. Save the `.PublishSettings` file
+1. Go to your **Azure Static Web App** resource named `football-league-frontend`
+2. Click **Deployment token** in the left sidebar
+3. Click **Copy** to get the deployment token
 
 ### Backend Publish Profile (football-league-backend)
 
-1. Go to your **Azure App Service** resource for the backend
+1. Go to your **Azure App Service** resource named `football-league-backend`
 2. Click **Deployment Center** in the left sidebar
 3. Click **FTPS credentials** tab
 4. Click **Download publish profile**
@@ -66,10 +77,10 @@ In your GitHub repository:
 2. Click **New repository secret**
 3. Add these secrets:
 
-### Secret 1: AZURE_WEBAPP_PUBLISH_PROFILE
+### Secret 1: AZURE_STATIC_WEB_APPS_API_TOKEN
 
-- **Name**: `AZURE_WEBAPP_PUBLISH_PROFILE`
-- **Value**: Open the frontend `.PublishSettings` file and copy the entire XML content
+- **Name**: `AZURE_STATIC_WEB_APPS_API_TOKEN`
+- **Value**: Paste the deployment token you copied from the Static Web App
 - Click **Add secret**
 
 ### Secret 2: AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND
@@ -78,27 +89,28 @@ In your GitHub repository:
 - **Value**: Open the backend `.PublishSettings` file and copy the entire XML content
 - Click **Add secret**
 
-### Secret 3: AZURE_VITE_API_BASE_URL
-
-- **Name**: `AZURE_VITE_API_BASE_URL`
-- **Value**: Your backend API URL
-  - Production: `https://your-backend-app-service.azurewebsites.net`
+- **Value**: Your backend API URL (e.g., `https://football-league-backend.azurewebsites.net`)
 - Click **Add secret**
 
-## Step 4: Configure Azure Environment
+## Step 4: Configure Environment Variables
 
-In Azure Portal > Your Frontend App Service (`football-league-frontend`) > Configuration:
+### Frontend Environment Variables (Azure Static Web Apps)
 
-1. Click **Configuration**
-2. Under **Application settings**, click **Add**
+In Azure Portal > Your Static Web App (`football-league-frontend`) > Configuration:
+
+1. Click **Environment variables**
+2. Click **Add**
 3. Name: `VITE_API_BASE_URL`
-4. Value: Your backend API URL (production URL)
+4. Value: Your backend API URL (e.g., `https://football-league-backend.azurewebsites.net`)
 5. Click **Save**
 
-In Azure Portal > Your Backend App Service > Configuration:
+### Backend Environment Variables (Azure App Service)
 
-1. Add any environment variables your backend needs (database connection strings, etc.)
-2. Make sure CORS allows requests from your frontend URL
+In Azure Portal > Your Backend App Service (`football-league-backend`) > Configuration:
+
+1. Under **Application settings**, click **Add**
+2. Add any environment variables your backend needs (database connection strings, etc.)
+3. Make sure CORS allows requests from your frontend URL (add the Static Web App URL to allowed origins)
 
 ## Step 5: Deploy
 
@@ -146,7 +158,7 @@ Check logs:
 
 Common issues:
 
-- Missing `AZURE_STATIC_WEB_APPS_TOKEN` secret
+- Missing `AZURE_STATIC_WEB_APPS_API_TOKEN` secret
 - Build output location not set to `dist`
 - Node version incompatibility
 
@@ -222,14 +234,15 @@ Azure Portal > Deployments > Select previous deployment > Redeploy
 
 ## Quick Reference
 
-| Task              | Location                                          |
-| ----------------- | ------------------------------------------------- |
-| Deployment status | GitHub Actions tab                                |
-| Frontend App URL  | Azure Portal > App Service > Browse                |
-| Backend API URL   | Azure Portal > App Service > Browse                |
-| Publish Profile   | Azure Portal > App Service > Deployment Center    |
-| GitHub secrets    | GitHub Settings > Secrets and variables           |
-| Custom domain     | Azure Portal > Custom domains                     |
+| Task              | Location                                         |
+| ----------------- | ------------------------------------------------ |
+| Deployment status | GitHub Actions tab                               |
+| Frontend App URL  | Azure Portal > Static Web App > Browse           |
+| Backend API URL   | Azure Portal > App Service > Browse              |
+| Deployment Token  | Azure Portal > Static Web App > Deployment token |
+| Publish Profile   | Azure Portal > App Service > Deployment Center   |
+| GitHub secrets    | GitHub Settings > Secrets and variables          |
+| Custom domain     | Azure Portal > Custom domains                    |
 
 ## Support
 
