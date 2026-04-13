@@ -1,57 +1,64 @@
-# Deployment Instructions - Azure Static Web Apps
+# Deployment Instructions - Azure App Service
 
 ## Overview
 
-This project is configured to deploy automatically to Azure Static Web Apps when you push to the `main` branch.
+This project is configured to deploy automatically to Azure App Service when you push to the `main` branch.
 
 ## Prerequisites
 
 1. **Azure Subscription** - Create free account at https://azure.microsoft.com/free
-2. **Azure Static Web Apps Resource** - Set up in Azure Portal
-3. **GitHub Repository** - This repo with deployment workflow
+2. **Azure App Service Resources** - Frontend and backend App Services created in Azure Portal
+3. **GitHub Repository** - This repo with deployment workflows
 
-## Step 1: Create Azure Static Web Apps Resource
+## Step 1: Create Azure App Service Resources
 
-### Using Azure Portal (easiest for beginners)
+### Frontend App Service (football-league-frontend)
 
 1. Go to [Azure Portal](https://portal.azure.com)
 2. Click **Create a resource**
-3. Search for **"Static Web Apps"**
+3. Search for **"Web App"**
 4. Click **Create**
+5. **Basics** tab:
+   - **Subscription**: Your Azure subscription
+   - **Resource Group**: Create new or use existing
+   - **Name**: `football-league-frontend` (must be globally unique)
+   - **Publish**: Code
+   - **Runtime stack**: Node 22 LTS
+   - **Operating System**: Linux
+   - **Region**: Choose closest to you
+6. **App Service Plan**:
+   - Create new plan or use existing (Free tier available)
+7. Click **Review + create** then **Create**
 
-### Configure Resource:
+### Backend App Service (football-league-backend)
 
-- **Subscription**: Select your subscription
-- **Resource Group**: Create new (e.g., `football-league-rg`)
-- **Name**: `football-league-frontend`
-- **Plan**: Free (sufficient for coursework)
-- **Region**: UK South (or closest to you)
+1. Repeat the above steps for the backend
+2. **Basics** tab:
+   - **Name**: `football-league-backend` (must be globally unique)
+   - **Runtime stack**: .NET 8 (LTS)
+   - **Operating System**: Linux
 
-## Step 2: Configure GitHub Integration
+## Step 2: Get Publish Profiles
 
-During **Static Web Apps** creation, you'll connect it to GitHub:
+For Azure App Service deployment, you need publish profiles (not deployment tokens):
 
-1. **Source Control**: GitHub
-2. **Sign in** with your GitHub account
-3. **Organization**: larajp0812
-4. **Repository**: FootballLeagueApi
-5. **Branch**: main
-6. **Build Presets**: Custom
-7. **App location**: `frontend`
-8. **API location**: (Leave empty)
-9. **Build output location**: `dist`
+### Frontend Publish Profile (football-league-frontend)
 
-Azure will automatically create a workflow file in `.github/workflows/`.
+1. Go to your **Azure App Service** resource named `football-league-frontend`
+2. Click **Deployment Center** in the left sidebar
+3. Click **FTPS credentials** tab
+4. Click **Download publish profile**
+5. Save the `.PublishSettings` file
 
-## Step 3: Get Deployment Token
+### Backend Publish Profile (football-league-backend)
 
-After Azure Static Web Apps is created:
+1. Go to your **Azure App Service** resource for the backend
+2. Click **Deployment Center** in the left sidebar
+3. Click **FTPS credentials** tab
+4. Click **Download publish profile**
+5. Save the `.PublishSettings` file
 
-1. Go to your Static Web App resource in Azure Portal
-2. Click **Deployment tokens** in the left sidebar
-3. Copy the token value
-
-## Step 4: Add GitHub Secrets
+## Step 3: Add GitHub Secrets
 
 In your GitHub repository:
 
@@ -59,23 +66,28 @@ In your GitHub repository:
 2. Click **New repository secret**
 3. Add these secrets:
 
-### Secret 1: AZURE_STATIC_WEB_APPS_TOKEN
+### Secret 1: AZURE_WEBAPP_PUBLISH_PROFILE
 
-- **Name**: `AZURE_STATIC_WEB_APPS_TOKEN`
-- **Value**: Paste the token from Step 3
+- **Name**: `AZURE_WEBAPP_PUBLISH_PROFILE`
+- **Value**: Open the frontend `.PublishSettings` file and copy the entire XML content
 - Click **Add secret**
 
-### Secret 2: AZURE_VITE_API_BASE_URL
+### Secret 2: AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND
+
+- **Name**: `AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND`
+- **Value**: Open the backend `.PublishSettings` file and copy the entire XML content
+- Click **Add secret**
+
+### Secret 3: AZURE_VITE_API_BASE_URL
 
 - **Name**: `AZURE_VITE_API_BASE_URL`
 - **Value**: Your backend API URL
-  - Development: `https://localhost:7195`
-  - Production: `https://your-backend-api.azurewebsites.net`
+  - Production: `https://your-backend-app-service.azurewebsites.net`
 - Click **Add secret**
 
-## Step 5: Configure Azure Environment
+## Step 4: Configure Azure Environment
 
-In Azure Portal > Your Static Web App > Configuration:
+In Azure Portal > Your Frontend App Service (`football-league-frontend`) > Configuration:
 
 1. Click **Configuration**
 2. Under **Application settings**, click **Add**
@@ -83,7 +95,12 @@ In Azure Portal > Your Static Web App > Configuration:
 4. Value: Your backend API URL (production URL)
 5. Click **Save**
 
-## Step 6: Deploy
+In Azure Portal > Your Backend App Service > Configuration:
+
+1. Add any environment variables your backend needs (database connection strings, etc.)
+2. Make sure CORS allows requests from your frontend URL
+
+## Step 5: Deploy
 
 ### Automatic Deployment
 
@@ -208,9 +225,9 @@ Azure Portal > Deployments > Select previous deployment > Redeploy
 | Task              | Location                                          |
 | ----------------- | ------------------------------------------------- |
 | Deployment status | GitHub Actions tab                                |
-| App URL           | Azure Portal > Static Web App > Browse            |
-| Backend API URL   | Azure Portal > Static Web App > Configuration     |
-| Deployment token  | Azure Portal > Static Web App > Deployment tokens |
+| Frontend App URL  | Azure Portal > App Service > Browse                |
+| Backend API URL   | Azure Portal > App Service > Browse                |
+| Publish Profile   | Azure Portal > App Service > Deployment Center    |
 | GitHub secrets    | GitHub Settings > Secrets and variables           |
 | Custom domain     | Azure Portal > Custom domains                     |
 
