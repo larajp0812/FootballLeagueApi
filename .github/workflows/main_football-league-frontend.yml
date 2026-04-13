@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '22.x'
+          node-version: "22.x"
 
       - name: Install frontend dependencies
         run: |
@@ -41,4 +41,3 @@ jobs:
           api_location: ""
           app_artifact_location: "frontend/dist"
           skip_app_build: true
-          
