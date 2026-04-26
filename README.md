@@ -141,8 +141,6 @@ If the connection string is not set, telemetry export is effectively disabled.
   }
 ```
 
-> Security note: do not commit real secrets. Prefer environment variables or user secrets for sensitive values.
-
 ## Authentication & Authorization
 
 - `POST /api/auth/register` registers a user and returns JWT token
