@@ -31,7 +31,6 @@ function LoginPage() {
   return (
     <PageContainer
       title="Login"
-      subtitle="Sign in to access protected CRUD endpoints from your .NET API"
       className="app-page auth-page"
       titleClassName="text-light text-center"
     >

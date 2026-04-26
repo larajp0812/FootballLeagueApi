@@ -57,7 +57,6 @@ function DashboardPage() {
   return (
     <PageContainer
       title="League Management Hub"
-      subtitle="Manage teams, players, fixtures, and league operations"
       titleClassName="text-white"
       subtitleClassName="text-light"
     >

@@ -196,7 +196,6 @@ function MatchesPage() {
   return (
     <PageContainer
       title="Matches"
-      subtitle="CRUD module integrated with /api/matches endpoints"
       className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
@@ -442,6 +441,7 @@ function MatchesPage() {
       ) : null}
     </PageContainer>
   );
+
 }
 
 export default MatchesPage;

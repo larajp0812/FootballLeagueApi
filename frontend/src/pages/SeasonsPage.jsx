@@ -143,7 +143,6 @@ function SeasonsPage() {
   return (
     <PageContainer
       title="Seasons"
-      subtitle="CRUD module integrated with /api/seasons endpoints"
       className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
@@ -306,6 +305,7 @@ function SeasonsPage() {
       ) : null}
     </PageContainer>
   );
+
 }
 
 export default SeasonsPage;

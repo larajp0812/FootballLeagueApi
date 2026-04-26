@@ -43,7 +43,6 @@ function ForgotPasswordPage() {
   return (
     <PageContainer
       title="Forgot Password"
-      subtitle="Request a secure password reset link"
       className="app-page auth-page"
       titleClassName="text-light text-center"
     >

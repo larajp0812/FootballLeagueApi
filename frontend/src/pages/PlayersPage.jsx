@@ -179,7 +179,6 @@ function PlayersPage() {
   return (
     <PageContainer
       title="Players"
-      subtitle="CRUD module integrated with /api/players endpoints"
       className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
@@ -419,6 +418,7 @@ function PlayersPage() {
       ) : null}
     </PageContainer>
   );
+
 }
 
 export default PlayersPage;

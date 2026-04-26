@@ -52,7 +52,6 @@ function ResetPasswordPage() {
   return (
     <PageContainer
       title="Reset Password"
-      subtitle="Set a new password for your account"
       className="app-page auth-page"
       titleClassName="text-light text-center"
     >

@@ -136,7 +136,6 @@ function TeamsPage() {
   return (
     <PageContainer
       title="Teams"
-      subtitle="CRUD module integrated with /api/teams endpoints"
       className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
@@ -307,6 +306,7 @@ function TeamsPage() {
       ) : null}
     </PageContainer>
   );
+
 }
 
 export default TeamsPage;

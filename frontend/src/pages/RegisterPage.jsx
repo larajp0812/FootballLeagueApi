@@ -26,7 +26,6 @@ function RegisterPage() {
   return (
     <PageContainer
       title="Register"
-      subtitle="Create an account and confirm your email before first login"
       className="app-page auth-page"
       titleClassName="text-light text-center"
     >

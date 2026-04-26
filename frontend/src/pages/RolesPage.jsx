@@ -139,7 +139,6 @@ function RolesPage() {
     return (
       <PageContainer
         title="Roles"
-        subtitle="Admin role management integrated with /api/roles endpoints"
         className="app-page"
       >
         <Alert variant="warning" className="mb-0">
@@ -153,7 +152,6 @@ function RolesPage() {
   return (
     <PageContainer
       title="Roles"
-      subtitle="Admin role management integrated with /api/roles endpoints"
       className="app-page"
     >
       <ErrorAlert message={error} onClose={() => setError("")} />
@@ -328,6 +326,7 @@ function RolesPage() {
       </Tabs>
     </PageContainer>
   );
+
 }
 
 export default RolesPage;
