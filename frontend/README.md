@@ -55,6 +55,12 @@ VITE_API_BASE_URL=https://localhost:5240
 
 The frontend will default to `https://localhost:5240` if no environment variable is set.
 
+For production builds, set `VITE_API_BASE_URL` to your deployed API host (no `/swagger` path), for example:
+
+```env
+VITE_API_BASE_URL=https://ljp-football-league-avh9c5h2gcawctcv.canadacentral-01.azurewebsites.net
+```
+
 ## Development
 
 Start the development server:
@@ -213,52 +219,6 @@ When contributing to this project:
 4. Use meaningful commit messages
 5. Keep components focused and reusable
 
-## Rubric Compliance (CW2 - 100 Marks)
-
-### Project Setup & Architecture (10 Marks)
-
-- ✅ Proper folder structure with components, pages, services, contexts, hooks
-- ✅ Environment configuration via `.env` and `VITE_API_BASE_URL`
-- ✅ Global state management using React Context API for authentication
-
-### API Consumption (15 Marks)
-
-- ✅ Full backend API integration (CRUD operations, authentication, roles, standings)
-- ✅ Comprehensive error handling with `ErrorAlert` component
-- ✅ Loading and error states throughout the application
-
-### UI Development & Responsiveness (20 Marks)
-
-- ✅ Responsive design using Bootstrap and React-Bootstrap
-- ✅ Mobile-optimized interfaces with collapsible navigation
-- ✅ Clean, user-friendly UI with functional components
-
-### Component Reusability & Code Quality (15 Marks)
-
-- ✅ Reusable components: `PageContainer`, `ProtectedRoute`, `LoadingState`, `ErrorAlert`
-- ✅ Separation of concerns between UI and API logic
-- ✅ Well-organized component structure
-
-### React Best Practices (20 Marks)
-
-- ✅ Proper separation of UI, logic, and state management
-- ✅ Avoided prop drilling using Context API
-- ✅ React Router for single-page navigation
-
-### Testing & Debugging (10 Marks)
-
-- ✅ Unit tests configured with Vitest and React Testing Library
-- ✅ Baseline test structure in place
-
-### Deployment & Hosting (5 Marks)
-
-- ⏳ Cloud deployment to Netlify/Vercel/Azure pending
-
-### Version Control & GitHub Usage (5 Marks)
-
-- ✅ Clean git history with meaningful commits
-- ✅ Project properly organized in GitHub repository
-
 ## Related Documentation
 
 - [Backend API README](../README.md)
@@ -267,14 +227,12 @@ When contributing to this project:
 - [Bootstrap Documentation](https://react-bootstrap.github.io)
 - [Vite Documentation](https://vitejs.dev)
 
+## Azure Static Web Apps Notes
+
+- If you use a strict Content Security Policy, ensure `connect-src` allows your API host.
+- In this project, CSP is configured in `staticwebapp.config.json`.
+- After configuration changes, redeploy and hard-refresh the browser to pick up updated headers.
+
 ## License
 
-This project is part of the Web Application Development coursework (7SENG014W).
-
-- **Testing & Debugging**
-  - Frontend unit tests via Vitest + React Testing Library
-  - Backend tests included in root project (`/Tests`) for API/service validation
-
-- **Version Control & CI/CD**
-  - CI/CD workflow in root: `.github/workflows/ci-cd.yml`
-  - Structured commit history with feature and cleanup commits
+This project is provided for educational and portfolio purposes.
