@@ -158,7 +158,7 @@ frontend/
 
 The frontend consumes the following backend API endpoints:
 
-- **Authentication**: `/api/auth/login`, `/api/auth/register`, `/api/auth/forgot-password`, `/api/auth/reset-password`
+- **Authentication**: `/api/auth/login`, `/api/auth/register`, `/api/auth/refresh`, `/api/auth/forgot-password`, `/api/auth/reset-password`, `/api/auth/confirm-email`
 - **Teams**: `GET/POST/PUT/DELETE /api/teams`
 - **Players**: `GET/POST/PUT/DELETE /api/players`
 - **Seasons**: `GET/POST/PUT/DELETE /api/seasons`
@@ -232,6 +232,20 @@ When contributing to this project:
 - If you use a strict Content Security Policy, ensure `connect-src` allows your API host.
 - In this project, CSP is configured in `staticwebapp.config.json`.
 - After configuration changes, redeploy and hard-refresh the browser to pick up updated headers.
+
+## Submission Evidence Checklist
+
+Use this checklist before submission and viva:
+
+- Build passes: `npm run build`
+- Tests pass: `npm test`
+- Lint passes: `npm run lint`
+- API base URL configured for production (`VITE_API_BASE_URL`)
+- Mobile and laptop screenshots captured for key pages (Dashboard, Teams, Players, Matches, Login)
+- Authentication flow demonstrated (register -> confirm email -> login)
+- Session restore and token refresh demonstrated
+- Error/loading states demonstrated on at least one CRUD page
+- GitHub repository contains clean README and setup steps
 
 ## License
 
