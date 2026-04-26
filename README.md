@@ -1,8 +1,11 @@
-# Football League API
+# Football League Platform
 
-Football League API is a .NET 8 REST backend for managing teams, players, seasons, venues, matches, and match events.
+Football League Platform is a full-stack application with:
 
-It follows a layered architecture with Controllers, Services, and Repositories, and uses Entity Framework Core with SQLite.
+- A .NET 8 REST backend API for managing teams, players, seasons, venues, matches, and match events
+- A React single-page frontend that consumes the backend API for authentication, CRUD workflows, standings, and role administration
+
+The backend follows a layered architecture with Controllers, Services, and Repositories, and uses Entity Framework Core with SQLite.
 
 ## Highlights
 
@@ -18,6 +21,8 @@ It follows a layered architecture with Controllers, Services, and Repositories, 
 - Swagger/OpenAPI documentation
 - Unit tests using xUnit + Moq
 - Docker multi-stage build
+- React frontend with route-based SPA navigation
+- Frontend unit tests using Vitest + React Testing Library
 
 ## Tech Stack
 
@@ -28,6 +33,11 @@ It follows a layered architecture with Controllers, Services, and Repositories, 
 - JWT Bearer Authentication
 - Swashbuckle (Swagger)
 - xUnit + Moq
+- React 19
+- React Router 7
+- React Bootstrap 2
+- Vite 7
+- Vitest 4
 
 ## Project Structure
 
@@ -41,6 +51,7 @@ Data/          DbContext and EF configuration
 Migrations/    EF Core migrations
 Middleware/    Cross-cutting concerns
 Tests/         Unit tests
+frontend/      React SPA client application
 ```
 
 ## Getting Started
@@ -48,32 +59,36 @@ Tests/         Unit tests
 ### Prerequisites
 
 - .NET SDK 8.0+
+- Node.js 18+
+- npm 9+
 - (Optional) Docker
 
 ### Run Locally
 
-1. Restore packages
+1. Start the backend API
 
    ```bash
    dotnet restore
-   ```
-
-2. Apply migrations
-
-   ```bash
    dotnet ef database update
-   ```
-
-3. Build and run
-
-   ```bash
    dotnet build
    dotnet run
    ```
 
+2. Start the frontend app (in a second terminal)
+
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
+
 Swagger UI is available at:
 
 - `https://localhost:5240/swagger` (or your launch profile HTTPS port)
+
+Frontend app is available at:
+
+- `http://localhost:5173`
 
 ## Configuration
 
