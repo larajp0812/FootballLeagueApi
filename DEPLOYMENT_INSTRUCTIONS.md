@@ -179,7 +179,7 @@ Common issues:
 ### Development
 
 ```
-VITE_API_BASE_URL=https://localhost:7195
+VITE_API_BASE_URL=https://localhost:5240
 ```
 
 ### Production (Azure)

@@ -27,7 +27,7 @@ A modern React single-page application (SPA) that provides a web interface for m
 
 - Node.js >= 18.x
 - npm >= 9.x
-- The backend API running on `https://localhost:7195` (see backend README for setup)
+- The backend API running on `https://localhost:5240` (see backend README for setup)
 
 ## Installation
 
@@ -50,10 +50,10 @@ npm install
 Create a `.env.local` file in the frontend directory (optional - defaults are provided):
 
 ```env
-VITE_API_BASE_URL=https://localhost:7195
+VITE_API_BASE_URL=https://localhost:5240
 ```
 
-The frontend will default to `https://localhost:7195` if no environment variable is set.
+The frontend will default to `https://localhost:5240` if no environment variable is set.
 
 ## Development
 

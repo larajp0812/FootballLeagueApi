@@ -4,7 +4,7 @@
  * @type {string}
  */
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "https://localhost:7195";
+  import.meta.env.VITE_API_BASE_URL ?? "https://localhost:5240";
 
 const tokenStorageKey = "football_token";
 const roleStorageKey = "football_role";
