@@ -1,11 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { loginUser, registerUser } from "../services/authService";
+import { loginUser, refreshAuthToken, registerUser } from "../services/authService";
 
 export const AuthContext = createContext(null);
 
 const tokenStorageKey = "football_token";
 const roleStorageKey = "football_role";
+const refreshTokenStorageKey = "football_refresh_token";
+const userEmailStorageKey = "football_user_email";
 const unauthorizedEventName = "auth:unauthorized";
 
 /**
@@ -80,9 +82,56 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let isActive = true;
+
+    async function restoreSession() {
+      const existingToken = localStorage.getItem(tokenStorageKey);
+      const savedRefreshToken = localStorage.getItem(refreshTokenStorageKey);
+      const savedEmail = localStorage.getItem(userEmailStorageKey);
+
+      if (!existingToken || !savedRefreshToken || !savedEmail) {
+        return;
+      }
+
+      try {
+        const refreshed = await refreshAuthToken({
+          email: savedEmail,
+          refreshToken: savedRefreshToken,
+        });
+
+        if (!isActive) {
+          return;
+        }
+
+        if (refreshed?.token) {
+          setToken(refreshed.token);
+        }
+
+        if (refreshed?.refreshToken) {
+          localStorage.setItem(refreshTokenStorageKey, refreshed.refreshToken);
+        }
+      } catch {
+        if (!isActive) {
+          return;
+        }
+
+        setToken(null);
+      }
+    }
+
+    restoreSession();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!token) {
       localStorage.removeItem(tokenStorageKey);
       localStorage.removeItem(roleStorageKey);
+      localStorage.removeItem(refreshTokenStorageKey);
+      localStorage.removeItem(userEmailStorageKey);
       setRole("User");
       return;
     }
@@ -97,6 +146,8 @@ export function AuthProvider({ children }) {
     function handleUnauthorized() {
       setToken(null);
       setError("Session expired. Please log in again.");
+      localStorage.removeItem(refreshTokenStorageKey);
+      localStorage.removeItem(userEmailStorageKey);
     }
 
     window.addEventListener(unauthorizedEventName, handleUnauthorized);
@@ -111,8 +162,15 @@ export function AuthProvider({ children }) {
     setError("");
 
     try {
-      const response = await loginUser({ email: email.trim(), password });
+      const normalizedEmail = email.trim();
+      const response = await loginUser({ email: normalizedEmail, password });
       setToken(response.token);
+
+      if (response?.refreshToken) {
+        localStorage.setItem(refreshTokenStorageKey, response.refreshToken);
+        localStorage.setItem(userEmailStorageKey, normalizedEmail);
+      }
+
       return response;
     } catch (err) {
       setError(err.message);

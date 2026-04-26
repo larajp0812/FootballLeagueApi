@@ -62,16 +62,16 @@ export function resetPassword({ email, token, newPassword }) {
 }
 
 /**
- * Change user password when already authenticated
- * @param {Object} payload - Password change information
- * @param {string} payload.currentPassword - Current password for verification
- * @param {string} payload.newPassword - New password to set
- * @returns {Promise<Object>} Response from the server
- * @throws {Error} If current password is incorrect or password change fails
+ * Request a new access token and refresh token pair
+ * @param {Object} payload - Refresh token request payload
+ * @param {string} payload.email - User email address
+ * @param {string} payload.refreshToken - Existing refresh token
+ * @returns {Promise<Object>} New token pair and expiry details
+ * @throws {Error} If refresh token is invalid or expired
  */
-export function changePassword({ currentPassword, newPassword }) {
-  return apiRequest("/api/auth/change-password", {
+export function refreshAuthToken({ email, refreshToken }) {
+  return apiRequest("/api/auth/refresh", {
     method: "POST",
-    body: JSON.stringify({ currentPassword, newPassword }),
+    body: JSON.stringify({ email, refreshToken }),
   });
 }

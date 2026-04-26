@@ -116,19 +116,22 @@ describe("authService", () => {
     });
   });
 
-  describe("changePassword", () => {
-    it("calls apiRequest with password change data", async () => {
-      const mockResponse = { message: "Password changed successfully" };
+  describe("refreshAuthToken", () => {
+    it("calls apiRequest with refresh token data", async () => {
+      const mockResponse = {
+        token: "new-token",
+        refreshToken: "new-refresh-token",
+      };
       apiRequest.mockResolvedValue(mockResponse);
 
       const payload = {
-        currentPassword: "oldpass123",
-        newPassword: "newpass123",
+        email: "test@example.com",
+        refreshToken: "existing-refresh-token",
       };
 
-      const result = await authService.changePassword(payload);
+      const result = await authService.refreshAuthToken(payload);
 
-      expect(apiRequest).toHaveBeenCalledWith("/api/auth/change-password", {
+      expect(apiRequest).toHaveBeenCalledWith("/api/auth/refresh", {
         method: "POST",
         body: JSON.stringify(payload),
       });
