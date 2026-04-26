@@ -1,48 +1,53 @@
 import { render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { describe, expect, it } from "vitest";
 import ProtectedRoute from "./ProtectedRoute";
+import { AuthContext } from "../contexts/AuthContext";
 
-// Mock the useAuth hook
-vi.mock("../contexts/AuthContext", () => ({
-  useAuth: vi.fn(),
-}));
-
-import { useAuth } from "../contexts/AuthContext";
+function renderProtectedRoute({ isAuthenticated }) {
+  return render(
+    <AuthContext.Provider
+      value={{
+        token: isAuthenticated ? "test-token" : null,
+        role: "User",
+        isAuthenticated,
+        loading: false,
+        error: "",
+        login: async () => ({ token: "test-token" }),
+        register: async () => ({}),
+        logout: () => {},
+        clearError: () => {},
+      }}
+    >
+      <MemoryRouter initialEntries={["/protected"]}>
+        <Routes>
+          <Route
+            path="/protected"
+            element={
+              <ProtectedRoute>
+                <div>Protected Content</div>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/login" element={<div>Login Page</div>} />
+        </Routes>
+      </MemoryRouter>
+    </AuthContext.Provider>,
+  );
+}
 
 describe("ProtectedRoute", () => {
   it("renders children when user is authenticated", () => {
-    useAuth.mockReturnValue({
-      isAuthenticated: true,
-      token: "test-token",
-    });
-
-    render(
-      <BrowserRouter>
-        <ProtectedRoute>
-          <div>Protected Content</div>
-        </ProtectedRoute>
-      </BrowserRouter>,
-    );
+    renderProtectedRoute({ isAuthenticated: true });
 
     expect(screen.getByText("Protected Content")).toBeInTheDocument();
   });
 
   it("redirects to login when user is not authenticated", () => {
-    useAuth.mockReturnValue({
-      isAuthenticated: false,
-      token: null,
-    });
+    renderProtectedRoute({ isAuthenticated: false });
 
-    render(
-      <BrowserRouter>
-        <ProtectedRoute>
-          <div>Protected Content</div>
-        </ProtectedRoute>
-      </BrowserRouter>,
-    );
-
-    // When redirected, protected content should not be visible
+    // When redirected, protected content should not be visible.
     expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
+    expect(screen.getByText("Login Page")).toBeInTheDocument();
   });
 });

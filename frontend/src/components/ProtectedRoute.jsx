@@ -28,7 +28,20 @@ function ProtectedRoute({ children }) {
   const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Keep redirect state minimal to avoid accidentally nesting location objects.
+    return (
+      <Navigate
+        to="/login"
+        state={{
+          from: {
+            pathname: location.pathname,
+            search: location.search,
+            hash: location.hash,
+          },
+        }}
+        replace
+      />
+    );
   }
 
   return children;

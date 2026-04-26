@@ -25,7 +25,12 @@ function ErrorAlert({ message, onClose }) {
   if (!message) return null;
 
   return (
-    <Alert variant="danger" dismissible={Boolean(onClose)} onClose={onClose}>
+    <Alert
+      variant="danger"
+      dismissible={Boolean(onClose)}
+      onClose={onClose}
+      transition={false}
+    >
       {message}
     </Alert>
   );
