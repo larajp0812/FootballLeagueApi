@@ -116,6 +116,7 @@ export function AuthProvider({ children }) {
         }
 
         setToken(null);
+        setError("Your previous session expired. Please log in again.");
       }
     }
 
